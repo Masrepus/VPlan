@@ -1,0 +1,47 @@
+<resources>
+
+    <string name="activate_filter">Filtern</string>
+    <string name="cancel">Abbruch</string>
+    <string name="creds">Zugangsdaten</string>
+    <string name="download_finished">Herunterladen beendet</string>
+    <string name="downloading">Herunterladen…</string>
+    <string name="filter_enabled">Filter aktiv - Klicken für Details</string>
+    <string name="filter_title">Klassen/Kurse im Filter</string>
+    <string name="grade">Klasse</string>
+    <string name="k10">10. Klasse</string>
+    <string name="k5">5. Klasse</string>
+    <string name="k6">6. Klasse</string>
+    <string name="k7">7. Klasse</string>
+    <string name="k8">8. Klasse</string>
+    <string name="k9">9. Klasse</string>
+    <string name="last_update">Letztes Update:</string>
+    <string name="lesson">Stunde</string>
+    <string name="mittelstufe">Mittelstufe</string>
+    <string name="no_creds">Keine Zugangsdaten gespeichert</string>
+    <string name="no_creds_detailed">Es wurden noch keine Zugangsdaten gespeichert, willst du das jetzt tun?</string>
+    <string name="no_data">Keine Daten verfügbar; Vorgang abgebrochen</string>
+    <string name="no_data_today">Keine Daten für diesen Tag</string>
+    <string name="no_lesson">nicht verfügbar</string>
+    <string name="no_status">kein Status verfügbar</string>
+    <string name="oberstufe">Oberstufe</string>
+    <string name="ok">OK</string>
+    <string name="open_browser">Im Browser öffnen</string>
+    <string name="parsing_finished">Datenverarbeitung beendet</string>
+    <string name="published">Stand:</string>
+    <string name="pwd">Passwort</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="settings">Einstellungen</string>
+    <string name="status">Status</string>
+    <string name="still_parsing">Aktion nicht möglich! Daten werden noch verarbeitet!</string>
+    <string name="uname">Benutzername</string>
+    <string name="unterstufe">Unterstufe</string>
+    <string name="updating">Wird aktualisiert</string>
+    <string name="curr_filter">Momentan gefilterte Klassen</string>
+    <string name="no_filter">Klasse hinzufügen…</string>
+    <string name="drawer_closed">Navigationsleiste geschlossen</string>
+    <string name="drawer_open">Navigationsleiste geöffnet</string>
+    <string name="news">News</string>
+    <string name="tests">Tests</string>
+    <string name="vplan">Vertretungsplan</string>
+
+</resources>

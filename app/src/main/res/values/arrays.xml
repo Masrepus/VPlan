@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="vplan_modes">
+        <item>Unterstufe</item>
+        <item>Mittelstufe</item>
+        <item>Oberstufe</item>
+    </string-array>
+    <string-array name="grade_5">
+        <item>5A</item>
+        <item>5B</item>
+        <item>5C</item>
+        <item>5D</item>
+    </string-array>
+    <string-array name="grade_6">
+        <item>6A</item>
+        <item>6B</item>
+        <item>6C</item>
+        <item>6D</item>
+    </string-array>
+    <string-array name="grade_7">
+        <item>7A</item>
+        <item>7B</item>
+        <item>7C</item>
+        <item>7D</item>
+    </string-array>
+    <string-array name="grade_8">
+        <item>8A</item>
+        <item>8B</item>
+        <item>8C</item>
+        <item>8D</item>
+    </string-array>
+    <string-array name="grade_9">
+        <item>9A</item>
+        <item>9B</item>
+        <item>9C</item>
+        <item>9D</item>
+    </string-array>
+    <string-array name="grade_10">
+        <item>10A</item>
+        <item>10B</item>
+        <item>10C</item>
+        <item>10D</item>
+    </string-array>
+</resources>

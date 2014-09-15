@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/creds"
+        android:key="pref_key_creds">
+        <EditTextPreference
+            android:title="@string/uname"
+            android:key="@string/key_uname"
+            android:defaultValue="" />
+        <EditTextPreference
+            android:title="@string/pwd"
+            android:key="@string/key_pwd"
+            android:password="true"
+            android:defaultValue="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/filter_title">
+        <PreferenceScreen
+            android:title="@string/unterstufe"
+            android:key="@string/button_filter_unterstufe_key"
+            android:persistent="false">
+            <MultiSelectListPreference
+                android:title="@string/k5"
+                android:key="@string/key_grade5"
+                android:entries="@array/grade_5"
+                android:entryValues="@array/grade_5"/>
+            <MultiSelectListPreference
+                android:title="@string/k6"
+                android:key="@string/key_grade6"
+                android:entries="@array/grade_6"
+                android:entryValues="@array/grade_6"/>
+            <MultiSelectListPreference
+                android:title="@string/k7"
+                android:key="@string/key_grade7"
+                android:entries="@array/grade_7"
+                android:entryValues="@array/grade_7"/>
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="@string/mittelstufe"
+            android:key="button_filter_unterstufe_key"
+            android:persistent="false">
+            <MultiSelectListPreference
+                android:title="@string/k8"
+                android:key="pref_key_grade8"
+                android:entries="@array/grade_8"
+                android:entryValues="@array/grade_8"/>
+            <MultiSelectListPreference
+                android:title="@string/k9"
+                android:key="pref_key_grade9"
+                android:entries="@array/grade_9"
+                android:entryValues="@array/grade_9"/>
+            <MultiSelectListPreference
+                android:title="@string/k10"
+                android:key="pref_key_grade10"
+                android:entries="@array/grade_10"
+                android:entryValues="@array/grade_10"/>
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="@string/oberstufe"
+            android:key="button_filter_oberstufe_key"
+            android:persistent="false">
+            <EditTextPreference
+                android:title="@string/k11"
+                android:key="@string/key_grade11" />
+            <EditTextPreference
+                android:title="@string/k12"
+                android:key="@string/key_grade12" />
+            </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

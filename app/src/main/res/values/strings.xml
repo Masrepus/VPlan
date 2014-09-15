@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, MainActivity!</string>
+    <string name="app_name">Vetretungsplan</string>
+	<string name="no_lesson">not available</string>
+	<string name="all_grades">all grades</string>
+	<string name="no_status">no status available</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="headingListview">Vertretungsplan:</string>
+    <string name="grade">Grade</string>
+    <string name="lesson">Lesson</string>
+    <string name="status">Status</string>
+    <string name="last_update">Last update:</string>
+    <string name="download_finished">Finished downloading</string>
+    <string name="parsing_finished">Finished parsing</string>
+    <string name="err_getBytes" translatable="false">Error during getBytes from credentials</string>
+    <string name="err_decryptPW" translatable="false">Exception while decrypting pwd</string>
+    <string name="err_decryptUname" translatable="false">Exception while decrypting uname</string>
+    <string name="err_encryptCredentials" translatable="false">Exception while encrypting uname/pwd</string>
+    <string name="downloading">Downloading…</string>
+    <string name="no_data">No data available; operation cancelled</string>
+    <string name="refresh">refresh</string><string name="still_parsing">Action not available!
+ Parsing of data still in progress!</string>
+    <string name="vplan_base_url" translatable="false">http://app.schyren-gymnasium.de:80/</string>
+    <string name="vplan_base_cred" translatable="false">app.schyren-gymnasium.de:80/</string>
+    <string name="no_data_today">no data for this day</string>
+    <string name="settings">Settings</string>
+    <string name="unterstufe">Unterstufe</string>
+    <string name="mittelstufe">Mittelstufe</string>
+    <string name="oberstufe">Oberstufe</string>
+    <string name="open_browser">Open in web browser</string>
+    <string name="drawer_open">navigation drawer open</string>
+    <string name="drawer_closed">navigation drawer closed</string>
+    <string name="sgp" translatable="false">Schyren-Gymnasium</string>
+    <string name="updating">Updating</string>
+    <string name="published">published:</string>
+    <string name="creds">Credentials</string>
+    <string name="uname">Username</string>
+    <string name="pwd">Password</string>
+    <string name="k5">Grade 5</string>
+    <string name="k6">Grade 6</string>
+    <string name="k7">Grade 7</string>
+    <string name="k8">Grade 8</string>
+    <string name="k9">Grade 9</string>
+    <string name="k10">Grade 10</string>
+    <string name="k11" translatable="false">Q 11</string>
+    <string name="k12" translatable="false">Q 12</string>
+    <string name="filter_title">Classes/courses to filter</string>
+    <string name="key_uname" translatable="false">pref_uname</string>
+    <string name="key_pwd" translatable="false">pref_pwd</string>
+    <string name="button_filter_unterstufe_key" translatable="false">button_filter_unterstufe_key</string>
+    <string name="key_grade5" translatable="false">pref_key_grade5</string>
+    <string name="key_grade6" translatable="false">pref_key_grade6</string>
+    <string name="key_grade7" translatable="false">pref_key_grade7</string>
+    <string name="key_grade8" translatable="false">pref_key_grade8</string>
+    <string name="key_grade9" translatable="false">pref_key_grade9</string>
+    <string name="key_grade10" translatable="false">pref_key_grade10</string>
+    <string name="key_grade11" translatable="false">pref_key_grade11</string>
+    <string name="key_grade12" translatable="false">pref_key_grade12</string>
+    <string name="no_creds">No credentials saved</string>
+    <string name="no_creds_detailed">No credentials were saved yet, do you want to do this now?</string>
+    <string name="activate_filter">Apply filter</string>
+    <string name="filter_enabled">Filter enabled - Click for details</string>
+    <string name="curr_filter">Currently filtered classes</string>
+    <string name="no_filter">Add class…</string>
+    <string name="tests">Tests</string>
+    <string name="vplan">Vertretungsplan</string>
+
+</resources>
