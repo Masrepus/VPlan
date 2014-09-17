@@ -84,6 +84,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public ArrayList<String> filterMittelstufe = new ArrayList<String>();
     public ArrayList<String> filterOberstufe = new ArrayList<String>();
     private String[] keys = new String[8];
+    private String currentVPlanLink;
 
     /**
      * Called when the activity is first created.
@@ -116,7 +117,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             appInfo.setText("Fehler");
         }
 
-        updateAvailableFilesList();
         refreshFilters();
 
         //activate adapter for viewPager
@@ -414,90 +414,53 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             //we are online
 
             //encode uname and pw for http post
-            /**String text = getString(R.string.credentials);
-             byte[] data = null;
-             try {
-             data = text.getBytes("UTF-8");
-             } catch (UnsupportedOperationException e) {
-             e.printStackTrace();
-             Log.e(getPackageName(), getString(R.string.err_getBytes));
-             } catch (UnsupportedEncodingException e) {
-             e.printStackTrace();
-             Log.e(getPackageName(), getString(R.string.err_getBytes));
-             }
-             String encoding = Base64.encodeToString(data, Base64.DEFAULT);
+            String encoding = encodeCredentials();
 
-             Document doc = null;
-             try {
-             doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
-             } catch (IOException e) {
-             e.printStackTrace();
-             }*/
-            File sdcard = Environment.getExternalStorageDirectory();
-            File file = null;
-            switch (requestedVplanId) {
-                case 0:
-                    file = new File(sdcard, "tempVplan.txt");
-                    break;
-                case 1:
-                    file = new File(sdcard, "tempVplan1.txt");
-                    break;
-                case 2:
-                    file = new File(sdcard, "tempVplan2.txt");
-                    break;
-            }
-            StringBuilder tempText = new StringBuilder();
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(file));
-                String line;
+            if (encoding != null) {
 
-                while ((line = br.readLine()) != null) {
-                    tempText.append(line);
-                    tempText.append('\n');
-                }
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(getPackageName(), "Error while reading file");
-            }
-
-            Document doc = Jsoup.parse(tempText.toString());
-
-            if (doc != null) {
-
-                //tempContent contains all found tables
-                Elements tempContent = doc.select("table[class=hyphenate]");
-                //first table is the wanted one for available files list
-                Elements availableFiles;
-
+                Document doc = null;
                 try {
-                    availableFiles = tempContent.get(0).children().first().children();
-                } catch (Exception e) {
-                    availableFiles = null;
+                    doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-                //db input of available files + url's
-                if (availableFiles != null) {
+                if (doc != null) {
 
-                    int position = 0;
-                    datasource.open();
-                    datasource.newTable(MySQLiteHelper.TABLE_LINKS);
+                    //tempContent contains all found tables
+                    Elements tempContent = doc.select("table[class=hyphenate]");
+                    //first table is the wanted one for available files list
+                    Elements availableFiles;
 
-                    //now distribute the contents of availableFiles into a new list for the selection spinner
-                    for (Element row : availableFiles) {
-                        String url;
-                        String tag;
-
-                        tag = row.child(0).text();
-                        url = row.child(0).child(0).attributes().get("href");
-
-                        //sql insert
-                        datasource.createRowLinks(position, tag, url);
-
-                        position++;
+                    try {
+                        availableFiles = tempContent.get(0).child(0).children();
+                    } catch (Exception e) {
+                        availableFiles = null;
                     }
 
-                    datasource.close();
+                    //db input of available files + url's
+                    if (availableFiles != null) {
+
+                        int position = 0;
+                        datasource.open();
+                        datasource.newTable(MySQLiteHelper.TABLE_LINKS);
+
+                        //now distribute the contents of availableFiles into a new list for the selection spinner
+                        for (Element row : availableFiles) {
+                            String url;
+                            String tag;
+
+                            tag = row.child(0).text();
+                            url = row.child(0).child(0).attributes().get("href");
+
+                            //sql insert
+                            datasource.createRowLinks(position, tag, url);
+
+                            position++;
+                        }
+
+                        datasource.close();
+                    }
                 }
             }
         }
@@ -539,6 +502,10 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         // depending on the version requested return the appropriate string, optionally with credentials inside header
         String vplanBase;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat day = new SimpleDateFormat("dd");
+        SimpleDateFormat month = new SimpleDateFormat("MM");
+        SimpleDateFormat year = new SimpleDateFormat("yyyy");
         if (includeCredentials) {
 
             //uname and pwd are stored in settings sharedprefs
@@ -550,18 +517,24 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         } else {
             vplanBase = getString(R.string.vplan_base_url);
         }
+
+        String url = "";
         switch (version) {
             case BASIC:
                 return vplanBase;
             case UINFO:
-                return vplanBase + "pw/" + "urekursiv.php";
+                url = vplanBase + "pw/" + "urekursiv.php";
             case MINFO:
-                return vplanBase + "pw/" + "mrekursiv.php";
+                url = vplanBase + "pw/" + "mrekursiv.php";
             case OINFO:
-                return vplanBase + "oinfo/" + "srekursiv.php";
-            default:
-                return vplanBase;
+                url = vplanBase + "oinfo/" + "srekursiv.php";
         }
+
+        if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {
+            String date = currentVPlanLink.split("_")[2];
+
+            return url + "?datei=schuelerplan_vom_" + date;
+        } else return url;
     }
 
     /**
@@ -889,6 +862,36 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     }
 
     /**
+     * Encodes the saved username and password with Base64 encoder
+     * @return the credentials as single, encoded String; null if there was any error
+     */
+    public String encodeCredentials() {
+        //encode uname and pw for http post
+        //uname and pwd are stored in settings sharedPrefs
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String uname = pref.getString(getString(R.string.key_uname), "");
+        String pwd = pref.getString(getString(R.string.key_pwd), "");
+
+        if (uname.contentEquals("") || pwd.contentEquals("")) return null;
+
+        String creds = uname + ":" + pwd;
+
+        byte[] data = null;
+        try {
+            data = creds.getBytes("UTF-8");
+        } catch (UnsupportedOperationException e) {
+            e.printStackTrace();
+            Log.e(getPackageName(), getString(R.string.err_getBytes));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            Log.e(getPackageName(), getString(R.string.err_getBytes));
+        }
+        String encoding = Base64.encodeToString(data, Base64.DEFAULT);
+
+        return encoding;
+    }
+
+    /**
      * The async task used for background-parsing of online data
      */
     private class BgParse extends AsyncTask<Context, Integer, Boolean> {
@@ -907,13 +910,18 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             this.context = context[0];
 
             //download new data and then refresh pager adapter
-                datasource.open();
-                Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
+
+            updateAvailableFilesList();
+
+            datasource.open();
+
+            Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
 
                 try {
                     while (c.moveToNext()) {
                         //load every available vplan into the db
                         requestedVplanId = c.getPosition();
+                        currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
                         parseDataToSql();
                     }
                     publishProgress(1);
@@ -1061,37 +1069,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             }
         }
 
-        /**
-         * Encodes the saved username and password with Base64 encoder
-         * @return the credentials as single, encoded String; null if there was any error
-         */
-        private String encodeCredentials() {
-            //encode uname and pw for http post
-            //uname and pwd are stored in settings sharedPrefs
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-            String uname = pref.getString(getString(R.string.key_uname), "");
-            String pwd = pref.getString(getString(R.string.key_pwd), "");
 
-            if (uname.contentEquals("") || pwd.contentEquals("")) return null;
-
-            String creds = uname + ":" + pwd;
-
-            byte[] data = null;
-            try {
-                data = creds.getBytes("UTF-8");
-            } catch (UnsupportedOperationException e) {
-                e.printStackTrace();
-                Log.e(getPackageName(), getString(R.string.err_getBytes));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                Log.e(getPackageName(), getString(R.string.err_getBytes));
-            }
-            String encoding = Base64.encodeToString(data, Base64.DEFAULT);
-
-            publishProgress(0);
-
-            return encoding;
-        }
 
         /**
          * Takes care of all the downloading and db-inserting
@@ -1104,36 +1082,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             if (encoding == null) throw new Exception("no creds available");
 
             //load vplan xhtml file and select the right table into Elements table
-            //Document doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
-            File sdcard = Environment.getExternalStorageDirectory();
-            File file = null;
-            switch (requestedVplanMode) {
-                case UINFO:
-                    file = new File(sdcard, "tempVplan.txt");
-                    break;
-                case MINFO:
-                    file = new File(sdcard, "tempVplan1.txt");
-                    break;
-                case OINFO:
-                    file = new File(sdcard, "tempVplan2.txt");
-                    break;
-            }
-            StringBuilder tempText = new StringBuilder();
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(file));
-                String line;
-
-                while ((line = br.readLine()) != null) {
-                    tempText.append(line);
-                    tempText.append('\n');
-                }
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(getPackageName(), "Error while reading file");
-            }
-
-            Document doc = Jsoup.parse(tempText.toString());
+            Document doc = Jsoup.connect(getVPlanUrl(OINFO, false)).header("Authorization", "Basic " + encoding).post();
 
             //tempContent contains all found tables
             Elements tempContent = doc.select("table[class=hyphenate]");
@@ -1143,7 +1092,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             Elements tableRows;
             Elements availableFiles;
             try {
-                tableRows = tempContent.get(1).children().first().children();
+                tableRows = tempContent.get(1).child(0).children();
             } catch (Exception e) {
                 tableRows = null;
             }
@@ -1162,7 +1111,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             }
             String currentDate = null;
             if (separated != null) {
-                currentDate = separated[2].trim();
+                if (separated.length <= 2) currentDate = separated[1].trim();
+                else currentDate = separated[2].trim();
             }
 
             //get timePublished timestamp
