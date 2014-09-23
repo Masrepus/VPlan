@@ -62,6 +62,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final String PREF_PREFIX_VPLAN_TIME_PUBLISHED = "timePublished";
     public static final String PREF_IS_FILTER_ACTIVE = "isFilterActive";
     public static final String PREF_APPMODE = "appmode";
+    public static final String PREF_TODAY_VPLAN = "todayVplan";
     private static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
@@ -73,7 +74,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final int TESTS = 1;
     private int requestedVplanMode;
     private int requestedVplanId;
-    private int currVisibleVplanId;
     private boolean isOnlineRequested;
     private VPlanDataSource datasource;
     private MenuItem refreshItem;
@@ -129,23 +129,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
         viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i2) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                //each time a new page gets selected, update currVisibleVplanId for later use
-                currVisibleVplanId = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
-            }
-        });
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
         tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
 
@@ -277,6 +260,13 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     }
 
+    private int getTodayVplanId() {
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        return prefs.getInt(PREF_TODAY_VPLAN, 0);
+
+    }
+
     /**
      * Called when one of the RadioButtons in the navigation drawer is clicked
      */
@@ -398,6 +388,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setCurrentItem(getTodayVplanId());
     }
 
     /**

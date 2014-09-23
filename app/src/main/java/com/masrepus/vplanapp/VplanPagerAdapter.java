@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by samuel on 19.08.14.
@@ -74,6 +76,16 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         //this vplan's current date is used as title
         SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         title = prefs.getString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(position), "");
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+
+        //save the position of today's vplan in shared prefs
+        if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
+            editor.apply();
+        }
 
         return title;
     }
