@@ -1163,8 +1163,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                 for (Element row : tableRows) {
 
-                    //skip the first two rows
-                    if (row.elementSiblingIndex() == 0 || row.elementSiblingIndex() == 1) continue;
 
                     String[] columns = new String[row.children().size()];
                     String stunde = null;
@@ -1194,8 +1192,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
 
                     //sql insert of all three columns, but only if they aren't all empty
-                    if (stunde != null) {
-                        if ((klasse != "Klasse")) {
+                    if (stunde != null && !klasse.contentEquals("Klasse")) {
+
                             switch (requestedVplanId) {
                                 case 0:
                                     datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
@@ -1214,7 +1212,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                                     datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
                                     break;
                             }
-                        }
+
                     }
 
                     position++;
