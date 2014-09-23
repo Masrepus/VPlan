@@ -2,4 +2,5 @@
 
 <resources>
     <item type="id" name="TAG_DAY"/>
+    <item type="id" name="TAG_VPLAN_ID"/>
 </resources>
