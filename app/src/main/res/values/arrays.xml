@@ -41,4 +41,303 @@
         <item>10C</item>
         <item>10D</item>
     </string-array>
+    <string-array name="q_11_d">
+        <item>1D1</item>
+        <item>1D2</item>
+        <item>1D3</item>
+        <item>1D4</item>
+        <item>1D5</item>
+        <item>1D6</item>
+    </string-array>
+    <string-array name="q_12_d">
+        <item>2D1</item>
+        <item>2D2</item>
+        <item>2D3</item>
+        <item>2D4</item>
+        <item>2D5</item>
+        <item>2D6</item>
+        <item>2D7</item>
+    </string-array>
+    <string-array name="q_11_m">
+        <item>1M1</item>
+        <item>1M2</item>
+        <item>1M3</item>
+        <item>1M4</item>
+        <item>1M5</item>
+        <item>1M6</item>
+    </string-array>
+    <string-array name="q_12_m">
+        <item>2M1</item>
+        <item>2M2</item>
+        <item>2M3</item>
+        <item>2M4</item>
+        <item>2M5</item>
+        <item>2M6</item>
+        <item>2M7</item>
+    </string-array>
+    <string-array name="q_11_e">
+        <item>1E1</item>
+        <item>1E2</item>
+        <item>1E3</item>
+        <item>1E4</item>
+        <item>1E5</item>
+    </string-array>
+    <string-array name="q_12_e">
+        <item>2E1</item>
+        <item>2E2</item>
+        <item>2E3</item>
+        <item>2E4</item>
+        <item>2E5</item>
+        <item>2E6</item>
+    </string-array>
+    <string-array name="q_11_r">
+        <item>1K1</item>
+        <item>1K2</item>
+        <item>1K3</item>
+        <item>1Eth</item>
+        <item>1Ev</item>
+    </string-array>
+    <string-array name="q_12_r">
+        <item>2K1</item>
+        <item>2K2</item>
+        <item>2K3</item>
+        <item>2K4</item>
+        <item>2Eth</item>
+        <item>2Ev</item>
+    </string-array>
+    <string-array name="q_11_geo">
+        <item>1Geo1</item>
+        <item>1Geo2</item>
+        <item>1Geo3</item>
+    </string-array>
+    <string-array name="q_12_geo">
+        <item>2Geo1</item>
+        <item>2Geo2</item>
+        <item>2Geo3</item>
+    </string-array>
+    <string-array name="q_11_mu">
+        <item>1Mu1</item>
+        <item>1Mu2</item>
+    </string-array>
+    <string-array name="q_12_mu">
+        <item>2Mu1</item>
+        <item>2Mu2</item>
+        <item>2MuI1</item>
+        <item>2MuI2</item>
+    </string-array>
+    <string-array name="q_11_g">
+        <item>1G1</item>
+        <item>1G2</item>
+        <item>1G3</item>
+        <item>1G4</item>
+        <item>1G5</item>
+    </string-array>
+    <string-array name="q_12_g">
+        <item>2G1</item>
+        <item>2G2</item>
+        <item>2G3</item>
+        <item>2G4</item>
+        <item>2G5</item>
+        <item>2G6</item>
+    </string-array>
+    <string-array name="q_11_ph">
+        <item>1Ph1</item>
+        <item>1Ph2</item>
+    </string-array>
+    <string-array name="q_12_ph">
+        <item>2Ph1</item>
+        <item>2Ph2</item>
+    </string-array>
+    <string-array name="q_11_ph_b">
+        <item>1PhB</item>
+    </string-array>
+    <string-array name="q_12_ph_as">
+        <item>2Ph1A</item>
+    </string-array>
+    <string-array name="q_11_ch">
+        <item>1Ch1</item>
+        <item>1Ch2</item>
+        <item>1Ch3</item>
+    </string-array>
+    <string-array name="q_12_ch">
+        <item>2Ch1</item>
+        <item>2Ch2</item>
+    </string-array>
+    <string-array name="q_11_inf">
+        <item>1Inf</item>
+    </string-array>
+    <string-array name="q_12_inf">
+        <item>2Inf</item>
+    </string-array>
+    <string-array name="q_11_w">
+        <item>1WR1</item>
+        <item>1WR2</item>
+        <item>1WR3</item>
+    </string-array>
+    <string-array name="q_12_w">
+        <item>2WR1</item>
+        <item>2WR2</item>
+        <item>2WR3</item>
+    </string-array>
+    <string-array name="q_11_ku">
+        <item>1Ku1</item>
+        <item>1Ku2</item>
+        <item>1Ku3</item>
+        <item>1Ku4</item>
+    </string-array>
+    <string-array name="q_12_ku">
+        <item>2Ku1</item>
+        <item>2Ku2</item>
+        <item>2Ku3</item>
+        <item>2Ku4</item>
+    </string-array>
+    <string-array name="q_11_f">
+        <item>1F1</item>
+        <item>1F2</item>
+    </string-array>
+    <string-array name="q_12_f">
+        <item>2F</item>
+    </string-array>
+    <string-array name="q_11_lat">
+        <item>1L</item>
+    </string-array>
+    <string-array name="q_12_lat">
+        <item>2L</item>
+    </string-array>
+    <string-array name="q_11_bio">
+        <item>1B1</item>
+        <item>1B2</item>
+        <item>1B3</item>
+    </string-array>
+    <string-array name="q_12_bio">
+        <item>2B1</item>
+        <item>2B2</item>
+        <item>2B3</item>
+    </string-array>
+    <string-array name="q_11_sk">
+        <item>1Sk1</item>
+        <item>1Sk2</item>
+        <item>1Sk3</item>
+        <item>1Sk4</item>
+        <item>1Sk5</item>
+    </string-array>
+    <string-array name="q_12_sk">
+        <item>2Sk1</item>
+        <item>2Sk2</item>
+        <item>2Sk3</item>
+        <item>2Sk4</item>
+        <item>2Sk5</item>
+        <item>2Sk6</item>
+    </string-array>
+    <string-array name="q_11_spo">
+        <item>1Smw1</item>
+        <item>1Smw2</item>
+        <item>1Smw3</item>
+        <item>1Smw4</item>
+        <item>1Smw5</item>
+        <item>1Smw6</item>
+    </string-array>
+    <string-array name="q_12_spo">
+        <item>2Smw1</item>
+        <item>2Smw2</item>
+        <item>2Smw3</item>
+        <item>2Smw4</item>
+        <item>2Smw5</item>
+        <item>2Smw6</item>
+    </string-array>
+    <string-array name="q_11_w_sem">
+        <item>1WS_B</item>
+        <item>1WS_C</item>
+        <item>1WS_D</item>
+        <item>1WS_E</item>
+        <item>1WS_F</item>
+        <item>1WS_G1</item>
+        <item>1WS_G2</item>
+        <item>1WS_Geo</item>
+        <item>1WS_PhA</item>
+        <item>1WS_Sp</item>
+    </string-array>
+    <string-array name="q_12_w_sem">
+        <item>1WS_C</item>
+        <item>1WS_E</item>
+        <item>1WS_G</item>
+        <item>1WS_Geo</item>
+        <item>1WS_K</item>
+        <item>1WS_Ku</item>
+        <item>1WS_M</item>
+        <item>1WS_Ph</item>
+        <item>1WS_Smw</item>
+        <item>1WS_WR</item>
+    </string-array>
+    <string-array name="q_11_p_sem">
+        <item>1PS_D</item>
+        <item>1PS_E</item>
+        <item>1PS_Ev</item>
+        <item>1PS_G</item>
+        <item>1PS_Geo</item>
+        <item>1PS_Inf</item>
+        <item>1PS_InfA</item>
+        <item>1PS_M</item>
+        <item>1PS_Ph</item>
+        <item>1PS_Smw</item>
+    </string-array>
+    <string-array name="q_12_p_sem">
+        <item>2PS_B</item>
+        <item>2PS_C</item>
+        <item>2PS_D1</item>
+        <item>2PS_D2</item>
+        <item>2PS_E</item>
+        <item>2PS_F</item>
+        <item>2PS_Ku</item>
+        <item>2PS_Mu</item>
+        <item>2PS_Ph</item>
+        <item>2PS_Smw</item>
+    </string-array>
+    <string-array name="q_11_sp">
+        <item>1Sp</item>
+    </string-array>
+    <string-array name="q_12_sp">
+        <item>2Sp</item>
+    </string-array>
+    <string-array name="q_11_rhe">
+        <item>1rhe1</item>
+        <item>1rhe2</item>
+    </string-array>
+    <string-array name="q_12_rhe">
+        <item>2rhe</item>
+    </string-array>
+    <string-array name="q_12_e_konv">
+        <item>2ekon1</item>
+    </string-array>
+    <string-array name="q_12_bigb">
+        <item>2no5bbx</item>
+    </string-array>
+    <string-array name="foto">
+        <item>1Fot</item>
+    </string-array>
+    <string-array name="ssp">
+        <item>SSp1</item>
+        <item>SSp2</item>
+    </string-array>
+    <string-array name="cho">
+        <item>Chw1</item>
+        <item>Chw2</item>
+    </string-array>
+    <string-array name="orch">
+        <item>1Orc</item>
+        <item>Orw1</item>
+        <item>Orw2</item>
+        <item>Orc1</item>
+        <item>Orc2</item>
+    </string-array>
+    <string-array name="q_11_psy">
+        <item>1psy1</item>
+        <item>1psy2</item>
+    </string-array>
+    <string-array name="q11_spo_add">
+        <item>1S_T</item>
+    </string-array>
+    <string-array name="q12_spo_add">
+        <item>2S_T</item>
+    </string-array>
 </resources>
