@@ -234,7 +234,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
 
         //restore the last checked appmode radiobutton
-        RadioButton currAppmodeRadio = null;
+        /*RadioButton currAppmodeRadio = null;
         switch (appMode) {
 
             case VPLAN:
@@ -242,7 +242,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 break;
             case TESTS:
                 currAppmodeRadio = (RadioButton) findViewById(R.id.radioTests);
-                break;
+                break; //commented out for public release
         }
 
         //check whether refresh is necessary
@@ -253,7 +253,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        settingsPrefs.registerOnSharedPreferenceChangeListener(this);
+        settingsPrefs.registerOnSharedPreferenceChangeListener(this);*/
 
     }
 
@@ -315,15 +315,15 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         switch (v.getId()) {
 
-            case R.id.radioTests:
+            /*case R.id.radioTests:
                 rbUiHandler(new int[]{R.id.radioTests, R.id.radioVPlan}, new int[]{R.id.radioTestsFrame, R.id.radioVPlanFrame});
 
                 new TestsParse().execute(this);
-                break;
-            case R.id.radioVPlan:
+                break;*/
+            /*case R.id.radioVPlan:
                 rbUiHandler(new int[]{R.id.radioVPlan, R.id.radioTests}, new int[]{R.id.radioVPlanFrame, R.id.radioTestsFrame});
 
-                break;
+                break;*/
         }
     }
 

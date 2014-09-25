@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.masrepus.vplanapp"
-        minSdkVersion 19
+        minSdkVersion 14
         targetSdkVersion 19
     }
 
