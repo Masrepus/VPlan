@@ -264,6 +264,13 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setCurrentItem(getTodayVplanId());
+    }
+
     /**
      * Called when one of the RadioButtons in the navigation drawer is clicked
      */
@@ -514,10 +521,13 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 return vplanBase;
             case UINFO:
                 url = vplanBase + "pw/" + "urekursiv.php";
+                break;
             case MINFO:
                 url = vplanBase + "pw/" + "mrekursiv.php";
+                break;
             case OINFO:
                 url = vplanBase + "oinfo/" + "srekursiv.php";
+                break;
         }
 
         if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {
@@ -595,6 +605,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
                 ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
                 viewPager.setAdapter(vplanPagerAdapter);
+                viewPager.setCurrentItem(getTodayVplanId());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -918,7 +929,14 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 //check whether this is because of missing creds
                 if (e.getMessage() == "no creds available") {
                     publishProgress(9999);
-                } else {
+                } else if (e.getMessage().contentEquals("failed to connect")) {
+                    publishProgress(8888);
+                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                    publishProgress(8887);
+                } else if (e.getMessage().contentEquals("failed to connect without creds")) {
+                    publishProgress(8886);
+                }
+                else {
                     e.printStackTrace();
                 }
                 return false;
@@ -975,6 +993,53 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
+                    break;
+                case 8886:
+                    progress = values[0];
+                    builder = new AlertDialog.Builder(context);
+                    builder.setTitle(getString(R.string.download_error_title));
+                    builder.setMessage(getString(R.string.download_error_nocreds));
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            startActivityForResult(new Intent(context, SettingsActivity.class), 0);
+                        }
+                    });
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+                    break;
+                case 8887:
+                    progress = values[0];
+                    builder = new AlertDialog.Builder(context);
+                    builder.setTitle(getString(R.string.download_error_title));
+                    builder.setMessage(getString(R.string.download_error_nointernet));
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+                    break;
+                case 8888:
+                    progress = values[0];
+                    builder = new AlertDialog.Builder(context);
+                    builder.setTitle(getString(R.string.download_error_title));
+                    builder.setMessage(getString(R.string.download_error));
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+                    break;
             }
         }
 
@@ -1032,6 +1097,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
                 viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
                 viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
+                viewPager.setCurrentItem(getTodayVplanId());
             } else {
                 ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
                 if (pb != null) {
@@ -1052,7 +1118,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     //notify about no data available
                     Toast.makeText(getApplicationContext(), getString(R.string.no_data), Toast.LENGTH_SHORT).show();
                 }
-                //if progress is 9999, then the user has already been notified about the error, so no further action needed
+                //if progress is 9999 or 8888, then the user has already been notified about the error, so no further action needed
 
             }
         }
@@ -1067,10 +1133,19 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
             String encoding = encodeCredentials();
 
-            if (encoding == null) throw new Exception("no creds available");
+            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("no creds available");
+
+            Document doc;
 
             //load vplan xhtml file and select the right table into Elements table
-            Document doc = Jsoup.connect(getVPlanUrl(OINFO, false)).header("Authorization", "Basic " + encoding).post();
+            try {
+                doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
+            } catch (Exception e) {
+                if (encoding == null) {
+                    if (requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
+                    else throw new Exception("failed to connect oinfo");
+                } else throw new Exception("failed to connect");
+            }
 
             //tempContent contains all found tables
             Elements tempContent = doc.select("table[class=hyphenate]");
