@@ -87,6 +87,7 @@ public class VplanFragment extends Fragment {
                 Boolean isFilterActive = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0).getBoolean(MainActivity.PREF_IS_FILTER_ACTIVE, false);
 
                 //if filter is active, then use it after filling the Arraylist
+                int listSizeBeforeFilter = 0;
                 if (isFilterActive) {
 
                     while (c.moveToNext()) {
@@ -103,6 +104,8 @@ public class VplanFragment extends Fragment {
 
                         tempList.add(row);
                     }
+
+                    listSizeBeforeFilter = tempList.size();
 
                     //now perform the filtering
                     for (Row currRow : tempList) {
@@ -155,10 +158,20 @@ public class VplanFragment extends Fragment {
                     }
                 }
 
-                //if there should be no data available after filtering, then inflate the no-data layout
+                //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
                 if (list.size() == 0) {
                     rootView = inflater.inflate(
                             R.layout.no_data_vplan_list, container, false);
+                    TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
+                    String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
+                    timePublishedTV.setText(currTimePublished);
+
+                    String msgMode;
+                    if (listSizeBeforeFilter > 1) msgMode = getString(R.string.msg_hidden_plural);
+                    else msgMode = getString(R.string.msg_hidden_singular);
+
+                    TextView hiddenItemsTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
+                    hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode);
                     MainActivity.inflateStatus = 1;
                     return rootView;
                 } else {
@@ -180,7 +193,15 @@ public class VplanFragment extends Fragment {
                 }
             } else {
                 datasource.close();
-                return inflater.inflate(R.layout.no_data_vplan_list, container, false);
+                rootView = inflater.inflate(
+                        R.layout.no_data_vplan_list, container, false);
+                TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
+                String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
+                timePublishedTV.setText(currTimePublished);
+
+                TextView hiddenDataTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
+                hiddenDataTV.setText("");
+                return rootView;
             }
         }
     }

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, MainActivity!</string>
-    <string name="app_name">Vetretungsplan</string>
+    <string name="app_name">SGP</string>
 	<string name="no_lesson">not available</string>
 	<string name="all_grades">all grades</string>
 	<string name="no_status">no status available</string>
@@ -35,7 +35,7 @@
     <string name="drawer_closed">navigation drawer closed</string>
     <string name="sgp" translatable="false">Schyren-Gymnasium</string>
     <string name="updating">Updating</string>
-    <string name="published">published:</string>
+    <string name="published">Published:</string>
     <string name="creds">Credentials</string>
     <string name="uname">Username</string>
     <string name="pwd">Password</string>
@@ -67,7 +67,7 @@
     <string name="no_filter">Add class…</string>
     <string name="tests">Tests</string>
     <string name="vplan">Vertretungsplan</string>
-    <string name="deutsch">Deutsch</string>
+    <string name="deutsch" translatable="false">Deutsch</string>
     <string name="key_deutsch_q11">pref_key_d_q11</string>
     <string name="key_deutsch_q12">pref_key_d_q12</string>
     <string name="mathe">Mathematik</string>
@@ -91,7 +91,7 @@
     <string name="pref_key_info_q11">pref_key_info_q11</string>
     <string name="pref_key_wr_q11">pref_key_wr_q11</string>
     <string name="ku">Kunst</string>
-    <string name="chem">Chemie</string>
+    <string name="chem" translatable="false">Chemie</string>
     <string name="inf">Informatik</string>
     <string name="wr">Wirtschaft</string>
     <string name="franz">Französisch</string>
@@ -115,7 +115,7 @@
     <string name="pref_key_foto">pref_key_foto</string>
     <string name="ssp">Schulspiel</string>
     <string name="pref_key_ssp">pref_key_ssp</string>
-    <string name="cho">Chor</string>
+    <string name="cho" translatable="false">Chor</string>
     <string name="pref_key_cho">pref_key_cho</string>
     <string name="orc">Orchester</string>
     <string name="pref_key_orc">pref_key_orc</string>
@@ -150,5 +150,7 @@
     <string name="pref_key_ekon_q12">pref_key_ekon_q12</string>
     <string name="bigb">Bigband</string>
     <string name="pref_key_bigb_q12">pref_key_bigb_q12</string>
+    <string name="msg_hidden_plural"> items hidden because of filtering)</string>
+    <string name="msg_hidden_singular">item hidden because of filtering)</string>
 
 </resources>

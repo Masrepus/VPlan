@@ -65,10 +65,9 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/timeChangedTextView"
-            android:layout_toRightOf="@+id/timeChangedStatic"
+            android:layout_toRightOf="@+id/nodataTV"
             android:layout_gravity="center"
-            android:textStyle="italic"
-            android:text="small text" />
+            android:textStyle="italic" />
     </FrameLayout>
 
 </LinearLayout>

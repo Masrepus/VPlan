@@ -5,11 +5,44 @@
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/no_data_today"
-        android:id="@+id/timeChangedStatic"
-        android:layout_gravity="center" />
+        android:layout_gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/no_data_today"
+            android:id="@+id/nodataTV"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/hiddenItemsTV"
+            android:layout_gravity="center"
+            android:layout_below="@+id/nodataTV"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/darker_gray" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/frameLayout"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/timeChangedTextView"
+            android:layout_toRightOf="@+id/nodataTV"
+            android:layout_gravity="center"
+            android:textStyle="italic" />
+    </FrameLayout>
 </FrameLayout>

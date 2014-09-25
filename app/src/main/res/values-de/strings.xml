@@ -20,7 +20,7 @@
     <string name="no_creds">Keine Zugangsdaten gespeichert</string>
     <string name="no_creds_detailed">Es wurden noch keine Zugangsdaten gespeichert, willst du das jetzt tun?</string>
     <string name="no_data">Keine Daten verfügbar; Vorgang abgebrochen</string>
-    <string name="no_data_today">Keine Daten für diesen Tag</string>
+    <string name="no_data_today">Keine Vertretungen</string>
     <string name="no_lesson">nicht verfügbar</string>
     <string name="no_status">kein Status verfügbar</string>
     <string name="oberstufe">Oberstufe</string>
@@ -43,5 +43,7 @@
     <string name="news">News</string>
     <string name="tests">Tests</string>
     <string name="vplan">Vertretungsplan</string>
+    <string name="msg_hidden_plural">Einträge wegen Filterung verborgen)</string>
+    <string name="msg_hidden_singular">Eintrag wegen Filterung verborgen)</string>
 
 </resources>
