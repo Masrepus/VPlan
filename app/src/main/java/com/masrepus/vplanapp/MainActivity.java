@@ -14,7 +14,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -43,15 +42,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends FragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -83,7 +80,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public ArrayList<String> filterUnterstufe = new ArrayList<String>();
     public ArrayList<String> filterMittelstufe = new ArrayList<String>();
     public ArrayList<String> filterOberstufe = new ArrayList<String>();
-    private String[] keys = new String[8];
+    private Map<String, ?> keys;
     private String currentVPlanLink;
 
     /**
@@ -341,7 +338,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         radioButtons.get(0).setTypeface(Typeface.DEFAULT_BOLD);
 
-        for (int i=1; i<=radioButtons.size() - 1; i++) {
+        for (int i = 1; i <= radioButtons.size() - 1; i++) {
             radioButtons.get(i).setTypeface(Typeface.DEFAULT);
         }
 
@@ -354,7 +351,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         frameLayouts.get(0).setEnabled(true);
 
-        for (int i=1; i<=frameLayouts.size() - 1; i++) {
+        for (int i = 1; i <= frameLayouts.size() - 1; i++) {
             frameLayouts.get(i).setEnabled(false);
         }
     }
@@ -369,9 +366,10 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     /**
      * Called when SettingsActivity returns a result, which is when it is destroyed
+     *
      * @param requestCode is always 0
-     * @param resultCode is always 0 as well
-     * @param data no data is being sent by SettingsActivity, so always null
+     * @param resultCode  is always 0 as well
+     * @param data        no data is being sent by SettingsActivity, so always null
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -382,6 +380,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     /**
      * Called after everything is initialised and syncs the navigation drawer toggle in the actionbar
+     *
      * @param savedInstanceState
      */
     @Override
@@ -460,6 +459,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     /**
      * Called in order to find the correct url for the currently requested vplan mode. To accomplish that, it passes the request on to getVPlanUrl with the current mode
+     *
      * @return the url as a String
      */
     private String findRequestedVPlan() {
@@ -486,7 +486,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     /**
      * Called by findRequestedVplan in order to find the correct vplan url
-     * @param version either UINFO, MINFO or OINFO, depending on the current mode
+     *
+     * @param version            either UINFO, MINFO or OINFO, depending on the current mode
      * @param includeCredentials only true if the url will be used to open the website in a browser, which appends username:password@ before the url
      * @return the url as a String
      */
@@ -494,10 +495,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         // depending on the version requested return the appropriate string, optionally with credentials inside header
         String vplanBase;
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat day = new SimpleDateFormat("dd");
-        SimpleDateFormat month = new SimpleDateFormat("MM");
-        SimpleDateFormat year = new SimpleDateFormat("yyyy");
+
         if (includeCredentials) {
 
             //uname and pwd are stored in settings sharedprefs
@@ -598,7 +596,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
                 viewPager.setAdapter(vplanPagerAdapter);
                 return true;
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -655,64 +654,57 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
      */
     private void refreshFilters() {
 
-        keys[0] = getString(R.string.key_grade5);
-        keys[1] = getString(R.string.key_grade6);
-        keys[2] = getString(R.string.key_grade7);
-        keys[3] = getString(R.string.key_grade8);
-        keys[4] = getString(R.string.key_grade9);
-        keys[5] = getString(R.string.key_grade10);
-        keys[6] = getString(R.string.key_grade11);
-        keys[7] = getString(R.string.key_grade12);
-
         //create a new list and fill it
-        ArrayList<String> filter;
+        ArrayList<String> filterUinfoTemp = new ArrayList<String>();
+        ArrayList<String> filterMinfoTemp = new ArrayList<String>();
+        ArrayList<String> filterOinfoTemp = new ArrayList<String>();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        keys = pref.getAll();
+        String[] uinfoKeys = {getString(R.string.key_grade5), getString(R.string.key_grade6), getString(R.string.key_grade7)};
 
-        //first for UINFO
-        filter = new ArrayList<String>();
-        for (int i = 0; i <= 2; i++) {
+        String[] minfoKeys = {getString(R.string.key_grade8), getString(R.string.key_grade9), getString(R.string.key_grade10)};
 
-            //add every item from the 3 stringsets to the filter list
-            Set<String> set = pref.getStringSet(keys[i], null);
-            //if set is null, then there aren't any saved classes for one of the categories yet, so skip this round
-            if (set == null) continue;
+        //iterate through all shared prefs stringsets
+        int mode;
+        int position = 0;
 
-            String[] tempArray = set.toArray(new String[set.size()]);
-            filter.addAll(Arrays.asList(tempArray));
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+
+            //skip pwd or uname
+            if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd)))
+                continue;
+
+            if (Arrays.asList(uinfoKeys).contains(entry.getKey())) {
+                mode = UINFO;
+            } else if (Arrays.asList(minfoKeys).contains(entry.getKey())) {
+                mode = MINFO;
+            } else mode = OINFO;
+
+            Set<String> set = pref.getStringSet(entry.getKey(), null);
+
+            if (set == null || set.isEmpty()) continue;
+
+            switch (mode) {
+
+                case UINFO:
+                    filterUinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
+                    break;
+                case MINFO:
+                    filterMinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
+                    break;
+                case OINFO:
+                    filterOinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
+                    break;
+            }
+
+            position++;
+
         }
-        //save the newly created list to UINFO list
-        filterUnterstufe = filter;
 
-        //now MINFO
-        filter = new ArrayList<String>();
-        for (int i = 3; i <= 5; i++) {
-
-            //add every item from the 3 stringsets to the filter list
-            Set<String> set = pref.getStringSet(keys[i], null);
-            //if set is null, then there aren't any saved classes for one of the categories yet, so skip this round
-            if (set == null) continue;
-
-            String[] tempArray = set.toArray(new String[set.size()]);
-            filter.addAll(Arrays.asList(tempArray));
-        }
-        //save the newly created list to MINFO list
-        filterMittelstufe = filter;
-
-        //now OINFO
-        filter = new ArrayList<String>();
-        for (int i = 6; i <= 7; i++) {
-
-            //add every item from the 3 comma separated strings to the filter
-            String tempString = pref.getString(keys[i], "");
-
-            //if string is null, then skip this
-            if (tempString.contentEquals("")) continue;
-
-            //split the single classes out of the comma separated string provided by the user
-            filter.addAll(Arrays.asList(tempString.split("\\s*,\\s*")));
-        }
-        //save the newly created list to OINFO list
-        filterOberstufe = filter;
+        //activate the new filters
+        filterUnterstufe = filterUinfoTemp;
+        filterMittelstufe = filterMinfoTemp;
+        filterOberstufe = filterOinfoTemp;
 
         //now determine which filter is currently needed
         switch (requestedVplanMode) {
@@ -855,6 +847,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     /**
      * Encodes the saved username and password with Base64 encoder
+     *
      * @return the credentials as single, encoded String; null if there was any error
      */
     public String encodeCredentials() {
@@ -894,6 +887,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         /**
          * Starts the process of parsing
+         *
          * @param context Used for method calls that require a context parameter
          * @return returns true if everything went well
          */
@@ -909,30 +903,31 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
             Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
 
-                try {
-                    while (c.moveToNext()) {
-                        //load every available vplan into the db
-                        requestedVplanId = c.getPosition();
-                        currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
-                        parseDataToSql();
-                    }
-                    publishProgress(1);
-
-                    return true;
-                } catch (Exception e) {
-
-                    //check whether this is because of missing creds
-                    if (e.getMessage() == "no creds available") {
-                        publishProgress(9999);
-                    } else {
-                        e.printStackTrace();
-                    }
-                    return false;
+            try {
+                while (c.moveToNext()) {
+                    //load every available vplan into the db
+                    requestedVplanId = c.getPosition();
+                    currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
+                    parseDataToSql();
                 }
+                publishProgress(1);
+
+                return true;
+            } catch (Exception e) {
+
+                //check whether this is because of missing creds
+                if (e.getMessage() == "no creds available") {
+                    publishProgress(9999);
+                } else {
+                    e.printStackTrace();
+                }
+                return false;
+            }
         }
 
         /**
          * Called if the progress is updated
+         *
          * @param values Only [0] in use: 0 is dowloading, 1 is download finished, 99 is error because no data available, 9999 is error because of missing credentials
          */
         @Override
@@ -985,6 +980,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         /**
          * Called when background parsing has finished and refreshes the whole ui, activates the adapter for the viewpager etc
+         *
          * @param success is true if there was no error, false if an error occured, the user is being notified about that, unless error was because of missing credentials where the user has already been notified
          */
         @Override
@@ -1016,16 +1012,16 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 progressToast.show();
 
                 //save and display last update timestamp
-                    Calendar calendar = Calendar.getInstance();
-                    String lastUpdate = format.format(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                String lastUpdate = format.format(calendar.getTime());
 
-                    SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putString(PREF_LAST_UPDATE, lastUpdate);
-                    editor.apply();
+                SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString(PREF_LAST_UPDATE, lastUpdate);
+                editor.apply();
 
-                    TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
-                    lastUpdateTv.setText(lastUpdate);
+                TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
+                lastUpdateTv.setText(lastUpdate);
 
                 //activate adapter for viewPager
                 VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
@@ -1062,9 +1058,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
 
 
-
         /**
          * Takes care of all the downloading and db-inserting
+         *
          * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null
          */
         public void parseDataToSql() throws Exception {
@@ -1186,24 +1182,24 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     //sql insert of all three columns, but only if they aren't all empty
                     if (stunde != null && !klasse.contentEquals("Klasse")) {
 
-                            switch (requestedVplanId) {
-                                case 0:
-                                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
-                                    break;
-                                case 1:
-                                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_1, position, stunde, klasse, status);
-                                    break;
-                                case 2:
-                                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_2, position, stunde, klasse, status);
-                                    break;
-                                case 3:
-                                    datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
-                                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_3, position, stunde, klasse, status);
-                                    break;
-                                case 4:
-                                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
-                                    break;
-                            }
+                        switch (requestedVplanId) {
+                            case 0:
+                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
+                                break;
+                            case 1:
+                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_1, position, stunde, klasse, status);
+                                break;
+                            case 2:
+                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_2, position, stunde, klasse, status);
+                                break;
+                            case 3:
+                                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
+                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_3, position, stunde, klasse, status);
+                                break;
+                            case 4:
+                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
+                                break;
+                        }
 
                     }
 
