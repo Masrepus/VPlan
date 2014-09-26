@@ -33,6 +33,17 @@
                 android:textColor="@android:color/primary_text_dark" />
         </FrameLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/no_data"
+            android:id="@+id/welcome_textView"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:onClick="refresh"
+            android:clickable="true" />
+
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"

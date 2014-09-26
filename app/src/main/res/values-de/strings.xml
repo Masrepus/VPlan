@@ -19,7 +19,7 @@
     <string name="mittelstufe">Mittelstufe</string>
     <string name="no_creds">Keine Zugangsdaten gespeichert</string>
     <string name="no_creds_detailed">Es wurden noch keine Zugangsdaten gespeichert, willst du das jetzt tun?</string>
-    <string name="no_data">Keine Daten verfügbar; Vorgang abgebrochen</string>
+    <string name="no_data">Keine Daten verfügbar, klicken zum aktualisieren</string>
     <string name="no_data_today">Keine Vertretungen</string>
     <string name="no_lesson">nicht verfügbar</string>
     <string name="no_status">kein Status verfügbar</string>

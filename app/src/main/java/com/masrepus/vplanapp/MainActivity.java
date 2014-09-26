@@ -94,6 +94,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        final TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+        welcome.setVisibility(View.VISIBLE);
+
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
         requestedVplanMode = pref.getInt(PREF_VPLAN_MODE, UINFO);
@@ -118,6 +121,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         //activate adapter for viewPager
         VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+
+        //if the adapter's number of fragments is 0, then display the no data layout on top of it
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(vplanPagerAdapter);
 
@@ -163,6 +169,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     }
 
                     if (currMode != requestedVplanMode) {
+
+                        welcome.setVisibility(View.VISIBLE);
 
                         //refresh adapter for viewPager
                         VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
@@ -401,7 +409,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     /**
      * Checks whether the device is online and if this is true it fetches the currently available files from the right internet page by calling findRequestedVplan()
      */
-    private void updateAvailableFilesList() {
+    private void updateAvailableFilesList() throws Exception {
 
         //load the list of files that are available just now, if internet connection is available, else just skip that
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -414,13 +422,15 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             //encode uname and pw for http post
             String encoding = encodeCredentials();
 
-            if (encoding != null) {
+            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
 
                 Document doc = null;
                 try {
                     doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    if (encoding == null) throw new Exception("failed to connect oinfo");
+                    else throw new Exception("failed to connect");
                 }
 
                 if (doc != null) {
@@ -460,7 +470,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                         datasource.close();
                     }
                 }
-            }
         }
     }
 
@@ -610,6 +619,10 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void refresh(View v) {
+        refresh(refreshItem);
     }
 
     /**
@@ -887,6 +900,41 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         return encoding;
     }
 
+    public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(titleStringRes)
+                .setMessage(msgStringRes);
+
+        //if buttoncount is 1, then there should be only one ok button, otherwise also add a cancel one
+        switch (buttonCount) {
+            case 1:
+                builder.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                break;
+            case 2:
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivityForResult(new Intent(context, SettingsActivity.class), 0);
+                    }
+                })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                break;
+        }
+
+        builder.show();
+    }
+
     /**
      * The async task used for background-parsing of online data
      */
@@ -908,7 +956,24 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
             //download new data and then refresh pager adapter
 
-            updateAvailableFilesList();
+            try {
+                updateAvailableFilesList();
+            } catch (Exception e) {
+                //check whether this is because of missing creds
+                if (e.getMessage() == "no creds available") {
+                    publishProgress(9999);
+                    return false;
+                } else if (e.getMessage().contentEquals("failed to connect")) {
+                    publishProgress(8888);
+                    return false;
+                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                    publishProgress(8887);
+                    return false;
+                } else if (e.getMessage().contentEquals("failed to connect without creds")) {
+                    publishProgress(8886);
+                    return false;
+                }
+            }
 
             datasource.open();
 
@@ -975,70 +1040,19 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     break;
                 case 9999:
                     progress = values[0];
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle(R.string.no_creds);
-                    builder.setMessage(getString(R.string.no_creds_detailed));
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //user clicked OK button, so take him to settings
-                            startActivity(new Intent(context, SettingsActivity.class));
-                        }
-                    });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //user cancelled dialog, so just leave everything as it was
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    showAlert(context, R.string.no_creds, R.string.no_creds_detailed, 2);
                     break;
                 case 8886:
                     progress = values[0];
-                    builder = new AlertDialog.Builder(context);
-                    builder.setTitle(getString(R.string.download_error_title));
-                    builder.setMessage(getString(R.string.download_error_nocreds));
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            startActivityForResult(new Intent(context, SettingsActivity.class), 0);
-                        }
-                    });
-                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.show();
+                    showAlert(context, R.string.download_error_title, R.string.download_error_nocreds, 2);
                     break;
                 case 8887:
                     progress = values[0];
-                    builder = new AlertDialog.Builder(context);
-                    builder.setTitle(getString(R.string.download_error_title));
-                    builder.setMessage(getString(R.string.download_error_nointernet));
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.show();
+                    showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
                     break;
                 case 8888:
                     progress = values[0];
-                    builder = new AlertDialog.Builder(context);
-                    builder.setTitle(getString(R.string.download_error_title));
-                    builder.setMessage(getString(R.string.download_error));
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.show();
+                    showAlert(context, R.string.download_error_title, R.string.download_error, 1);
                     break;
             }
         }

@@ -20,7 +20,7 @@
     <string name="err_decryptUname" translatable="false">Exception while decrypting uname</string>
     <string name="err_encryptCredentials" translatable="false">Exception while encrypting uname/pwd</string>
     <string name="downloading">Downloading…</string>
-    <string name="no_data">No data available; operation cancelled</string>
+    <string name="no_data">No data available, click to refresh</string>
     <string name="refresh">refresh</string><string name="still_parsing">Action not available!
  Parsing of data still in progress!</string>
     <string name="vplan_base_url" translatable="false">http://app.schyren-gymnasium.de:80/</string>
