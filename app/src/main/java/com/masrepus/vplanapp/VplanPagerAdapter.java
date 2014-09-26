@@ -79,13 +79,24 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        SimpleDateFormat hour = new SimpleDateFormat("HH");
 
         //save the position of today's vplan in shared prefs
-        if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
-            editor.apply();
-        }
+            if ((String.valueOf(title)).contains(format.format(calendar.getTime())) && Integer.valueOf(hour.format(calendar.getTime())) < 17) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
+                editor.apply();
+            } else if (Integer.valueOf(hour.format(calendar.getTime())) >= 17) {
+                calendar = Calendar.getInstance();
+                if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 3);
+                } else calendar.add(Calendar.DAY_OF_MONTH, 1);
+                if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
+                    editor.apply();
+                }
+            }
 
         return title;
     }
