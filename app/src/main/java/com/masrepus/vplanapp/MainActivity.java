@@ -257,11 +257,11 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         if (currAppmodeRadio != null) {
             onModeChangeRadioButtonClick(currAppmodeRadio);
             currAppmodeRadio.setChecked(true);
-        }
+        }*/
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        settingsPrefs.registerOnSharedPreferenceChangeListener(this);*/
+        settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
     }
 
