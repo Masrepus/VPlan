@@ -119,19 +119,30 @@ public class VplanFragment extends Fragment {
                             for (int i = 0; i <= filter.size() - 1; i++) {
                                 char[] klasseFilter = filter.get(i).toCharArray();
 
-                                //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
-                                for (int y=0; y <= klasseFilter.length - 1; y++) {
-                                    if (klasse.contains(String.valueOf(klasseFilter[y]))) {
-                                        isNeeded = true;
-                                    } else {
-                                        isNeeded = false;
-                                        break;
-                                    }
-                                }
-                                if (isNeeded) break;
+                                //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
+                                if (pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO) == MainActivity.OINFO) {
+                                    String filterItem = filter.get(i);
+                                    if (klasse.contains(filterItem)) isNeeded = true;
+                                    else isNeeded = false;
 
-                                //also set isneeded to true if klasse=""
-                                if (klasse.contentEquals("")) isNeeded = true;
+                                    if (isNeeded) break;
+                                    if (klasse.contentEquals("")) isNeeded = true;
+                                } else { //in u/minfo the order doesn't play a role
+
+                                    //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
+                                    for (int y = 0; y <= klasseFilter.length - 1; y++) {
+                                        if (klasse.contains(String.valueOf(klasseFilter[y]))) {
+                                            isNeeded = true;
+                                        } else {
+                                            isNeeded = false;
+                                            break;
+                                        }
+                                    }
+                                    if (isNeeded) break;
+
+                                    //also set isneeded to true if klasse=""
+                                    if (klasse.contentEquals("")) isNeeded = true;
+                                }
                             }
                         } else {
                             //if there is no item in the filter list, then still take the rows without a value for class
