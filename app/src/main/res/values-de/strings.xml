@@ -49,5 +49,6 @@
     <string name="download_error_title">Herunterladen gescheitert</string>
     <string name="download_error_nocreds">Für Unter- und Mittelstufe sind Benutzername und Passwort benötigt. Jetzt eingeben?</string>
     <string name="download_error_nointernet">Bitte die Internetverbindung überprüfen</string>
+    <string name="hidden_items">Verborgene Einträge</string>
 
 </resources>

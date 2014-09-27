@@ -1,5 +1,6 @@
 package com.masrepus.vplanapp;
 
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -8,14 +9,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by samuel on 19.08.14.
  */
-public class VplanFragment extends Fragment {
+public class VplanFragment extends Fragment implements View.OnClickListener {
 
     public static final String ARG_REQUESTED_VPLAN_ID = "requestedVplan";
     public static final String FLAG_VPLAN_LOADING_DUMMY = "loadingDummy";
@@ -23,6 +29,7 @@ public class VplanFragment extends Fragment {
     private VPlanDataSource datasource;
     private SharedPreferences pref;
     private ArrayList<String> filter;
+    private ArrayList<Row> hiddenItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -152,6 +159,9 @@ public class VplanFragment extends Fragment {
                         if (isNeeded) list.add(currRow);
                     }
 
+                    //now save the differences
+                    hiddenItems = new ArrayList<Row>(nonOverLap(tempList, list));
+
                 } else {
                     // just fill the list normally
                     while (c.moveToNext()) {
@@ -185,6 +195,10 @@ public class VplanFragment extends Fragment {
 
                     TextView hiddenItemsTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
                     hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode);
+
+                    RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
+                    hiddenDataFrame.setOnClickListener(this);
+
                     MainActivity.inflateStatus = 1;
                     return rootView;
                 } else {
@@ -214,8 +228,41 @@ public class VplanFragment extends Fragment {
 
                 TextView hiddenDataTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
                 hiddenDataTV.setText("");
+
+                RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
+                hiddenDataFrame.setOnClickListener(this);
                 return rootView;
             }
         }
+    }
+
+    private Collection<Row> union(Collection<Row> coll1, Collection<Row> coll2) {
+        Set<Row> union = new HashSet<Row>(coll1);
+        union.addAll(new HashSet<Row>(coll2));
+        return union;
+    }
+
+    private Collection<Row> intersect(Collection<Row> coll1, Collection<Row> coll2) {
+        Set<Row> intersection = new HashSet<Row>(coll1);
+        intersection.retainAll(new HashSet<Row>(coll2));
+        return intersection;
+    }
+
+    /**
+     * Finds out the differences between two collections
+     * @return returns a collection containing the items that are different
+     */
+    private Collection<Row> nonOverLap(Collection<Row> coll1, Collection<Row> coll2) {
+        Collection<Row> result = union(coll1, coll2);
+        result.removeAll(intersect(coll1, coll2));
+        return result;
+    }
+
+    @Override
+    public void onClick(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.hidden_items);
+        builder.setAdapter(new MySimpleArrayAdapter(getActivity(), hiddenItems), null);
+        builder.show();
     }
 }
