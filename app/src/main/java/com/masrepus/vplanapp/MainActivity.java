@@ -82,6 +82,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public ArrayList<String> filterOberstufe = new ArrayList<String>();
     private Map<String, ?> keys;
     private String currentVPlanLink;
+    public enum ProgressCode {STARTED, PARSING_FINISHED, FINISHED_ALL, ERR_NO_INTERNET, ERR_NO_CREDS, ERR_NO_INTERNET_OR_NO_CREDS}
 
     /**
      * Called when the activity is first created.
@@ -242,7 +243,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
 
         //restore the last checked appmode radiobutton
-        /*RadioButton currAppmodeRadio = null;
+        RadioButton currAppmodeRadio = null;
         switch (appMode) {
 
             case VPLAN:
@@ -257,7 +258,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         if (currAppmodeRadio != null) {
             onModeChangeRadioButtonClick(currAppmodeRadio);
             currAppmodeRadio.setChecked(true);
-        }*/
+        }
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -267,6 +268,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     private int getTodayVplanId() {
 
+        //today's vplan id has been saved in sharedprefs
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
         return prefs.getInt(PREF_TODAY_VPLAN, 0);
 
@@ -275,6 +277,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     @Override
     protected void onResume() {
         super.onResume();
+
+        //refresh the pager adapter
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
     }
@@ -330,15 +334,15 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         switch (v.getId()) {
 
-            /*case R.id.radioTests:
+            case R.id.radioTests:
                 rbUiHandler(new int[]{R.id.radioTests, R.id.radioVPlan}, new int[]{R.id.radioTestsFrame, R.id.radioVPlanFrame});
 
                 new TestsParse().execute(this);
-                break;*/
-            /*case R.id.radioVPlan:
+                break;
+            case R.id.radioVPlan:
                 rbUiHandler(new int[]{R.id.radioVPlan, R.id.radioTests}, new int[]{R.id.radioVPlanFrame, R.id.radioTestsFrame});
 
-                break;*/
+                break;
         }
     }
 
@@ -395,8 +399,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     /**
      * Called after everything is initialised and syncs the navigation drawer toggle in the actionbar
-     *
-     * @param savedInstanceState
      */
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
@@ -582,6 +584,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 refresh(item);
                 return true;
             case R.id.action_open_browser:
+                //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));
                 Intent intent = new Intent(Intent.ACTION_VIEW, link);
                 startActivity(intent);
@@ -690,7 +693,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         //iterate through all shared prefs stringsets
         int mode;
-        int position = 0;
 
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
@@ -720,8 +722,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     filterOinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
                     break;
             }
-
-            position++;
 
         }
 
@@ -938,11 +938,13 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     /**
      * The async task used for background-parsing of online data
      */
-    private class BgParse extends AsyncTask<Context, Integer, Boolean> {
+    private class BgParse extends AsyncTask<Context, Enum, Boolean> {
 
-        int progress;
+        ProgressCode progress;
+        int downloaded;
+        int total_downloads;
         Context context;
-        Toast progressToast;
+        ProgressBar progressBar;
 
         /**
          * Starts the process of parsing
@@ -957,20 +959,18 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             //download new data and then refresh pager adapter
 
             try {
+                publishProgress(ProgressCode.STARTED);
                 updateAvailableFilesList();
             } catch (Exception e) {
                 //check whether this is because of missing creds
                 if (e.getMessage() == "no creds available") {
-                    publishProgress(9999);
+                    publishProgress(ProgressCode.ERR_NO_CREDS);
                     return false;
                 } else if (e.getMessage().contentEquals("failed to connect")) {
-                    publishProgress(8888);
+                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
                     return false;
                 } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                    publishProgress(8887);
-                    return false;
-                } else if (e.getMessage().contentEquals("failed to connect without creds")) {
-                    publishProgress(8886);
+                    publishProgress(ProgressCode.ERR_NO_INTERNET);
                     return false;
                 }
             }
@@ -980,28 +980,32 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
 
             try {
+                total_downloads = c.getCount();
+                downloaded = 0;
+
                 while (c.moveToNext()) {
                     //load every available vplan into the db
                     requestedVplanId = c.getPosition();
                     currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
                     parseDataToSql();
+
+                    downloaded = c.getPosition() + 1;
+                    publishProgress(ProgressCode.PARSING_FINISHED);
                 }
-                publishProgress(1);
+
+                publishProgress(ProgressCode.FINISHED_ALL);
 
                 return true;
             } catch (Exception e) {
 
                 //check whether this is because of missing creds
                 if (e.getMessage() == "no creds available") {
-                    publishProgress(9999);
+                    publishProgress(ProgressCode.ERR_NO_CREDS);
                 } else if (e.getMessage().contentEquals("failed to connect")) {
-                    publishProgress(8888);
+                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
                 } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                    publishProgress(8887);
-                } else if (e.getMessage().contentEquals("failed to connect without creds")) {
-                    publishProgress(8886);
-                }
-                else {
+                    publishProgress(ProgressCode.ERR_NO_INTERNET);
+                } else {
                     e.printStackTrace();
                 }
                 return false;
@@ -1014,44 +1018,36 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
          * @param values Only [0] in use: 0 is dowloading, 1 is download finished, 99 is error because no data available, 9999 is error because of missing credentials
          */
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Enum... values) {
 
-            switch (values[0]) {
-                case 0:
-                    progress = values[0];
-                    progressToast = Toast.makeText(this.context, R.string.downloading, Toast.LENGTH_SHORT);
-                    progressToast.show();
+            switch ((ProgressCode)values[0]) {
+                case STARTED:
+                    progress = (ProgressCode)values[0];
+                    progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setIndeterminate(true);
                     break;
-                case 1:
-                    progress = values[0];
-                    if (progressToast != null) {
-                        progressToast.cancel();
-                    }
-                    progressToast = Toast.makeText(this.context, R.string.download_finished, Toast.LENGTH_SHORT);
-                    progressToast.show();
+                case PARSING_FINISHED:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setIndeterminate(false);
+                    progressBar.setProgress((int)(100 * (double)downloaded/total_downloads));
                     break;
-                case 99:
-                    progress = values[0];
-                    if (progressToast != null) {
-                        progressToast.cancel();
-                    }
-                    progressToast = Toast.makeText(this.context, R.string.no_data, Toast.LENGTH_LONG);
-                    progressToast.show();
+                case ERR_NO_CREDS:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setVisibility(View.INVISIBLE);
+
+                    showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
                     break;
-                case 9999:
-                    progress = values[0];
-                    showAlert(context, R.string.no_creds, R.string.no_creds_detailed, 2);
-                    break;
-                case 8886:
-                    progress = values[0];
-                    showAlert(context, R.string.download_error_title, R.string.download_error_nocreds, 2);
-                    break;
-                case 8887:
-                    progress = values[0];
+                case ERR_NO_INTERNET:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setVisibility(View.INVISIBLE);
+
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
                     break;
-                case 8888:
-                    progress = values[0];
+                case ERR_NO_INTERNET_OR_NO_CREDS:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setVisibility(View.INVISIBLE);
+
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
                     break;
             }
@@ -1064,7 +1060,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
          */
         @Override
         protected void onPostExecute(Boolean success) {
-            if (success && progress != 99 && progress != 9999) {
+            if (success) {
                 //stop progress bar
                 ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
                 if (pb != null) {
@@ -1072,23 +1068,18 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     //if pb is null, then data is already displayed, so no dummy layout available
                     pb.setIndeterminate(false);
                     pb.setVisibility(View.INVISIBLE);
-                } else {
+                }
 
-                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                    if (refreshItem != null) {
-                        if (refreshItem.getActionView() != null) {
-                            refreshItem.getActionView().clearAnimation();
-                            refreshItem.setActionView(null);
-                        }
+                //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+                if (refreshItem != null) {
+                    if (refreshItem.getActionView() != null) {
+                        refreshItem.getActionView().clearAnimation();
+                        refreshItem.setActionView(null);
                     }
                 }
 
                 //notify about success
-                if (progressToast != null) {
-                    progressToast.cancel();
-                }
-                progressToast = Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT);
-                progressToast.show();
+                Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
 
                 //save and display last update timestamp
                 Calendar calendar = Calendar.getInstance();
@@ -1112,28 +1103,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
                 viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
                 viewPager.setCurrentItem(getTodayVplanId());
-            } else {
-                ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
-                if (pb != null) {
-
-                    //if pb is null, then data is already displayed, so no dummy layout available
-                    pb.setIndeterminate(false);
-                    pb.setVisibility(View.INVISIBLE);
-                }
-
-                //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                if (refreshItem != null) {
-                    refreshItem.getActionView().clearAnimation();
-                    refreshItem.setActionView(null);
-                }
-
-                //check what the cause for the error was
-                if (progress == 99) {
-                    //notify about no data available
-                    Toast.makeText(getApplicationContext(), getString(R.string.no_data), Toast.LENGTH_SHORT).show();
-                }
-                //if progress is 9999 or 8888, then the user has already been notified about the error, so no further action needed
-
             }
         }
 
@@ -1295,8 +1264,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     position++;
                 }
                 datasource.close();
-            } else {
-                publishProgress(99);
             }
 
             if (availableFiles != null) {

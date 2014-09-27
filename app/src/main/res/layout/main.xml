@@ -11,6 +11,14 @@
         android:id="@+id/background"
         android:animateLayoutChanges="true">
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:indeterminateBehavior="cycle"
+            android:visibility="invisible" />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -164,7 +172,7 @@
 
         </RadioGroup>
 
-        <!--<RadioGroup
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <FrameLayout
@@ -204,7 +212,7 @@
                     android:textAppearance="@android:style/TextAppearance.Holo.Large"
                     android:onClick="onModeChangeRadioButtonClick" />
             </FrameLayout>
-            </RadioGroup>commented out for public release-->
+            </RadioGroup>
 
         <RelativeLayout
             android:layout_width="fill_parent"
