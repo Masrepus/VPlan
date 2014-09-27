@@ -194,7 +194,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     else msgMode = getString(R.string.msg_hidden_singular);
 
                     TextView hiddenItemsTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
-                    hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode);
+                    hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode + ")");
 
                     RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
                     hiddenDataFrame.setOnClickListener(this);
@@ -208,6 +208,19 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
                     //display everything
                     ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
+
+                    //display a footer view that can be clicked in order to show hidden items
+                    View listFooter = LayoutInflater.from(getActivity()).inflate(R.layout.vplan_list_footer, null);
+
+                    String msgMode;
+                    if (listSizeBeforeFilter > 1) msgMode = getString(R.string.msg_hidden_plural);
+                    else msgMode = getString(R.string.msg_hidden_singular);
+
+                    TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
+                    hiddenItemsTV.setText(String.valueOf(listSizeBeforeFilter-list.size()) + " " + msgMode);
+                    listFooter.setOnClickListener(this);
+                    listView.addFooterView(listFooter);
+
                     listView.setAdapter(adapter);
 
                     //update textview for current timePublished

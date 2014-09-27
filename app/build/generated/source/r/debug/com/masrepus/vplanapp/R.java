@@ -96,10 +96,10 @@ public final class R {
     public static final class id {
         public static final int TAG_DAY=0x7f080000;
         public static final int TAG_VPLAN_ID=0x7f080001;
-        public static final int action_activate_filter=0x7f08002c;
-        public static final int action_open_browser=0x7f08002a;
-        public static final int action_refresh=0x7f080029;
-        public static final int action_settings=0x7f08002b;
+        public static final int action_activate_filter=0x7f08002d;
+        public static final int action_open_browser=0x7f08002b;
+        public static final int action_refresh=0x7f08002a;
+        public static final int action_settings=0x7f08002c;
         public static final int background=0x7f080003;
         public static final int drawer_layout=0x7f080002;
         public static final int drawer_left=0x7f08000a;
@@ -107,7 +107,7 @@ public final class R {
         public static final int frameLayout=0x7f080004;
         public static final int hiddenDataFrame=0x7f08001c;
         public static final int hiddenItemsTV=0x7f08001e;
-        public static final int klasse=0x7f080027;
+        public static final int klasse=0x7f080028;
         public static final int lastUpdate=0x7f08000c;
         public static final int lastUpdateStatic=0x7f08000b;
         public static final int linearLayout=0x7f080020;
@@ -115,7 +115,7 @@ public final class R {
         public static final int pager=0x7f080008;
         public static final int pager_title_strip=0x7f080009;
         public static final int progressBar=0x7f080006;
-        public static final int progressText=0x7f080025;
+        public static final int progressText=0x7f080026;
         public static final int radioGroup2=0x7f08000d;
         public static final int radioMinfo=0x7f080011;
         public static final int radioMinfoFrame=0x7f080010;
@@ -129,8 +129,9 @@ public final class R {
         public static final int radioVPlanFrame=0x7f080016;
         public static final int relativeLayout2=0x7f080018;
         public static final int settings_frame=0x7f08001a;
-        public static final int status=0x7f080028;
-        public static final int stunde=0x7f080026;
+        public static final int showHiddenItemsFrame=0x7f080025;
+        public static final int status=0x7f080029;
+        public static final int stunde=0x7f080027;
         public static final int textView2=0x7f080023;
         public static final int textView4=0x7f080021;
         public static final int textView5=0x7f080022;
@@ -145,8 +146,9 @@ public final class R {
         public static final int no_data_vplan_list=0x7f030001;
         public static final int refresh_action_view=0x7f030002;
         public static final int vplan_list=0x7f030003;
-        public static final int vplan_loading_dummy=0x7f030004;
-        public static final int vplanlist_element=0x7f030005;
+        public static final int vplan_list_footer=0x7f030004;
+        public static final int vplan_loading_dummy=0x7f030005;
+        public static final int vplanlist_element=0x7f030006;
     }
     public static final class menu {
         public static final int main_actions=0x7f0b0000;

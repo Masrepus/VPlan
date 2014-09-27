@@ -43,8 +43,8 @@
     <string name="news">News</string>
     <string name="tests">Tests</string>
     <string name="vplan">Vertretungsplan</string>
-    <string name="msg_hidden_plural">Einträge wegen Filterung verborgen)</string>
-    <string name="msg_hidden_singular">Eintrag wegen Filterung verborgen)</string>
+    <string name="msg_hidden_plural">Einträge wegen Filterung verborgen</string>
+    <string name="msg_hidden_singular">Eintrag wegen Filterung verborgen</string>
     <string name="download_error">Bitte überprüfe die gespeicherten Zugangsdaten und deine Internetverbindung</string>
     <string name="download_error_title">Herunterladen gescheitert</string>
     <string name="download_error_nocreds">Für Unter- und Mittelstufe sind Benutzername und Passwort benötigt. Jetzt eingeben?</string>
