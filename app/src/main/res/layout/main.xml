@@ -11,14 +11,6 @@
         android:id="@+id/background"
         android:animateLayoutChanges="true">
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:indeterminateBehavior="cycle"
-            android:visibility="invisible" />
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,6 +32,15 @@
                 android:text="small text"
                 android:textColor="@android:color/primary_text_dark" />
         </FrameLayout>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:indeterminateBehavior="cycle"
+            android:visibility="gone"
+            android:layout_below="@+id/frameLayout" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -174,7 +175,8 @@
 
         <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

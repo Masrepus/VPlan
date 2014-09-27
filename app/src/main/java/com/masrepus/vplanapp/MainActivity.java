@@ -66,7 +66,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final int OINFO = 3;
     public static int inflateStatus = 0;
     java.text.DateFormat format = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
-    private int appMode;
+    private int appMode = VPLAN; //at the moment tests is not available
     public static final int VPLAN = 0;
     public static final int TESTS = 1;
     private int requestedVplanMode;
@@ -1034,19 +1034,19 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     break;
                 case ERR_NO_CREDS:
                     progress = (ProgressCode)values[0];
-                    progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
                     break;
                 case ERR_NO_INTERNET:
                     progress = (ProgressCode)values[0];
-                    progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
                     break;
                 case ERR_NO_INTERNET_OR_NO_CREDS:
                     progress = (ProgressCode)values[0];
-                    progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
                     break;
@@ -1067,7 +1067,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                     //if pb is null, then data is already displayed, so no dummy layout available
                     pb.setIndeterminate(false);
-                    pb.setVisibility(View.INVISIBLE);
+                    pb.setVisibility(View.GONE);
                 }
 
                 //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)

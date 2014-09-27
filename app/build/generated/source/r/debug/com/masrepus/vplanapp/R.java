@@ -103,8 +103,8 @@ public final class R {
         public static final int background=0x7f080003;
         public static final int drawer_layout=0x7f080002;
         public static final int drawer_left=0x7f08000a;
-        public static final int filterWarning=0x7f080006;
-        public static final int frameLayout=0x7f080005;
+        public static final int filterWarning=0x7f080005;
+        public static final int frameLayout=0x7f080004;
         public static final int hiddenItemsTV=0x7f08001d;
         public static final int klasse=0x7f080026;
         public static final int lastUpdate=0x7f08000c;
@@ -113,7 +113,7 @@ public final class R {
         public static final int nodataTV=0x7f08001c;
         public static final int pager=0x7f080008;
         public static final int pager_title_strip=0x7f080009;
-        public static final int progressBar=0x7f080004;
+        public static final int progressBar=0x7f080006;
         public static final int progressText=0x7f080024;
         public static final int radioGroup2=0x7f08000d;
         public static final int radioMinfo=0x7f080011;
