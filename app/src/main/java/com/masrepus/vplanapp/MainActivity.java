@@ -617,7 +617,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
                 ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
                 viewPager.setAdapter(vplanPagerAdapter);
-                viewPager.setCurrentItem(getTodayVplanId());
+                viewPager.setCurrentItem(getTodayVplanId(), false);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -1102,7 +1102,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
                 viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
                 viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
-                viewPager.setCurrentItem(getTodayVplanId());
+                viewPager.setCurrentItem(getTodayVplanId(), false);
             }
         }
 

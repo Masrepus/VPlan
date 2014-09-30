@@ -189,15 +189,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
                     timePublishedTV.setText(currTimePublished);
 
-                    String msgMode;
-                    if (listSizeBeforeFilter > 1) msgMode = getString(R.string.msg_hidden_plural);
-                    else msgMode = getString(R.string.msg_hidden_singular);
-
-                    TextView hiddenItemsTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
-                    hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode + ")");
-
-                    RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
-                    hiddenDataFrame.setOnClickListener(this);
+                    displayHiddenItemsCount(rootView, listSizeBeforeFilter);
 
                     MainActivity.inflateStatus = 1;
                     return rootView;
@@ -209,24 +201,12 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     //display everything
                     ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
 
-                    //display a footer view that can be clicked in order to show hidden items
-                    View listFooter = LayoutInflater.from(getActivity()).inflate(R.layout.vplan_list_footer, null);
-
-                    String msgMode;
-                    if (listSizeBeforeFilter > 1) msgMode = getString(R.string.msg_hidden_plural);
-                    else msgMode = getString(R.string.msg_hidden_singular);
-
-                    TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
-                    hiddenItemsTV.setText(String.valueOf(listSizeBeforeFilter-list.size()) + " " + msgMode);
-                    listFooter.setOnClickListener(this);
-                    listView.addFooterView(listFooter);
+                    addHiddenItemsCountFooter(listView, listSizeBeforeFilter-list.size());
 
                     listView.setAdapter(adapter);
 
                     //update textview for current timePublished
-                    TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-                    String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
-                    timePublishedTV.setText(currTimePublished);
+                    displayTimePublished(rootView, args.getInt(ARG_REQUESTED_VPLAN_ID));
 
                     datasource.close();
                     return rootView;
@@ -235,9 +215,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                 datasource.close();
                 rootView = inflater.inflate(
                         R.layout.no_data_vplan_list, container, false);
-                TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-                String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
-                timePublishedTV.setText(currTimePublished);
+
+                displayTimePublished(rootView, args.getInt(ARG_REQUESTED_VPLAN_ID));
 
                 TextView hiddenDataTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
                 hiddenDataTV.setText("");
@@ -277,5 +256,45 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
         builder.setTitle(R.string.hidden_items);
         builder.setAdapter(new MySimpleArrayAdapter(getActivity(), hiddenItems), null);
         builder.show();
+    }
+
+    private void addHiddenItemsCountFooter(ListView listView, int hiddenItemsCount) {
+
+        //display a footer view that can be clicked in order to show hidden items, but only if there are any
+        View listFooter = LayoutInflater.from(getActivity()).inflate(R.layout.vplan_list_footer, null);
+
+        String msgMode;
+        if (hiddenItemsCount > 0) {
+
+            if (hiddenItemsCount > 1) msgMode = getString(R.string.msg_hidden_plural);
+            else msgMode = getString(R.string.msg_hidden_singular);
+
+            //display the hidden items count in listview footer
+            TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
+            hiddenItemsTV.setText(String.valueOf(hiddenItemsCount) + " " + msgMode);
+            listFooter.setOnClickListener(this);
+            listView.addFooterView(listFooter);
+        }
+    }
+
+    private void displayHiddenItemsCount(View rootView, int listSizeBeforeFilter) {
+
+        String msgMode;
+
+        if (listSizeBeforeFilter > 1) msgMode = getString(R.string.msg_hidden_plural);
+        else msgMode = getString(R.string.msg_hidden_singular);
+
+        TextView hiddenItemsTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
+        hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode + ")");
+
+        RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
+        hiddenDataFrame.setOnClickListener(this);
+    }
+
+    private void displayTimePublished(View rootView, int vplanId) {
+
+        TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
+        String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(vplanId), "");
+        timePublishedTV.setText(currTimePublished);
     }
 }
