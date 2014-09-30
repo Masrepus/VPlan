@@ -1037,18 +1037,42 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
+
+                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+                    if (refreshItem != null) {
+                        if (refreshItem.getActionView() != null) {
+                            refreshItem.getActionView().clearAnimation();
+                            refreshItem.setActionView(null);
+                        }
+                    }
                     break;
                 case ERR_NO_INTERNET:
                     progress = (ProgressCode)values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
+
+                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+                    if (refreshItem != null) {
+                        if (refreshItem.getActionView() != null) {
+                            refreshItem.getActionView().clearAnimation();
+                            refreshItem.setActionView(null);
+                        }
+                    }
                     break;
                 case ERR_NO_INTERNET_OR_NO_CREDS:
                     progress = (ProgressCode)values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
+
+                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+                    if (refreshItem != null) {
+                        if (refreshItem.getActionView() != null) {
+                            refreshItem.getActionView().clearAnimation();
+                            refreshItem.setActionView(null);
+                        }
+                    }
                     break;
             }
         }
@@ -1110,7 +1134,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         /**
          * Takes care of all the downloading and db-inserting
          *
-         * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null
+         * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null or if therer has been an error while downloading
          */
         public void parseDataToSql() throws Exception {
 
@@ -1137,6 +1161,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             Element headerCurrentDate;
             Elements tableRows;
             Elements availableFiles;
+
             try {
                 tableRows = tempContent.get(1).child(0).children();
             } catch (Exception e) {
@@ -1150,16 +1175,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 headerCurrentDate = null;
             }
 
-            //only take the current day of the week and the date out of the header text; delete the space before the split string
-            String[] separated = null;
-            if (headerCurrentDate != null) {
-                separated = headerCurrentDate.text().split("für");
-            }
-            String currentDate = null;
-            if (separated != null) {
-                if (separated.length <= 2) currentDate = separated[1].trim();
-                else currentDate = separated[2].trim();
-            }
+
 
             //get timePublished timestamp
             try {
@@ -1168,13 +1184,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 timePublished = "";
             }
 
-
-            //now save the current loaded vplan's date and its last-changed timestamp for later usage
-            SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanId), currentDate);
-            editor.putString(PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanId), timePublished);
-            editor.apply();
+            saveCurrentTimestamp(headerCurrentDate);
 
             //put the contents of the first table (available files) into another elements object for further processing
             try {
@@ -1183,111 +1193,151 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 availableFiles = null;
             }
 
-            if (tableRows != null) {
-                int position = 0;
+            parseVplan(tableRows);
 
-                datasource.open();
+            parseAvailableFiles(availableFiles);
+        }
+    }
 
-                //clear the existing table for the requested vplan
-                switch (requestedVplanId) {
-                    case 0:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_0);
-                        break;
-                    case 1:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_1);
-                        break;
-                    case 2:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_2);
-                        break;
-                    case 3:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
-                        break;
-                    case 4:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_4);
-                        break;
-                }
+    public void insertVplanRow(String stunde, String klasse, String status, int position) {
 
-                for (Element row : tableRows) {
+        //sql insert of all three columns, but only if they aren't all empty
+        if (stunde != null && !klasse.contentEquals("Klasse")) {
 
-
-                    String[] columns = new String[row.children().size()];
-                    String stunde = null;
-                    String klasse = null;
-                    String status = null;
-
-                    //distribute the row's content into an array in order to get the columns
-                    for (int c = 0; c + 1 <= row.children().size(); c++) {
-                        columns[c] = row.child(c).text();
-                    }
-
-                    //put the data into the right strings, all strings from columns >= column 3 into status column
-                    if (columns.length > 1) {
-                        klasse = columns[0];
-                        stunde = columns[1];
-
-                        if (columns.length > 2) {
-                            //insert the third column into status, then add all the remaining columns to it as well
-                            status = columns[2];
-                        } else status = "";
-                    }
-
-                    for (int i = 3; i + 1 <= row.children().size(); i++) {
-                        status += " ";
-                        status += columns[i];
-                    }
-
-
-                    //sql insert of all three columns, but only if they aren't all empty
-                    if (stunde != null && !klasse.contentEquals("Klasse")) {
-
-                        switch (requestedVplanId) {
-                            case 0:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
-                                break;
-                            case 1:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_1, position, stunde, klasse, status);
-                                break;
-                            case 2:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_2, position, stunde, klasse, status);
-                                break;
-                            case 3:
-                                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_3, position, stunde, klasse, status);
-                                break;
-                            case 4:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
-                                break;
-                        }
-
-                    }
-
-                    position++;
-                }
-                datasource.close();
+            switch (requestedVplanId) {
+                case 0:
+                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
+                    break;
+                case 1:
+                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_1, position, stunde, klasse, status);
+                    break;
+                case 2:
+                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_2, position, stunde, klasse, status);
+                    break;
+                case 3:
+                    datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
+                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_3, position, stunde, klasse, status);
+                    break;
+                case 4:
+                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
+                    break;
             }
 
-            if (availableFiles != null) {
+        }
+    }
 
-                int position = 0;
-                datasource.open();
-                datasource.newTable(MySQLiteHelper.TABLE_LINKS);
+    public void clearExistingTable() {
 
-                //now distribute the contents of availableFiles into a new list for the selection spinner
-                for (Element row : availableFiles) {
-                    String url;
-                    String tag;
+        //clear the existing table for the requested vplan
+        switch (requestedVplanId) {
+            case 0:
+                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_0);
+                break;
+            case 1:
+                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_1);
+                break;
+            case 2:
+                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_2);
+                break;
+            case 3:
+                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
+                break;
+            case 4:
+                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_4);
+                break;
+        }
+    }
 
-                    tag = row.child(0).text();
-                    url = row.child(0).child(0).attributes().get("href");
+    public void saveCurrentTimestamp(Element headerCurrentDate) {
 
-                    //sql insert
-                    datasource.createRowLinks(position, tag, url);
+        //only take the current day of the week and the date out of the header text; delete the space before the split string
+        String[] separated = null;
+        if (headerCurrentDate != null) {
+            separated = headerCurrentDate.text().split("für");
+        }
+        String currentDate = null;
+        if (separated != null) {
+            if (separated.length <= 2) currentDate = separated[1].trim();
+            else currentDate = separated[2].trim();
+        }
 
-                    position++;
+        //now save the current loaded vplan's date and its last-changed timestamp for later usage
+        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanId), currentDate);
+        editor.putString(PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanId), timePublished);
+        editor.apply();
+    }
+
+    public void parseVplan(Elements tableRows) {
+
+        if (tableRows != null) {
+            int position = 0;
+
+            datasource.open();
+
+            clearExistingTable();
+
+            for (Element row : tableRows) {
+
+
+                String[] columns = new String[row.children().size()];
+                String stunde = null;
+                String klasse = null;
+                String status = null;
+
+                //distribute the row's content into an array in order to get the columns
+                for (int c = 0; c + 1 <= row.children().size(); c++) {
+                    columns[c] = row.child(c).text();
                 }
 
-                datasource.close();
+                //put the data into the right strings, all strings from columns >= column 3 into status column
+                if (columns.length > 1) {
+                    klasse = columns[0];
+                    stunde = columns[1];
+
+                    if (columns.length > 2) {
+                        //insert the third column into status, then add all the remaining columns to it as well
+                        status = columns[2];
+                    } else status = "";
+                }
+
+                for (int i = 3; i + 1 <= row.children().size(); i++) {
+                    status += " ";
+                    status += columns[i];
+                }
+
+                insertVplanRow(stunde, klasse, status, position);
+
+                position++;
             }
+            datasource.close();
+        }
+    }
+
+    public void parseAvailableFiles(Elements availableFiles) {
+
+        if (availableFiles != null) {
+
+            int position = 0;
+            datasource.open();
+            datasource.newTable(MySQLiteHelper.TABLE_LINKS);
+
+            //now distribute the contents of availableFiles into a new list for the selection spinner
+            for (Element row : availableFiles) {
+                String url;
+                String tag;
+
+                tag = row.child(0).text();
+                url = row.child(0).child(0).attributes().get("href");
+
+                //sql insert
+                datasource.createRowLinks(position, tag, url);
+
+                position++;
+            }
+
+            datasource.close();
         }
     }
 }
