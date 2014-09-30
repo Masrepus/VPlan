@@ -1038,13 +1038,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                     showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
 
-                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                    if (refreshItem != null) {
-                        if (refreshItem.getActionView() != null) {
-                            refreshItem.getActionView().clearAnimation();
-                            refreshItem.setActionView(null);
-                        }
-                    }
+                    resetRefreshAnimation();
+
                     break;
                 case ERR_NO_INTERNET:
                     progress = (ProgressCode)values[0];
@@ -1052,13 +1047,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
 
-                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                    if (refreshItem != null) {
-                        if (refreshItem.getActionView() != null) {
-                            refreshItem.getActionView().clearAnimation();
-                            refreshItem.setActionView(null);
-                        }
-                    }
+                    resetRefreshAnimation();
+
                     break;
                 case ERR_NO_INTERNET_OR_NO_CREDS:
                     progress = (ProgressCode)values[0];
@@ -1066,13 +1056,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
 
-                    //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                    if (refreshItem != null) {
-                        if (refreshItem.getActionView() != null) {
-                            refreshItem.getActionView().clearAnimation();
-                            refreshItem.setActionView(null);
-                        }
-                    }
+                    resetRefreshAnimation();
+
                     break;
             }
         }
@@ -1085,48 +1070,16 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                //stop progress bar
-                ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
-                if (pb != null) {
+                stopProgressBar();
 
-                    //if pb is null, then data is already displayed, so no dummy layout available
-                    pb.setIndeterminate(false);
-                    pb.setVisibility(View.GONE);
-                }
-
-                //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                if (refreshItem != null) {
-                    if (refreshItem.getActionView() != null) {
-                        refreshItem.getActionView().clearAnimation();
-                        refreshItem.setActionView(null);
-                    }
-                }
+                resetRefreshAnimation();
 
                 //notify about success
                 Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
 
-                //save and display last update timestamp
-                Calendar calendar = Calendar.getInstance();
-                String lastUpdate = format.format(calendar.getTime());
+                refreshLastUpdate();
 
-                SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putString(PREF_LAST_UPDATE, lastUpdate);
-                editor.apply();
-
-                TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
-                lastUpdateTv.setText(lastUpdate);
-
-                //activate adapter for viewPager
-                VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
-                ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                viewPager.setAdapter(vplanPagerAdapter);
-
-                //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-                DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-                viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-                viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
-                viewPager.setCurrentItem(getTodayVplanId(), false);
+                activatePagerAdapter(context);
             }
         }
 
@@ -1338,6 +1291,58 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             }
 
             datasource.close();
+        }
+    }
+
+    public void activatePagerAdapter(Context context) {
+
+        //activate adapter for viewPager
+        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(vplanPagerAdapter);
+
+        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+        viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
+        viewPager.setCurrentItem(getTodayVplanId(), false);
+    }
+
+    public void refreshLastUpdate() {
+
+        //save and display last update timestamp
+        Calendar calendar = Calendar.getInstance();
+        String lastUpdate = format.format(calendar.getTime());
+
+        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(PREF_LAST_UPDATE, lastUpdate);
+        editor.apply();
+
+        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
+        lastUpdateTv.setText(lastUpdate);
+    }
+
+    public void resetRefreshAnimation() {
+
+        //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+        if (refreshItem != null) {
+            if (refreshItem.getActionView() != null) {
+                refreshItem.getActionView().clearAnimation();
+                refreshItem.setActionView(null);
+            }
+        }
+    }
+
+    public void stopProgressBar() {
+
+        //stop progress bar
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
+        if (pb != null) {
+
+            //if pb is null, then data is already displayed, so no dummy layout available
+            pb.setIndeterminate(false);
+            pb.setVisibility(View.GONE);
         }
     }
 }
