@@ -60,10 +60,12 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final String PREF_IS_FILTER_ACTIVE = "isFilterActive";
     public static final String PREF_APPMODE = "appmode";
     public static final String PREF_TODAY_VPLAN = "todayVplan";
-    private static final int BASIC = 0;
+    public static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
     public static final int OINFO = 3;
+    public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
+    public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
     public static int inflateStatus = 0;
     java.text.DateFormat format = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     private int appMode = VPLAN; //at the moment tests is not available
@@ -100,6 +102,14 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        pref.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                requestedVplanId = sharedPreferences.getInt(PREF_REQUESTED_VPLAN_ID, 0);
+                currentVPlanLink = sharedPreferences.getString(PREF_CURR_VPLAN_LINK, "");
+                timePublished = sharedPreferences.getString(PREF_PREFIX_VPLAN_TIME_PUBLISHED, "");
+            }
+        });
         requestedVplanMode = pref.getInt(PREF_VPLAN_MODE, UINFO);
         appMode = pref.getInt(PREF_APPMODE, VPLAN);
         if (pref.getBoolean(PREF_IS_FILTER_ACTIVE, false)) {
@@ -647,7 +657,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         isOnlineRequested = true;
 
         //get data and put it into db, viewpager adapter is automatically refreshed
-        new BgParse().execute(this);
+        new BgDownloader().execute(this);
     }
 
     /**
@@ -938,7 +948,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     /**
      * The async task used for background-parsing of online data
      */
-    private class BgParse extends AsyncTask<Context, Enum, Boolean> {
+    abstract class BgParse extends AsyncTask<Context, Enum, Boolean> {
 
         ProgressCode progress;
         int downloaded;
@@ -1343,6 +1353,72 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             //if pb is null, then data is already displayed, so no dummy layout available
             pb.setIndeterminate(false);
             pb.setVisibility(View.GONE);
+        }
+    }
+
+    private class BgDownloader extends AsyncDownloader {
+
+        @Override
+        protected void onProgressUpdate(Enum... values) {
+            super.onProgressUpdate(values);
+
+            switch ((ProgressCode)values[0]) {
+                case STARTED:
+                    progress = (ProgressCode)values[0];
+                    progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setIndeterminate(true);
+                    break;
+                case PARSING_FINISHED:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setIndeterminate(false);
+                    progressBar.setProgress((int)(100 * (double)downloaded/total_downloads));
+                    break;
+                case ERR_NO_CREDS:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
+
+                    resetRefreshAnimation();
+
+                    break;
+                case ERR_NO_INTERNET:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
+
+                    resetRefreshAnimation();
+
+                    break;
+                case ERR_NO_INTERNET_OR_NO_CREDS:
+                    progress = (ProgressCode)values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.download_error_title, R.string.download_error, 1);
+
+                    resetRefreshAnimation();
+
+                    break;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+            if (success) {
+                stopProgressBar();
+
+                resetRefreshAnimation();
+
+                //notify about success
+                Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
+
+                refreshLastUpdate();
+
+                activatePagerAdapter(context);
+            }
         }
     }
 }

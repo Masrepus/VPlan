@@ -237,6 +237,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     private Collection<Row> intersect(Collection<Row> coll1, Collection<Row> coll2) {
         Set<Row> intersection = new HashSet<Row>(coll1);
         intersection.retainAll(new HashSet<Row>(coll2));
+
         return intersection;
     }
 
