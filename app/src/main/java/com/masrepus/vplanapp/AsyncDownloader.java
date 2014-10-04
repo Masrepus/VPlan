@@ -24,6 +24,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 
 /**
  * The async task used for background-parsing of online data
@@ -122,6 +123,11 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             }
             return false;
         }
+    }
+
+    @Override
+    protected void onPostExecute(Boolean success) {
+        if (success) refreshLastUpdate();
     }
 
     /**
@@ -501,5 +507,19 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 }
             }
         }
+    }
+
+    public String refreshLastUpdate() {
+
+        //save and display last update timestamp
+        Calendar calendar = Calendar.getInstance();
+        String lastUpdate = MainActivity.standardFormat.format(calendar.getTime());
+
+        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(MainActivity.PREF_LAST_UPDATE, lastUpdate);
+        editor.apply();
+
+        return lastUpdate;
     }
 }

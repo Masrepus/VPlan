@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
     public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
     public static int inflateStatus = 0;
-    java.text.DateFormat format = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
+    public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     private int appMode = VPLAN; //at the moment tests is not available
     public static final int VPLAN = 0;
     public static final int TESTS = 1;
@@ -1318,16 +1318,21 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         viewPager.setCurrentItem(getTodayVplanId(), false);
     }
 
-    public void refreshLastUpdate() {
+    public String refreshLastUpdate() {
 
         //save and display last update timestamp
         Calendar calendar = Calendar.getInstance();
-        String lastUpdate = format.format(calendar.getTime());
+        String lastUpdate = standardFormat.format(calendar.getTime());
 
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(PREF_LAST_UPDATE, lastUpdate);
         editor.apply();
+
+        return lastUpdate;
+    }
+
+    public void displayLastUpdate(String lastUpdate) {
 
         TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
         lastUpdateTv.setText(lastUpdate);
@@ -1406,8 +1411,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         @Override
         protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
             if (success) {
+
+                super.onPostExecute(success);
                 stopProgressBar();
 
                 resetRefreshAnimation();
@@ -1415,7 +1421,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 //notify about success
                 Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
 
-                refreshLastUpdate();
+                displayLastUpdate(refreshLastUpdate());
 
                 activatePagerAdapter(context);
             }
