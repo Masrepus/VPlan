@@ -88,8 +88,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 editor.apply();
             } else if (Integer.valueOf(hour.format(calendar.getTime())) >= 17) {
                 calendar = Calendar.getInstance();
-                if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
-                    calendar.add(Calendar.DAY_OF_MONTH, 3);
+                if (calendar.get(Calendar.DAY_OF_WEEK) >= 6 /*friday*/) {
+                    calendar.add(Calendar.DAY_OF_MONTH, getDaysUntilMonday(calendar));
                 } else calendar.add(Calendar.DAY_OF_MONTH, 1);
                 if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
                     SharedPreferences.Editor editor = prefs.edit();
@@ -99,5 +99,10 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             }
 
         return title;
+    }
+
+    private int getDaysUntilMonday(Calendar calendar) {
+
+        return 3-Math.abs(calendar.get(Calendar.DAY_OF_WEEK) - 6);
     }
 }
