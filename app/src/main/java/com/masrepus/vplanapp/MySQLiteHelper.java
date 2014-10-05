@@ -71,6 +71,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     /**
      * Creates all the tables needed in the vplan dbs
+     *
      * @param database the database to contain the tables
      */
     @Override
@@ -86,6 +87,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     /**
      * Basically is just used to completely wipe all the tables in a db
+     *
      * @param db
      * @param oldVersion not in use
      * @param newVersion not in use

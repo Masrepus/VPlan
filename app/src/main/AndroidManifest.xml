@@ -26,7 +26,8 @@
             android:label="@string/settings" />
 
         <service
-            android:name=".DownloadService"
+            android:name=".DownloaderService"
+            android:enabled="true"
             android:exported="false" >
         </service>
     </application>

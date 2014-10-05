@@ -158,5 +158,14 @@
     <string name="download_error_nocreds">You first have to enter username and password for Unterstufe and Mittelstufe. Do this now?</string>
     <string name="news">news</string>
     <string name="hidden_items">Hidden items</string>
+    <string name="bg_updates">Background updates</string>
+    <string name="activate_bg_updates">Activate background updates</string>
+    <string name="update_int">Update interval</string>
+    <string name="pref_key_upd_int" translatable="false">pref_key_upd_int</string>
+    <string name="pref_key_bg_updates" translatable="false">pref_key_bg_updates</string>
+    <string name="msg_bg_update">Updating data</string>
+    <string name="preparing">Preparing...</string>
+    <string name="downloaded_prog"> downloaded...</string>
+    <string name="files"> files</string>
 
 </resources>

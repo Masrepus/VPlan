@@ -33,6 +33,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
     /**
      * Requests a new VPlanFragment by passing the current filter and the requested vplan id
+     *
      * @param i used as requested vplan id
      */
     @Override
@@ -82,27 +83,27 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         SimpleDateFormat hour = new SimpleDateFormat("HH");
 
         //save the position of today's vplan in shared prefs
-            if ((String.valueOf(title)).contains(format.format(calendar.getTime())) && Integer.valueOf(hour.format(calendar.getTime())) < 17) {
+        if ((String.valueOf(title)).contains(format.format(calendar.getTime())) && Integer.valueOf(hour.format(calendar.getTime())) < 17) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
+            editor.apply();
+        } else if (Integer.valueOf(hour.format(calendar.getTime())) >= 17) {
+            calendar = Calendar.getInstance();
+            if (calendar.get(Calendar.DAY_OF_WEEK) >= 6 /*friday*/) {
+                calendar.add(Calendar.DAY_OF_MONTH, getDaysUntilMonday(calendar));
+            } else calendar.add(Calendar.DAY_OF_MONTH, 1);
+            if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
                 editor.apply();
-            } else if (Integer.valueOf(hour.format(calendar.getTime())) >= 17) {
-                calendar = Calendar.getInstance();
-                if (calendar.get(Calendar.DAY_OF_WEEK) >= 6 /*friday*/) {
-                    calendar.add(Calendar.DAY_OF_MONTH, getDaysUntilMonday(calendar));
-                } else calendar.add(Calendar.DAY_OF_MONTH, 1);
-                if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
-                    editor.apply();
-                }
             }
+        }
 
         return title;
     }
 
     private int getDaysUntilMonday(Calendar calendar) {
 
-        return 3-Math.abs(calendar.get(Calendar.DAY_OF_WEEK) - 6);
+        return 3 - Math.abs(calendar.get(Calendar.DAY_OF_WEEK) - 6);
     }
 }

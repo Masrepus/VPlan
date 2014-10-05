@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -201,7 +200,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     //display everything
                     ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
 
-                    addHiddenItemsCountFooter(listView, listSizeBeforeFilter-list.size());
+                    addHiddenItemsCountFooter(listView, listSizeBeforeFilter - list.size());
 
                     listView.setAdapter(adapter);
 
@@ -243,6 +242,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Finds out the differences between two collections
+     *
      * @return returns a collection containing the items that are different
      */
     private Collection<Row> nonOverLap(Collection<Row> coll1, Collection<Row> coll2) {
@@ -286,7 +286,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
         else msgMode = getString(R.string.msg_hidden_singular);
 
         TextView hiddenItemsTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
-        hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " "+ msgMode + ")");
+        hiddenItemsTV.setText("(" + String.valueOf(listSizeBeforeFilter) + " " + msgMode + ")");
 
         RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
         hiddenDataFrame.setOnClickListener(this);

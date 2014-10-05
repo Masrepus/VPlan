@@ -19,8 +19,9 @@ public class MySimpleArrayAdapter extends ArrayAdapter {
 
     /**
      * Constructor for the custom arrayadapter
+     *
      * @param activity used for method-calls that require a context parameter
-     * @param list a Row ArrayList that has to be parsed into a listview
+     * @param list     a Row ArrayList that has to be parsed into a listview
      */
     public MySimpleArrayAdapter(Activity activity, ArrayList<Row> list) {
         super(activity, R.layout.vplan_list, list);

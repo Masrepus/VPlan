@@ -360,4 +360,16 @@
             </PreferenceScreen>
             </PreferenceScreen>
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/bg_updates">
+        <CheckBoxPreference
+            android:title="@string/activate_bg_updates"
+            android:key="@string/pref_key_bg_updates" />
+        <ListPreference
+            android:title="@string/update_int"
+            android:key="@string/pref_key_upd_int"
+            android:entries="@array/upd_intervals"
+            android:entryValues="@array/upd_int_values"
+            android:defaultValue="1" />
+    </PreferenceCategory>
 </PreferenceScreen>

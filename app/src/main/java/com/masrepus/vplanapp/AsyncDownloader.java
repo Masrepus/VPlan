@@ -4,7 +4,6 @@ package com.masrepus.vplanapp;
  * Created by samuel on 30.09.14.
  */
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -14,8 +13,8 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,6 +31,9 @@ import java.util.Calendar;
 abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     private static final int BASIC = MainActivity.BASIC;
+    private static final int UINFO = MainActivity.UINFO;
+    private static final int MINFO = MainActivity.MINFO;
+    private static final int OINFO = MainActivity.OINFO;
     MainActivity.ProgressCode progress;
     int downloaded;
     int total_downloads;
@@ -42,10 +44,6 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private String currentVPlanLink;
     private String timePublished;
     private int requestedVplanMode;
-
-    private static final int UINFO = MainActivity.UINFO;
-    private static final int MINFO = MainActivity.MINFO;
-    private static final int OINFO = MainActivity.OINFO;
 
     /**
      * Starts the process of parsing
@@ -139,7 +137,8 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         String encoding = encodeCredentials();
 
-        if (encoding == null && requestedVplanMode != MainActivity.OINFO) throw new Exception("no creds available");
+        if (encoding == null && requestedVplanMode != MainActivity.OINFO)
+            throw new Exception("no creds available");
 
         Document doc;
 
@@ -148,7 +147,8 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
         } catch (Exception e) {
             if (encoding == null) {
-                if (requestedVplanMode != MainActivity.OINFO) throw new Exception("failed to connect without creds");
+                if (requestedVplanMode != MainActivity.OINFO)
+                    throw new Exception("failed to connect without creds");
                 else throw new Exception("failed to connect oinfo");
             } else throw new Exception("failed to connect");
         }
@@ -173,7 +173,6 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         } catch (Exception e) {
             headerCurrentDate = null;
         }
-
 
 
         //get timePublished timestamp
@@ -458,7 +457,8 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             //encode uname and pw for http post
             String encoding = encodeCredentials();
 
-            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
+            if (encoding == null && requestedVplanMode != OINFO)
+                throw new Exception("failed to connect without creds");
 
             Document doc = null;
             try {

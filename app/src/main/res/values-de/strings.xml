@@ -50,5 +50,12 @@
     <string name="download_error_nocreds">Für Unter- und Mittelstufe sind Benutzername und Passwort benötigt. Jetzt eingeben?</string>
     <string name="download_error_nointernet">Bitte die Internetverbindung überprüfen</string>
     <string name="hidden_items">Verborgene Einträge</string>
+    <string name="bg_updates">Hintergrundaktualisierung</string>
+    <string name="activate_bg_updates">Automatisch aktualisieren</string>
+    <string name="preparing">Vorbereiten...</string>
+    <string name="update_int">Intervall</string>
+    <string name="msg_bg_update">Aktualisiere Daten</string>
+    <string name="files">Dateien</string>
+    <string name="downloaded_prog">heruntergeladen...</string>
 
 </resources>

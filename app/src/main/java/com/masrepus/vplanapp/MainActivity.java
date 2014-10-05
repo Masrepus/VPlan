@@ -1,7 +1,9 @@
 package com.masrepus.vplanapp;
 
 import android.app.ActionBar;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -60,17 +62,22 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final String PREF_IS_FILTER_ACTIVE = "isFilterActive";
     public static final String PREF_APPMODE = "appmode";
     public static final String PREF_TODAY_VPLAN = "todayVplan";
+    public static final String PREF_IS_BG_UPD_ACTIVE = "isBgUpdActive";
     public static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
     public static final int OINFO = 3;
     public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
     public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
-    public static int inflateStatus = 0;
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
-    private int appMode = VPLAN; //at the moment tests is not available
     public static final int VPLAN = 0;
+    private int appMode = VPLAN; //at the moment tests is not available
     public static final int TESTS = 1;
+    public static int inflateStatus = 0;
+    public ArrayList<String> filterCurrent = new ArrayList<String>();
+    public ArrayList<String> filterUnterstufe = new ArrayList<String>();
+    public ArrayList<String> filterMittelstufe = new ArrayList<String>();
+    public ArrayList<String> filterOberstufe = new ArrayList<String>();
     private int requestedVplanMode;
     private int requestedVplanId;
     private boolean isOnlineRequested;
@@ -78,13 +85,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
     private String timePublished;
-    public ArrayList<String> filterCurrent = new ArrayList<String>();
-    public ArrayList<String> filterUnterstufe = new ArrayList<String>();
-    public ArrayList<String> filterMittelstufe = new ArrayList<String>();
-    public ArrayList<String> filterOberstufe = new ArrayList<String>();
     private Map<String, ?> keys;
     private String currentVPlanLink;
-    public enum ProgressCode {STARTED, PARSING_FINISHED, FINISHED_ALL, ERR_NO_INTERNET, ERR_NO_CREDS, ERR_NO_INTERNET_OR_NO_CREDS}
 
     /**
      * Called when the activity is first created.
@@ -434,54 +436,55 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             //encode uname and pw for http post
             String encoding = encodeCredentials();
 
-            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
+            if (encoding == null && requestedVplanMode != OINFO)
+                throw new Exception("failed to connect without creds");
 
-                Document doc = null;
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
+            } catch (IOException e) {
+                e.printStackTrace();
+                if (encoding == null) throw new Exception("failed to connect oinfo");
+                else throw new Exception("failed to connect");
+            }
+
+            if (doc != null) {
+
+                //tempContent contains all found tables
+                Elements tempContent = doc.select("table[class=hyphenate]");
+                //first table is the wanted one for available files list
+                Elements availableFiles;
+
                 try {
-                    doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (encoding == null) throw new Exception("failed to connect oinfo");
-                    else throw new Exception("failed to connect");
+                    availableFiles = tempContent.get(0).child(0).children();
+                } catch (Exception e) {
+                    availableFiles = null;
                 }
 
-                if (doc != null) {
+                //db input of available files + url's
+                if (availableFiles != null) {
 
-                    //tempContent contains all found tables
-                    Elements tempContent = doc.select("table[class=hyphenate]");
-                    //first table is the wanted one for available files list
-                    Elements availableFiles;
+                    int position = 0;
+                    datasource.open();
+                    datasource.newTable(MySQLiteHelper.TABLE_LINKS);
 
-                    try {
-                        availableFiles = tempContent.get(0).child(0).children();
-                    } catch (Exception e) {
-                        availableFiles = null;
+                    //now distribute the contents of availableFiles into a new list for the selection spinner
+                    for (Element row : availableFiles) {
+                        String url;
+                        String tag;
+
+                        tag = row.child(0).text();
+                        url = row.child(0).child(0).attributes().get("href");
+
+                        //sql insert
+                        datasource.createRowLinks(position, tag, url);
+
+                        position++;
                     }
 
-                    //db input of available files + url's
-                    if (availableFiles != null) {
-
-                        int position = 0;
-                        datasource.open();
-                        datasource.newTable(MySQLiteHelper.TABLE_LINKS);
-
-                        //now distribute the contents of availableFiles into a new list for the selection spinner
-                        for (Element row : availableFiles) {
-                            String url;
-                            String tag;
-
-                            tag = row.child(0).text();
-                            url = row.child(0).child(0).attributes().get("href");
-
-                            //sql insert
-                            datasource.createRowLinks(position, tag, url);
-
-                            position++;
-                        }
-
-                        datasource.close();
-                    }
+                    datasource.close();
                 }
+            }
         }
     }
 
@@ -592,6 +595,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 refresh(item);
+                return true;
+            case R.id.dservicetest:
+                startService(new Intent(this, DownloaderService.class));
                 return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
@@ -707,8 +713,19 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
             //skip pwd or uname
-            if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd)))
+            if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd))
+                    || entry.getKey().contentEquals(getString(R.string.pref_key_upd_int)))
                 continue;
+
+            //treat bg updates separately
+            if (entry.getKey().contentEquals(getString(R.string.pref_key_bg_updates))) {
+
+                int interval = Integer.valueOf(pref.getString(getString(R.string.pref_key_upd_int), ""));
+
+                refreshBgUpdates(Boolean.valueOf(entry.getValue().toString()), interval);
+
+                continue;
+            }
 
             if (Arrays.asList(uinfoKeys).contains(entry.getKey())) {
                 mode = UINFO;
@@ -754,6 +771,25 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
     }
 
+    private void refreshBgUpdates(Boolean activated, int interval) {
+
+        //get the download intent from downloadservice and use it for alarmmanager
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent downloadIntent = new Intent(this, DownloaderService.class);
+
+        //find out whether we have to update the pending intent
+        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        Boolean wasActiveBefore = pref.getBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+        int flag = 0;
+        if (wasActiveBefore) flag = PendingIntent.FLAG_UPDATE_CURRENT;
+
+        PendingIntent pendingDownloadIntent = PendingIntent.getService(this, 0, downloadIntent, flag);
+
+        if (activated) {
+            //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, System.currentTimeMillis(), interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
+        } else alarmManager.cancel(pendingDownloadIntent);
+    }
+
     /**
      * Called when the grey statusbar displaying the filter status is clicked; shows a dialog displaying the contents of the current filter
      */
@@ -780,103 +816,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             builder.setItems(filterCurrent.toArray(new String[filterCurrent.size()]), null);
         }
         AlertDialog dialog = builder.show();
-    }
-
-    private class TestsParse extends AsyncTask<Context, Integer, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Context... context) {
-
-            //get the tests for q11
-            Document doc;
-            Elements tableRows;
-            try {
-                doc = Jsoup.connect(getString(R.string.vplan_base_url) + "oinfo/scha11.html").get();
-            } catch (IOException e) {
-                e.printStackTrace();
-                doc = null;
-                publishProgress(99);
-            }
-            if (doc == null) return false;
-
-            publishProgress(1);
-
-            try {
-                tableRows = doc.select("table").first().child(0).children();
-            } catch (Exception e) {
-                e.printStackTrace();
-                tableRows = null;
-                publishProgress(999);
-            }
-
-            if (tableRows != null) {
-
-                datasource.open();
-
-                //clear the existing tests table
-                datasource.newTable(MySQLiteHelper.TABLE_TESTS);
-
-                String lastDate = null;
-
-                for (Element row : tableRows) {
-
-                    //skip the first row as it just contains the title
-                    if (row.elementSiblingIndex() == 0) continue;
-
-                    String[] columns = new String[row.children().size()];
-                    String klasse;
-                    String date = "";
-
-                    //distribute the row's content into an array in order to get the columns
-                    for (Element column : row.children()) {
-                        columns[column.elementSiblingIndex()] = column.text();
-                    }
-
-                    //put the data into the right strings, no 1 is the date and no 2 is the class
-                    if (columns.length > 0) {
-
-                        //if the date column is empty, this means that it has already been used, so look for the last date
-                        if (columns[0].contentEquals("")) {
-                            if (lastDate != null && !lastDate.contentEquals("")) {
-                                date = lastDate;
-                            }
-                        } else {
-                            date = columns[0];
-                            lastDate = date;
-                        }
-
-                        klasse = columns[1];
-
-                        //sql insert the two values
-                        datasource.createRowTests(date, klasse);
-                    }
-                }
-                datasource.close();
-            }
-
-            Toast t = new Toast(context[0]);
-            t.setText("TestsParse erfolgreich beendet");
-            //TODO fehler
-
-            return true;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            switch (values[0]) {
-
-                case 1:
-                    //downloading has ended
-                    break;
-                case 99:
-                    //error while downloading
-                    break;
-                case 999:
-                    //error because there was no data to extract
-                    break;
-            }
-        }
     }
 
     /**
@@ -943,223 +882,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
 
         builder.show();
-    }
-
-    /**
-     * The async task used for background-parsing of online data
-     */
-    abstract class BgParse extends AsyncTask<Context, Enum, Boolean> {
-
-        ProgressCode progress;
-        int downloaded;
-        int total_downloads;
-        Context context;
-        ProgressBar progressBar;
-
-        /**
-         * Starts the process of parsing
-         *
-         * @param context Used for method calls that require a context parameter
-         * @return returns true if everything went well
-         */
-        protected Boolean doInBackground(Context... context) {
-
-            this.context = context[0];
-
-            //download new data and then refresh pager adapter
-
-            try {
-                publishProgress(ProgressCode.STARTED);
-                updateAvailableFilesList();
-            } catch (Exception e) {
-                //check whether this is because of missing creds
-                if (e.getMessage() == "no creds available") {
-                    publishProgress(ProgressCode.ERR_NO_CREDS);
-                    return false;
-                } else if (e.getMessage().contentEquals("failed to connect")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
-                    return false;
-                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET);
-                    return false;
-                }
-            }
-
-            datasource.open();
-
-            Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
-
-            try {
-                total_downloads = c.getCount();
-                downloaded = 0;
-
-                while (c.moveToNext()) {
-                    //load every available vplan into the db
-                    requestedVplanId = c.getPosition();
-                    currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
-                    parseDataToSql();
-
-                    downloaded = c.getPosition() + 1;
-                    publishProgress(ProgressCode.PARSING_FINISHED);
-                }
-
-                publishProgress(ProgressCode.FINISHED_ALL);
-
-                return true;
-            } catch (Exception e) {
-
-                //check whether this is because of missing creds
-                if (e.getMessage() == "no creds available") {
-                    publishProgress(ProgressCode.ERR_NO_CREDS);
-                } else if (e.getMessage().contentEquals("failed to connect")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
-                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET);
-                } else {
-                    e.printStackTrace();
-                }
-                return false;
-            }
-        }
-
-        /**
-         * Called if the progress is updated
-         *
-         * @param values Only [0] in use: 0 is dowloading, 1 is download finished, 99 is error because no data available, 9999 is error because of missing credentials
-         */
-        @Override
-        protected void onProgressUpdate(Enum... values) {
-
-            switch ((ProgressCode)values[0]) {
-                case STARTED:
-                    progress = (ProgressCode)values[0];
-                    progressBar = (ProgressBar) findViewById(R.id.progressBar);
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setIndeterminate(true);
-                    break;
-                case PARSING_FINISHED:
-                    progress = (ProgressCode)values[0];
-                    progressBar.setIndeterminate(false);
-                    progressBar.setProgress((int)(100 * (double)downloaded/total_downloads));
-                    break;
-                case ERR_NO_CREDS:
-                    progress = (ProgressCode)values[0];
-                    progressBar.setVisibility(View.GONE);
-
-                    showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
-
-                    resetRefreshAnimation();
-
-                    break;
-                case ERR_NO_INTERNET:
-                    progress = (ProgressCode)values[0];
-                    progressBar.setVisibility(View.GONE);
-
-                    showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
-
-                    resetRefreshAnimation();
-
-                    break;
-                case ERR_NO_INTERNET_OR_NO_CREDS:
-                    progress = (ProgressCode)values[0];
-                    progressBar.setVisibility(View.GONE);
-
-                    showAlert(context, R.string.download_error_title, R.string.download_error, 1);
-
-                    resetRefreshAnimation();
-
-                    break;
-            }
-        }
-
-        /**
-         * Called when background parsing has finished and refreshes the whole ui, activates the adapter for the viewpager etc
-         *
-         * @param success is true if there was no error, false if an error occured, the user is being notified about that, unless error was because of missing credentials where the user has already been notified
-         */
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                stopProgressBar();
-
-                resetRefreshAnimation();
-
-                //notify about success
-                Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
-
-                refreshLastUpdate();
-
-                activatePagerAdapter(context);
-            }
-        }
-
-
-        /**
-         * Takes care of all the downloading and db-inserting
-         *
-         * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null or if therer has been an error while downloading
-         */
-        public void parseDataToSql() throws Exception {
-
-            String encoding = encodeCredentials();
-
-            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("no creds available");
-
-            Document doc;
-
-            //load vplan xhtml file and select the right table into Elements table
-            try {
-                doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
-            } catch (Exception e) {
-                if (encoding == null) {
-                    if (requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
-                    else throw new Exception("failed to connect oinfo");
-                } else throw new Exception("failed to connect");
-            }
-
-            //tempContent contains all found tables
-            Elements tempContent = doc.select("table[class=hyphenate]");
-            //the desired table is second child of tempContent
-            //each child of tableRows is one table row:
-            Element headerCurrentDate;
-            Elements tableRows;
-            Elements availableFiles;
-
-            try {
-                tableRows = tempContent.get(1).child(0).children();
-            } catch (Exception e) {
-                tableRows = null;
-            }
-
-            //put the text of the h2 element after availableFiles table into headerCurrentDate
-            try {
-                headerCurrentDate = doc.select("h2").first();
-            } catch (Exception e) {
-                headerCurrentDate = null;
-            }
-
-
-
-            //get timePublished timestamp
-            try {
-                timePublished = doc.select("p").first().text();
-            } catch (Exception e) {
-                timePublished = "";
-            }
-
-            saveCurrentTimestamp(headerCurrentDate);
-
-            //put the contents of the first table (available files) into another elements object for further processing
-            try {
-                availableFiles = tempContent.get(0).children().first().children();
-            } catch (Exception e) {
-                availableFiles = null;
-            }
-
-            parseVplan(tableRows);
-
-            parseAvailableFiles(availableFiles);
-        }
     }
 
     public void insertVplanRow(String stunde, String klasse, String status, int position) {
@@ -1361,26 +1083,204 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
     }
 
-    private class BgDownloader extends AsyncDownloader {
+    public enum ProgressCode {STARTED, PARSING_FINISHED, FINISHED_ALL, ERR_NO_INTERNET, ERR_NO_CREDS, ERR_NO_INTERNET_OR_NO_CREDS}
+
+    private class TestsParse extends AsyncTask<Context, Integer, Boolean> {
 
         @Override
-        protected void onProgressUpdate(Enum... values) {
-            super.onProgressUpdate(values);
+        protected Boolean doInBackground(Context... context) {
 
-            switch ((ProgressCode)values[0]) {
+            //get the tests for q11
+            Document doc;
+            Elements tableRows;
+            try {
+                doc = Jsoup.connect(getString(R.string.vplan_base_url) + "oinfo/scha11.html").get();
+            } catch (IOException e) {
+                e.printStackTrace();
+                doc = null;
+                publishProgress(99);
+            }
+            if (doc == null) return false;
+
+            publishProgress(1);
+
+            try {
+                tableRows = doc.select("table").first().child(0).children();
+            } catch (Exception e) {
+                e.printStackTrace();
+                tableRows = null;
+                publishProgress(999);
+            }
+
+            if (tableRows != null) {
+
+                datasource.open();
+
+                //clear the existing tests table
+                datasource.newTable(MySQLiteHelper.TABLE_TESTS);
+
+                String lastDate = null;
+
+                for (Element row : tableRows) {
+
+                    //skip the first row as it just contains the title
+                    if (row.elementSiblingIndex() == 0) continue;
+
+                    String[] columns = new String[row.children().size()];
+                    String klasse;
+                    String date = "";
+
+                    //distribute the row's content into an array in order to get the columns
+                    for (Element column : row.children()) {
+                        columns[column.elementSiblingIndex()] = column.text();
+                    }
+
+                    //put the data into the right strings, no 1 is the date and no 2 is the class
+                    if (columns.length > 0) {
+
+                        //if the date column is empty, this means that it has already been used, so look for the last date
+                        if (columns[0].contentEquals("")) {
+                            if (lastDate != null && !lastDate.contentEquals("")) {
+                                date = lastDate;
+                            }
+                        } else {
+                            date = columns[0];
+                            lastDate = date;
+                        }
+
+                        klasse = columns[1];
+
+                        //sql insert the two values
+                        datasource.createRowTests(date, klasse);
+                    }
+                }
+                datasource.close();
+            }
+
+            Toast t = new Toast(context[0]);
+            t.setText("TestsParse erfolgreich beendet");
+            //TODO fehler
+
+            return true;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            switch (values[0]) {
+
+                case 1:
+                    //downloading has ended
+                    break;
+                case 99:
+                    //error while downloading
+                    break;
+                case 999:
+                    //error because there was no data to extract
+                    break;
+            }
+        }
+    }
+
+    /**
+     * The async task used for background-parsing of online data
+     */
+    abstract class BgParse extends AsyncTask<Context, Enum, Boolean> {
+
+        ProgressCode progress;
+        int downloaded;
+        int total_downloads;
+        Context context;
+        ProgressBar progressBar;
+
+        /**
+         * Starts the process of parsing
+         *
+         * @param context Used for method calls that require a context parameter
+         * @return returns true if everything went well
+         */
+        protected Boolean doInBackground(Context... context) {
+
+            this.context = context[0];
+
+            //download new data and then refresh pager adapter
+
+            try {
+                publishProgress(ProgressCode.STARTED);
+                updateAvailableFilesList();
+            } catch (Exception e) {
+                //check whether this is because of missing creds
+                if (e.getMessage() == "no creds available") {
+                    publishProgress(ProgressCode.ERR_NO_CREDS);
+                    return false;
+                } else if (e.getMessage().contentEquals("failed to connect")) {
+                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                    return false;
+                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                    publishProgress(ProgressCode.ERR_NO_INTERNET);
+                    return false;
+                }
+            }
+
+            datasource.open();
+
+            Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
+
+            try {
+                total_downloads = c.getCount();
+                downloaded = 0;
+
+                while (c.moveToNext()) {
+                    //load every available vplan into the db
+                    requestedVplanId = c.getPosition();
+                    currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
+                    parseDataToSql();
+
+                    downloaded = c.getPosition() + 1;
+                    publishProgress(ProgressCode.PARSING_FINISHED);
+                }
+
+                publishProgress(ProgressCode.FINISHED_ALL);
+
+                return true;
+            } catch (Exception e) {
+
+                //check whether this is because of missing creds
+                if (e.getMessage() == "no creds available") {
+                    publishProgress(ProgressCode.ERR_NO_CREDS);
+                } else if (e.getMessage().contentEquals("failed to connect")) {
+                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                    publishProgress(ProgressCode.ERR_NO_INTERNET);
+                } else {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        }
+
+        /**
+         * Called if the progress is updated
+         *
+         * @param values Only [0] in use: 0 is dowloading, 1 is download finished, 99 is error because no data available, 9999 is error because of missing credentials
+         */
+        @Override
+        protected void onProgressUpdate(Enum... values) {
+
+            switch ((ProgressCode) values[0]) {
                 case STARTED:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar = (ProgressBar) findViewById(R.id.progressBar);
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar.setIndeterminate(true);
                     break;
                 case PARSING_FINISHED:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setIndeterminate(false);
-                    progressBar.setProgress((int)(100 * (double)downloaded/total_downloads));
+                    progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
                     break;
                 case ERR_NO_CREDS:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
@@ -1389,7 +1289,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                     break;
                 case ERR_NO_INTERNET:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
@@ -1398,7 +1298,146 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
                     break;
                 case ERR_NO_INTERNET_OR_NO_CREDS:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.download_error_title, R.string.download_error, 1);
+
+                    resetRefreshAnimation();
+
+                    break;
+            }
+        }
+
+        /**
+         * Called when background parsing has finished and refreshes the whole ui, activates the adapter for the viewpager etc
+         *
+         * @param success is true if there was no error, false if an error occured, the user is being notified about that, unless error was because of missing credentials where the user has already been notified
+         */
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                stopProgressBar();
+
+                resetRefreshAnimation();
+
+                //notify about success
+                Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
+
+                refreshLastUpdate();
+
+                activatePagerAdapter(context);
+            }
+        }
+
+
+        /**
+         * Takes care of all the downloading and db-inserting
+         *
+         * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null or if therer has been an error while downloading
+         */
+        public void parseDataToSql() throws Exception {
+
+            String encoding = encodeCredentials();
+
+            if (encoding == null && requestedVplanMode != OINFO)
+                throw new Exception("no creds available");
+
+            Document doc;
+
+            //load vplan xhtml file and select the right table into Elements table
+            try {
+                doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
+            } catch (Exception e) {
+                if (encoding == null) {
+                    if (requestedVplanMode != OINFO)
+                        throw new Exception("failed to connect without creds");
+                    else throw new Exception("failed to connect oinfo");
+                } else throw new Exception("failed to connect");
+            }
+
+            //tempContent contains all found tables
+            Elements tempContent = doc.select("table[class=hyphenate]");
+            //the desired table is second child of tempContent
+            //each child of tableRows is one table row:
+            Element headerCurrentDate;
+            Elements tableRows;
+            Elements availableFiles;
+
+            try {
+                tableRows = tempContent.get(1).child(0).children();
+            } catch (Exception e) {
+                tableRows = null;
+            }
+
+            //put the text of the h2 element after availableFiles table into headerCurrentDate
+            try {
+                headerCurrentDate = doc.select("h2").first();
+            } catch (Exception e) {
+                headerCurrentDate = null;
+            }
+
+
+            //get timePublished timestamp
+            try {
+                timePublished = doc.select("p").first().text();
+            } catch (Exception e) {
+                timePublished = "";
+            }
+
+            saveCurrentTimestamp(headerCurrentDate);
+
+            //put the contents of the first table (available files) into another elements object for further processing
+            try {
+                availableFiles = tempContent.get(0).children().first().children();
+            } catch (Exception e) {
+                availableFiles = null;
+            }
+
+            parseVplan(tableRows);
+
+            parseAvailableFiles(availableFiles);
+        }
+    }
+
+    private class BgDownloader extends AsyncDownloader {
+
+        @Override
+        protected void onProgressUpdate(Enum... values) {
+            super.onProgressUpdate(values);
+
+            switch ((ProgressCode) values[0]) {
+                case STARTED:
+                    progress = (ProgressCode) values[0];
+                    progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setIndeterminate(true);
+                    break;
+                case PARSING_FINISHED:
+                    progress = (ProgressCode) values[0];
+                    progressBar.setIndeterminate(false);
+                    progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
+                    break;
+                case ERR_NO_CREDS:
+                    progress = (ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
+
+                    resetRefreshAnimation();
+
+                    break;
+                case ERR_NO_INTERNET:
+                    progress = (ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
+
+                    resetRefreshAnimation();
+
+                    break;
+                case ERR_NO_INTERNET_OR_NO_CREDS:
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
@@ -1411,9 +1450,10 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
         @Override
         protected void onPostExecute(Boolean success) {
+
+            super.onPostExecute(success);
             if (success) {
 
-                super.onPostExecute(success);
                 stopProgressBar();
 
                 resetRefreshAnimation();
