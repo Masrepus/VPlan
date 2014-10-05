@@ -105,7 +105,6 @@ public final class R {
         public static final int background=0x7f080003;
         public static final int drawer_layout=0x7f080002;
         public static final int drawer_left=0x7f08000a;
-        public static final int dservicetest=0x7f08002e;
         public static final int filterWarning=0x7f080005;
         public static final int frameLayout=0x7f080004;
         public static final int hiddenDataFrame=0x7f08001c;

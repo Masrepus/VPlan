@@ -20,9 +20,5 @@
         android:id="@+id/action_activate_filter"
         android:title="@string/activate_filter"
         android:checkable="true" />
-    <item
-        android:id="@+id/dservicetest"
-        android:title="test download"
-        android:showAsAction="never" />
 
 </menu>

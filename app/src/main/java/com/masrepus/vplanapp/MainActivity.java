@@ -596,9 +596,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             case R.id.action_refresh:
                 refresh(item);
                 return true;
-            case R.id.dservicetest:
-                startService(new Intent(this, DownloaderService.class));
-                return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));
@@ -786,7 +783,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         PendingIntent pendingDownloadIntent = PendingIntent.getService(this, 0, downloadIntent, flag);
 
         if (activated) {
-            //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, System.currentTimeMillis(), interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
         } else alarmManager.cancel(pendingDownloadIntent);
     }
 
