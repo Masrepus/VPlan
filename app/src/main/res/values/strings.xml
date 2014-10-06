@@ -167,5 +167,6 @@
     <string name="preparing">Preparing...</string>
     <string name="downloaded_prog"> downloaded...</string>
     <string name="files"> files</string>
+    <string name="retry">Retry</string>
 
 </resources>

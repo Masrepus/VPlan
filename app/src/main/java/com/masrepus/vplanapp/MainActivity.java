@@ -687,6 +687,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+        if (sharedPreferences == getSharedPreferences(PREFS_NAME, 0)) {
+            if (key.contentEquals(PREF_LAST_UPDATE)) activatePagerAdapter(this);
+        }
         //settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
     }

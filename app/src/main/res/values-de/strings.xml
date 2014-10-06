@@ -57,5 +57,6 @@
     <string name="msg_bg_update">Aktualisiere Daten</string>
     <string name="files">Dateien</string>
     <string name="downloaded_prog">heruntergeladen...</string>
+    <string name="retry">Erneut versuchen</string>
 
 </resources>

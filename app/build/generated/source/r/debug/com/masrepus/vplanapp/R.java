@@ -88,12 +88,13 @@ public final class R {
         public static final int divider=0x7f020001;
         public static final int divider_vertical=0x7f020002;
         public static final int drawer_shadow=0x7f020003;
-        public static final int ic_drawer=0x7f020004;
-        public static final int ic_refresh=0x7f020005;
-        public static final int ic_settings=0x7f020006;
-        public static final int ic_website=0x7f020007;
-        public static final int sgplogob=0x7f020008;
-        public static final int yellow_selector=0x7f020009;
+        public static final int ic_cancel=0x7f020004;
+        public static final int ic_drawer=0x7f020005;
+        public static final int ic_refresh=0x7f020006;
+        public static final int ic_settings=0x7f020007;
+        public static final int ic_website=0x7f020008;
+        public static final int sgplogob=0x7f020009;
+        public static final int yellow_selector=0x7f02000a;
     }
     public static final class id {
         public static final int TAG_DAY=0x7f080000;
@@ -134,6 +135,7 @@ public final class R {
         public static final int showHiddenItemsFrame=0x7f080025;
         public static final int status=0x7f080029;
         public static final int stunde=0x7f080027;
+        public static final int test=0x7f08002e;
         public static final int textView2=0x7f080023;
         public static final int textView4=0x7f080021;
         public static final int textView5=0x7f080022;
@@ -302,26 +304,27 @@ public final class R {
         public static final int pwd=0x7f09008f;
         public static final int refresh=0x7f090090;
         public static final int religion=0x7f090091;
-        public static final int rhet=0x7f090092;
-        public static final int settings=0x7f090093;
-        public static final int sgp=0x7f090094;
-        public static final int sk=0x7f090095;
-        public static final int sp=0x7f090096;
-        public static final int sp_add=0x7f090097;
-        public static final int spo=0x7f090098;
-        public static final int ssp=0x7f090099;
-        public static final int status=0x7f09009a;
-        public static final int still_parsing=0x7f09009b;
-        public static final int tests=0x7f09009c;
-        public static final int uname=0x7f09009d;
-        public static final int unterstufe=0x7f09009e;
-        public static final int update_int=0x7f09009f;
-        public static final int updating=0x7f0900a0;
-        public static final int vplan=0x7f0900a1;
-        public static final int vplan_base_cred=0x7f0900a2;
-        public static final int vplan_base_url=0x7f0900a3;
-        public static final int wr=0x7f0900a4;
-        public static final int wsem=0x7f0900a5;
+        public static final int retry=0x7f090092;
+        public static final int rhet=0x7f090093;
+        public static final int settings=0x7f090094;
+        public static final int sgp=0x7f090095;
+        public static final int sk=0x7f090096;
+        public static final int sp=0x7f090097;
+        public static final int sp_add=0x7f090098;
+        public static final int spo=0x7f090099;
+        public static final int ssp=0x7f09009a;
+        public static final int status=0x7f09009b;
+        public static final int still_parsing=0x7f09009c;
+        public static final int tests=0x7f09009d;
+        public static final int uname=0x7f09009e;
+        public static final int unterstufe=0x7f09009f;
+        public static final int update_int=0x7f0900a0;
+        public static final int updating=0x7f0900a1;
+        public static final int vplan=0x7f0900a2;
+        public static final int vplan_base_cred=0x7f0900a3;
+        public static final int vplan_base_url=0x7f0900a4;
+        public static final int wr=0x7f0900a5;
+        public static final int wsem=0x7f0900a6;
     }
     public static final class style {
         public static final int MyActionBar=0x7f0a0000;

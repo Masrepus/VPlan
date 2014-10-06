@@ -81,6 +81,8 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             }
         }
 
+        if (isCancelled()) return false;
+
         datasource.open();
 
         Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
@@ -90,6 +92,9 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             downloaded = 0;
 
             while (c.moveToNext()) {
+
+                if (isCancelled()) return false;
+
                 //load every available vplan into the db
                 requestedVplanId = c.getPosition();
                 currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
