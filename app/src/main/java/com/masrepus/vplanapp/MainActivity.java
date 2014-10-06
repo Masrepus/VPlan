@@ -16,6 +16,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -63,12 +64,13 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final String PREF_APPMODE = "appmode";
     public static final String PREF_TODAY_VPLAN = "todayVplan";
     public static final String PREF_IS_BG_UPD_ACTIVE = "isBgUpdActive";
+    public static final String PREF_CURR_BG_INT = "currInt";
+    public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
+    public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
     public static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
     public static final int OINFO = 3;
-    public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
-    public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final int VPLAN = 0;
     private int appMode = VPLAN; //at the moment tests is not available
@@ -770,21 +772,41 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
     private void refreshBgUpdates(Boolean activated, int interval) {
 
-        //get the download intent from downloadservice and use it for alarmmanager
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent downloadIntent = new Intent(this, DownloaderService.class);
-
         //find out whether we have to update the pending intent
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-        Boolean wasActiveBefore = pref.getBoolean(PREF_IS_BG_UPD_ACTIVE, false);
-        int flag = 0;
-        if (wasActiveBefore) flag = PendingIntent.FLAG_UPDATE_CURRENT;
+        SharedPreferences.Editor editor = pref.edit();
 
+        Boolean wasActiveBefore = pref.getBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+        int flag;
+        if (wasActiveBefore) {
+            flag = PendingIntent.FLAG_UPDATE_CURRENT;
+
+            //only update the alarm if the interval really changed, else just skip this unless it has to be deactivated
+            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated) saveAlarm(activated, interval, flag, editor);
+        } else saveAlarm(activated, interval, 0, editor);
+
+        editor.apply();
+    }
+
+    private void saveAlarm(boolean activated, long interval, int flag, SharedPreferences.Editor editor) {
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Intent downloadIntent = new Intent(this, DownloaderService.class);
         PendingIntent pendingDownloadIntent = PendingIntent.getService(this, 0, downloadIntent, flag);
 
         if (activated) {
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
-        } else alarmManager.cancel(pendingDownloadIntent);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
+
+            //save that it is active now and also save the current interval
+            editor.putBoolean(PREF_IS_BG_UPD_ACTIVE, true);
+            editor.putLong(PREF_CURR_BG_INT, interval);
+        } else {
+            alarmManager.cancel(pendingDownloadIntent);
+
+            //save that it isn't active anymore
+            editor.putBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+        }
     }
 
     /**
