@@ -135,7 +135,6 @@ public final class R {
         public static final int showHiddenItemsFrame=0x7f080025;
         public static final int status=0x7f080029;
         public static final int stunde=0x7f080027;
-        public static final int test=0x7f08002e;
         public static final int textView2=0x7f080023;
         public static final int textView4=0x7f080021;
         public static final int textView5=0x7f080022;
