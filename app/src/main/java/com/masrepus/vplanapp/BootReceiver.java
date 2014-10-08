@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 
 /**
  * Created by samuel on 05.10.14.
@@ -21,7 +22,7 @@ public class BootReceiver extends BroadcastReceiver {
         this.context = context;
 
         //set the alarm
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
         refreshBgUpdates(Boolean.valueOf(pref.getString(context.getString(R.string.pref_key_bg_updates), "false")), Integer.valueOf(pref.getString(context.getString(R.string.pref_key_upd_int), "")));
     }
