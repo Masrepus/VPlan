@@ -105,7 +105,7 @@
                     android:title="@string/phy"
                     android:key="@string/pref_key_phy_q11"
                     android:entries="@array/q_11_ph"
-                    android:entryValues="@array/q_11_d" />
+                    android:entryValues="@array/q_11_ph" />
                 <MultiSelectListPreference
                     android:title="@string/ph_b"
                     android:key="@string/pref_key_phb_q11"
