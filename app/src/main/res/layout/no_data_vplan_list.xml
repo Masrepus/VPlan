@@ -30,7 +30,8 @@
             android:layout_below="@+id/nodataTV"
             android:layout_centerHorizontal="true"
             android:textColor="@android:color/darker_gray"
-            android:clickable="false" />
+            android:clickable="false"
+            android:textSize="20dp" />
     </RelativeLayout>
 
     <FrameLayout
