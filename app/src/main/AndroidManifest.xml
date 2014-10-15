@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.masrepus.vplanapp"
     android:versionCode="2"
-    android:versionName="1.1" >
+    android:versionName="1.1.1" >
 
     <uses-sdk tools:node="replace" />
 
