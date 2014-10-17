@@ -30,6 +30,11 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <receiver android:name=".BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

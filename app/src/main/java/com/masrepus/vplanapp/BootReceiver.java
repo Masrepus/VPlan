@@ -33,16 +33,10 @@ public class BootReceiver extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent downloadIntent = new Intent(context, DownloaderService.class);
 
-        //find out whether we have to update the pending intent
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        Boolean wasActiveBefore = pref.getBoolean(MainActivity.PREF_IS_BG_UPD_ACTIVE, false);
-        int flag = 0;
-        if (wasActiveBefore) flag = PendingIntent.FLAG_UPDATE_CURRENT;
-
-        PendingIntent pendingDownloadIntent = PendingIntent.getService(context, 0, downloadIntent, flag);
+        PendingIntent pendingDownloadIntent = PendingIntent.getService(context, 0, downloadIntent, 0);
 
         if (activated) {
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
-        } else alarmManager.cancel(pendingDownloadIntent);
+        }
     }
 }
