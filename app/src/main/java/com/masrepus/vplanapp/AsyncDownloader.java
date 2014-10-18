@@ -111,6 +111,8 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             publishProgress(MainActivity.ProgressCode.FINISHED_ALL);
 
+            datasource.close();
+
             return true;
         } catch (Exception e) {
 
