@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_refresh"
         android:title="@string/refresh"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_open_browser"
         android:icon="@drawable/ic_website"
         android:title="@string/open_browser"
-        android:showAsAction="always" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"
         android:title="@string/settings"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_activate_filter"
         android:title="@string/activate_filter"

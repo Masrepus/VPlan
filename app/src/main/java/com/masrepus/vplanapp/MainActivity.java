@@ -19,11 +19,13 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -55,7 +57,7 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends FragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String PREFS_NAME = "mPrefs";
     public static final String PREF_LAST_UPDATE = "lastUpdate";
     public static final String PREF_VPLAN_MODE = "mode";
@@ -156,13 +158,15 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         settings.setText(getString(R.string.settings).toUpperCase());
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        final ActionBar actionBar = getActionBar();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         final Context context = this;
         if (actionBar != null) {
 
-            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_closed) {
+            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
 
                 private int currMode;
 
@@ -203,7 +207,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                 @Override
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
-                    getActionBar().setTitle(R.string.sgp);
+                    actionBar.setTitle(R.string.sgp);
 
                     //save the content of requestedVplanMode for later check for change
                     currMode = requestedVplanMode;

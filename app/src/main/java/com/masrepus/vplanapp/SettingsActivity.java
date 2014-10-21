@@ -2,11 +2,12 @@ package com.masrepus.vplanapp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 
 /**
  * Created by samuel on 01.09.14.
  */
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends ActionBarActivity {
 
 
     /**

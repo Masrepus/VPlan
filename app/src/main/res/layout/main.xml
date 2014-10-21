@@ -1,259 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/background"
-        android:animateLayoutChanges="true">
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/frameLayout"
-            android:visibility="gone"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:background="@android:color/darker_gray"
-            android:clickable="true"
-            android:onClick="onFilterInfoClick">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:id="@+id/filterWarning"
-                android:layout_gravity="center"
-                android:textStyle="italic"
-                android:text="small text"
-                android:textColor="@android:color/primary_text_dark" />
-        </FrameLayout>
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:indeterminateBehavior="cycle"
-            android:visibility="gone"
-            android:layout_below="@+id/frameLayout" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/no_data"
-            android:id="@+id/welcome_textView"
-            android:layout_centerInParent="true"
-            android:gravity="center_horizontal"
-            android:onClick="refresh"
-            android:clickable="true" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/frameLayout">
-
-            <android.support.v4.view.PagerTabStrip
-                android:id="@+id/pager_title_strip"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"/>
-        </android.support.v4.view.ViewPager>
-
-
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/drawer_left"
-        android:layout_width="250dp"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_height="match_parent"
-        android:divider="@drawable/divider"
-        android:showDividers="middle"
-        android:layout_gravity="start"
-        android:orientation="vertical"
-        android:background="@android:color/background_light">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/lastUpdateStatic"
-                android:textStyle="bold|italic"
-                android:textColor="@android:color/darker_gray"
-                android:text="@string/last_update"
-                android:layout_gravity="center"
-                android:paddingTop="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/lastUpdate"
-                android:textStyle="bold|italic"
-                android:textColor="@android:color/darker_gray"
-                android:paddingBottom="10dp"
-                android:text="@string/last_update"
-                android:layout_gravity="center" />
-        </LinearLayout>
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioGroup2">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/yellow_selector"
-                android:paddingLeft="16dp"
-                android:id="@+id/radioUinfoFrame">
-
-                <RadioButton
-                    android:button="@null"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="@string/unterstufe"
-                    android:id="@+id/radioUinfo"
-                    android:layout_gravity="center"
-                    android:checked="false"
-                    android:textAppearance="@android:style/TextAppearance.Holo.Large"
-                    android:onClick="onVplanModeRadioButtonClick" />
-                </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/yellow_selector"
-                android:paddingLeft="16dp"
-                android:id="@+id/radioMinfoFrame">
-
-                <RadioButton
-                    android:button="@null"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="@string/mittelstufe"
-                    android:id="@+id/radioMinfo"
-                    android:layout_gravity="center"
-                    android:checked="false"
-                    android:textAppearance="@android:style/TextAppearance.Holo.Large"
-                    android:onClick="onVplanModeRadioButtonClick" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/yellow_selector"
-                android:paddingLeft="16dp"
-                android:id="@+id/radioOinfoFrame">
-
-                <RadioButton
-                    android:button="@null"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="@string/oberstufe"
-                    android:id="@+id/radioOinfo"
-                    android:layout_gravity="center"
-                    android:checked="false"
-                    android:textAppearance="@android:style/TextAppearance.Holo.Large"
-                    android:onClick="onVplanModeRadioButtonClick" />
-            </FrameLayout>
-
-        </RadioGroup>
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/yellow_selector"
-                android:paddingLeft="16dp"
-                android:id="@+id/radioTestsFrame">
-
-                <RadioButton
-                    android:button="@null"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="@string/tests"
-                    android:id="@+id/radioTests"
-                    android:layout_gravity="center"
-                    android:checked="false"
-                    android:textAppearance="@android:style/TextAppearance.Holo.Large"
-                    android:onClick="onModeChangeRadioButtonClick" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/yellow_selector"
-                android:paddingLeft="16dp"
-                android:id="@+id/radioVPlanFrame">
-
-                <RadioButton
-                    android:button="@null"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="@string/vplan"
-                    android:id="@+id/radioVPlan"
-                    android:layout_gravity="center"
-                    android:checked="false"
-                    android:textAppearance="@android:style/TextAppearance.Holo.Large"
-                    android:onClick="onModeChangeRadioButtonClick" />
-            </FrameLayout>
-            </RadioGroup>
+        android:layout_width="match_parent"
+        android:layout_below="@+id/toolbar">
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/relativeLayout2"
-            android:clickable="true">
+            android:id="@+id/background"
+            android:animateLayoutChanges="true">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="16dp"
-                android:layout_above="@+id/textViewAppInfo"
-                android:id="@+id/settings_frame"
-                android:paddingBottom="10dp"
+                android:id="@+id/frameLayout"
+                android:visibility="gone"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:background="@android:color/darker_gray"
                 android:clickable="true"
-                android:onClick="onSettingsClick">
+                android:onClick="onFilterInfoClick">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/filterWarning"
+                    android:layout_gravity="center"
+                    android:textStyle="italic"
+                    android:text="small text"
+                    android:textColor="@android:color/primary_text_dark" />
+            </FrameLayout>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:indeterminateBehavior="cycle"
+                android:visibility="gone"
+                android:layout_below="@+id/frameLayout" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/no_data"
+                android:id="@+id/welcome_textView"
+                android:layout_centerInParent="true"
+                android:gravity="center_horizontal"
+                android:onClick="refresh"
+                android:clickable="true" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/frameLayout">
+
+                <android.support.v4.view.PagerTabStrip
+                    android:id="@+id/pager_title_strip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp" />
+            </android.support.v4.view.ViewPager>
+
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/drawer_left"
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:divider="@drawable/divider"
+            android:showDividers="middle"
+            android:layout_gravity="start"
+            android:orientation="vertical"
+            android:background="@android:color/background_light">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/settings"
-                    android:id="@+id/textViewSettings"
-                    android:layout_gravity="left|center_vertical"
-                    android:drawableLeft="@drawable/ic_settings"
-                    android:drawablePadding="5dp"
-                    android:gravity="center_vertical|center_horizontal" />
-            </FrameLayout>
+                    android:id="@+id/lastUpdateStatic"
+                    android:textStyle="bold|italic"
+                    android:textColor="@android:color/darker_gray"
+                    android:text="@string/last_update"
+                    android:layout_gravity="center"
+                    android:paddingTop="10dp" />
 
-            <TextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/lastUpdate"
+                    android:textStyle="bold|italic"
+                    android:textColor="@android:color/darker_gray"
+                    android:paddingBottom="10dp"
+                    android:text="@string/last_update"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+            <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textViewAppInfo"
-                android:textAppearance="@android:style/TextAppearance.Holo.Small"
-                android:textColor="@android:color/darker_gray"
-                android:layout_alignParentBottom="true" />
-        </RelativeLayout>
-    </LinearLayout>
+                android:id="@+id/radioGroup2">
 
-</android.support.v4.widget.DrawerLayout>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/yellow_selector"
+                    android:paddingLeft="16dp"
+                    android:id="@+id/radioUinfoFrame">
+
+                    <RadioButton
+                        android:button="@null"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/unterstufe"
+                        android:id="@+id/radioUinfo"
+                        android:layout_gravity="center"
+                        android:checked="false"
+                        android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                        android:onClick="onVplanModeRadioButtonClick" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/yellow_selector"
+                    android:paddingLeft="16dp"
+                    android:id="@+id/radioMinfoFrame">
+
+                    <RadioButton
+                        android:button="@null"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/mittelstufe"
+                        android:id="@+id/radioMinfo"
+                        android:layout_gravity="center"
+                        android:checked="false"
+                        android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                        android:onClick="onVplanModeRadioButtonClick" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/yellow_selector"
+                    android:paddingLeft="16dp"
+                    android:id="@+id/radioOinfoFrame">
+
+                    <RadioButton
+                        android:button="@null"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/oberstufe"
+                        android:id="@+id/radioOinfo"
+                        android:layout_gravity="center"
+                        android:checked="false"
+                        android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                        android:onClick="onVplanModeRadioButtonClick" />
+                </FrameLayout>
+
+            </RadioGroup>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/yellow_selector"
+                    android:paddingLeft="16dp"
+                    android:id="@+id/radioTestsFrame">
+
+                    <RadioButton
+                        android:button="@null"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/tests"
+                        android:id="@+id/radioTests"
+                        android:layout_gravity="center"
+                        android:checked="false"
+                        android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                        android:onClick="onModeChangeRadioButtonClick" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/yellow_selector"
+                    android:paddingLeft="16dp"
+                    android:id="@+id/radioVPlanFrame">
+
+                    <RadioButton
+                        android:button="@null"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/vplan"
+                        android:id="@+id/radioVPlan"
+                        android:layout_gravity="center"
+                        android:checked="false"
+                        android:textAppearance="@android:style/TextAppearance.Holo.Large"
+                        android:onClick="onModeChangeRadioButtonClick" />
+                </FrameLayout>
+            </RadioGroup>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/relativeLayout2"
+                android:clickable="true">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="false"
+                    android:layout_alignParentLeft="true"
+                    android:paddingLeft="16dp"
+                    android:layout_above="@+id/textViewAppInfo"
+                    android:id="@+id/settings_frame"
+                    android:paddingBottom="10dp"
+                    android:clickable="true"
+                    android:onClick="onSettingsClick">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/settings"
+                        android:id="@+id/textViewSettings"
+                        android:layout_gravity="left|center_vertical"
+                        android:drawableLeft="@drawable/ic_settings"
+                        android:drawablePadding="5dp"
+                        android:gravity="center_vertical|center_horizontal" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textViewAppInfo"
+                    android:textAppearance="@android:style/TextAppearance.Holo.Small"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_alignParentBottom="true" />
+            </RelativeLayout>
+        </LinearLayout>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</RelativeLayout>
