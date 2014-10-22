@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by samuel on 05.10.14.
@@ -24,10 +25,10 @@ public class BootReceiver extends BroadcastReceiver {
         //set the alarm
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        refreshBgUpdates(Boolean.valueOf(pref.getString(context.getString(R.string.pref_key_bg_updates), "false")), Integer.valueOf(pref.getString(context.getString(R.string.pref_key_upd_int), "")));
+        refreshBgUpdates(pref.getString(context.getString(R.string.pref_key_bg_updates), "false"), Integer.valueOf(pref.getString(context.getString(R.string.pref_key_upd_int), "")));
     }
 
-    private void refreshBgUpdates(Boolean activated, int interval) {
+    private void refreshBgUpdates(String activated, int interval) {
 
         //get the download intent from downloadservice and use it for alarmmanager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -35,8 +36,9 @@ public class BootReceiver extends BroadcastReceiver {
 
         PendingIntent pendingDownloadIntent = PendingIntent.getService(context, 0, downloadIntent, 0);
 
-        if (activated) {
+        if (activated.contentEquals("true")) {
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
+            Log.d(context.getPackageName(), "successfully set alarm for auto update");
         }
     }
 }
