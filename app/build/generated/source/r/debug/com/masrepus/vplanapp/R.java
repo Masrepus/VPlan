@@ -2206,7 +2206,7 @@ containing a value of this type.
         public static final int Theme_AppCompat_Light_NoActionBar=0x7f0d00a5;
         public static final int Theme_AppCompat_NoActionBar=0x7f0d00a6;
         public static final int ThemeLightYellow=0x7f0d00a7;
-        public static final int ThemeYellow =0x7f0d00a8;
+        public static final int ThemeLightYellowNoActionBar=0x7f0d00a8;
         public static final int ThemeOverlay_AppCompat=0x7f0d00a9;
         public static final int ThemeOverlay_AppCompat_ActionBar=0x7f0d00aa;
         public static final int ThemeOverlay_AppCompat_Dark=0x7f0d00ab;
