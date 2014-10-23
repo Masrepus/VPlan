@@ -148,7 +148,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-        viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
 
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
         tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
@@ -200,7 +199,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                         //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
                         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
                         viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-                        viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
                     }
                 }
 
@@ -795,7 +793,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-        viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
         viewPager.setCurrentItem(getTodayVplanId(), false);
     }
 
