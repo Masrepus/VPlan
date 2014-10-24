@@ -138,7 +138,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         refreshFilters();
 
         //activate adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent);
 
         //if the adapter's number of fragments is 0, then display the no data layout on top of it
 
@@ -338,7 +338,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         editor.apply();
 
         //refresh adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(vplanPagerAdapter);
 
@@ -411,7 +411,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent));
+        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
     }
 
     /**
@@ -537,7 +537,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     filterWarning.setText(R.string.filter_enabled);
                 }
                 //refresh adapter for viewPager
-                VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+                VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent);
                 ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
                 viewPager.setAdapter(vplanPagerAdapter);
                 viewPager.setCurrentItem(getTodayVplanId(), false);
@@ -786,7 +786,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public void activatePagerAdapter(Context context) {
 
         //activate adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
+        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, getParent(), filterCurrent);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(vplanPagerAdapter);
 
