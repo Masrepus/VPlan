@@ -190,15 +190,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     if (currMode != requestedVplanMode) {
 
                         welcome.setVisibility(View.VISIBLE);
-
-                        //refresh adapter for viewPager
-                        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
-                        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                        viewPager.setAdapter(vplanPagerAdapter);
-
-                        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-                        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-                        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
                     }
                 }
 
@@ -345,6 +336,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(PREF_VPLAN_MODE, requestedVplanMode);
         editor.apply();
+
+        //refresh adapter for viewPager
+        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(vplanPagerAdapter);
+
+        //set a 1 dp margin between the fragments
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
     }
 
     public void onModeChangeRadioButtonClick(View v) {
