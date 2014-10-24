@@ -193,7 +193,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
                         viewPager.setAdapter(vplanPagerAdapter);
 
-                        //set a 1 dp margin between the fragments
+                        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
                         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
                         viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
                         viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
@@ -214,7 +214,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
 
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setElevation(2*(displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
 
             //set the actionbar title matching to requestedVplanMode
             switch (requestedVplanMode) {
@@ -305,7 +304,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public void onVplanModeRadioButtonClick(View v) {
 
         //update the requested vplanmode and check whether a different one has been selected
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
         switch (v.getId()) {
 
             case R.id.radioMinfo:
@@ -345,7 +343,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(PREF_VPLAN_MODE, requestedVplanMode);
         editor.apply();
-        pager.getAdapter().notifyDataSetChanged();
     }
 
     public void onModeChangeRadioButtonClick(View v) {
