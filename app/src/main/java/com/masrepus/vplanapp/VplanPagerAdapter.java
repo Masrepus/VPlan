@@ -149,8 +149,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                             //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
                             if (vplanMode == MainActivity.OINFO) {
                                 String filterItem = filter.get(i);
-                                if (klasse.contains(filterItem)) isNeeded = true;
-                                else isNeeded = false;
+                                if (vplanMode != MainActivity.OINFO)isNeeded = klasse.contains(filterItem);
+                                else isNeeded = klasse.contentEquals("Q" + filterItem);
 
                                 if (isNeeded) break;
                                 if (klasse.contentEquals("")) isNeeded = true;
@@ -180,7 +180,9 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 }
 
                 //now save the differences in the hiddenItems list
+                dataLists.add(id, list);
                 hiddenItems.add(id, new ArrayList<Row>(nonOverLap(tempList, list)));
+                listSizesBeforeFilter[id] = tempList.size();
 
             } else {
                 // just fill the list normally

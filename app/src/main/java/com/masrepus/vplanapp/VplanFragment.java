@@ -85,6 +85,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     //display everything
                     ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
 
+                    //get hidden items and activate the onclick listener for the footer
+                    hiddenItems = pagerAdapter.getHiddenItems(id);
                     addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
 
                     listView.setAdapter(adapter);
