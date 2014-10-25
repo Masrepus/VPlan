@@ -77,6 +77,7 @@ public class DownloaderService extends Service {
                     builder.setProgress(0, 0, false);
                     builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
                     builder.setOngoing(false);
+                    builder.setAutoCancel(true);
                 } else {
                     builder.setProgress(total_downloads, downloaded, false);
                     //if an error has happened then don't make the notification ongoing and add a retry action
@@ -88,7 +89,8 @@ public class DownloaderService extends Service {
                         builder.setProgress(0, 0, false)
                                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                                 .setOngoing(false)
-                                .addAction(android.R.drawable.stat_notify_sync_noanim, getString(R.string.retry), retryPending);
+                                .addAction(android.R.drawable.stat_notify_sync_noanim, getString(R.string.retry), retryPending)
+                                .setAutoCancel(true);
                     }
                 }
             }
