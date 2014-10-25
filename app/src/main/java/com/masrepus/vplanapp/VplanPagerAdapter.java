@@ -201,6 +201,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 }
 
                 dataLists.add(id, list);
+                listSizesBeforeFilter[id] = list.size();
             }
         }
         datasource.close();
@@ -228,7 +229,6 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         if (listSizesBeforeFilter.length > i) args.putInt(VplanFragment.ARG_LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);
         else args.putInt(VplanFragment.ARG_LIST_SIZE_ORIGINAL, 0);
-        //TODO ohne filter wird nix angezeigt
         args.putBoolean(VplanFragment.FLAG_VPLAN_LOADING_DUMMY, false);
         fragment.setArguments(args);
 
