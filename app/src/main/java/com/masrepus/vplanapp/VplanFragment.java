@@ -24,18 +24,21 @@ import java.util.Set;
 public class VplanFragment extends Fragment implements View.OnClickListener {
 
     public static final String ARG_REQUESTED_VPLAN_ID = "requestedVplan";
+    public static final String ARG_VPLAN_MODE = "vplanmode";
     public static final String FLAG_VPLAN_LOADING_DUMMY = "loadingDummy";
     public static final String ARG_LIST_SIZE = "size";
     public static final String ARG_HIDDEN_ITEMS_COUNT = "hiddenCount";
     public static final String ARG_LIST_SIZE_ORIGINAL = "listSizeBeforeFilter";
     private SharedPreferences pref;
     private ArrayList<Row> hiddenItems;
+    private int requestedVplanMode;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Bundle args = getArguments();
         int id = args.getInt(ARG_REQUESTED_VPLAN_ID);
+        requestedVplanMode = args.getInt(ARG_VPLAN_MODE);
         int listSize = args.getInt(ARG_LIST_SIZE);
         int hiddenItemsCount = args.getInt(ARG_HIDDEN_ITEMS_COUNT);
         int listSizeBeforeFilter = args.getInt(ARG_LIST_SIZE_ORIGINAL);
@@ -68,7 +71,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     rootView = inflater.inflate(
                             R.layout.no_data_vplan_list, container, false);
                     TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-                    String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
+                    String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
                     timePublishedTV.setText(currTimePublished);
 
                     //get the hidden items
@@ -157,7 +160,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     private void displayTimePublished(View rootView, int vplanId) {
 
         TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-        String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(vplanId), "");
+        String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(vplanId), "");
         timePublishedTV.setText(currTimePublished);
     }
 }

@@ -222,6 +222,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         //the id of the requested vplan for this fragment is the fragment's id; also pass hidden items count, data list size, original list size before filtering
         args.putInt(VplanFragment.ARG_REQUESTED_VPLAN_ID, i);
+        args.putInt(VplanFragment.ARG_VPLAN_MODE, vplanMode);
         if (hiddenItems.size() > i) args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
         else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
 
@@ -262,7 +263,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         //this vplan's current date is used as title
         SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        title = prefs.getString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(position), "");
+        title = prefs.getString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(vplanMode) + String.valueOf(position), "");
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");

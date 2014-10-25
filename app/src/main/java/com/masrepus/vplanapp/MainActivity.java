@@ -89,7 +89,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private VPlanDataSource datasource;
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
-    private String timePublished;
     private Map<String, ?> keys;
     private String currentVPlanLink;
 
@@ -114,7 +113,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 requestedVplanId = sharedPreferences.getInt(PREF_REQUESTED_VPLAN_ID, 0);
                 currentVPlanLink = sharedPreferences.getString(PREF_CURR_VPLAN_LINK, "");
-                timePublished = sharedPreferences.getString(PREF_PREFIX_VPLAN_TIME_PUBLISHED, "");
             }
         });
         requestedVplanMode = pref.getInt(PREF_VPLAN_MODE, UINFO);

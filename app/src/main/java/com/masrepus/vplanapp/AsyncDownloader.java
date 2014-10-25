@@ -265,11 +265,11 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             else currentDate = separated[2].trim();
         }
 
-        //now save the current loaded vplan's date and its last-changed timestamp for later usage
+        //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
         SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanId), currentDate);
-        editor.putString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanId), timePublished);
+        editor.putString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), currentDate);
+        editor.putString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), timePublished);
         editor.apply();
     }
 
