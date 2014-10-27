@@ -45,6 +45,12 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private String timePublished;
     private int requestedVplanMode;
 
+    protected int getRequestedVplanMode() {
+        //externalised so that the service can override this
+        SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        return pref.getInt(MainActivity.PREF_VPLAN_MODE, UINFO);
+    }
+
     /**
      * Starts the process of parsing
      *
@@ -60,7 +66,8 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
-        requestedVplanMode = pref.getInt(MainActivity.PREF_VPLAN_MODE, UINFO);
+        //get the requested vplan mode
+        requestedVplanMode = getRequestedVplanMode();
 
         //download new data and then refresh pager adapter
 
