@@ -160,7 +160,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         setSupportActionBar(toolbar);
 
         final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        final Context context = this;
+
         if (actionBar != null) {
 
             drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
@@ -189,15 +189,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                         welcome.setVisibility(View.VISIBLE);
                     }
-                }
-
-                @Override
-                public void onDrawerOpened(View drawerView) {
-                    super.onDrawerOpened(drawerView);
-                    actionBar.setTitle(R.string.sgp);
-
-                    //save the content of requestedVplanMode for later check for change
-                    currMode = requestedVplanMode;
                 }
             };
 
@@ -343,6 +334,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //set a 1 dp margin between the fragments
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+
+        //collapse drawer
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout.closeDrawers();
     }
 
     public void onModeChangeRadioButtonClick(View v) {
