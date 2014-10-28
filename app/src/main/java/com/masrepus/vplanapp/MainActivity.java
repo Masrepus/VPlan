@@ -34,10 +34,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -91,6 +95,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private ActionBarDrawerToggle drawerToggle;
     private Map<String, ?> keys;
     private String currentVPlanLink;
+    private int selectedItem;
 
     /**
      * Called when the activity is first created.
@@ -218,49 +223,68 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         tv.setVisibility(View.VISIBLE);
         tv.setText(lastUpdate);
 
-        //restore the last checked radio button
-        RadioButton currModeRadio = null;
-        switch (requestedVplanMode) {
+        //prepare vplan mode listview
+        ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
+        final DrawerListAdapter modesAdapter = new DrawerListAdapter(this, R.layout.drawer_list_item);
 
-            case UINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioUinfo);
-                break;
-            case MINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioMinfo);
-                break;
-            case OINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioOinfo);
-                break;
-        }
-
-        //check whether refresh is necessary
-        if (currModeRadio != null) {
-            onVplanModeRadioButtonClick(currModeRadio);
-            currModeRadio.setChecked(true);
-        }
-
-        //restore the last checked appmode radiobutton
-        RadioButton currAppmodeRadio = null;
-        switch (appMode) {
-
-            case VPLAN:
-                currAppmodeRadio = (RadioButton) findViewById(R.id.radioVPlan);
-                break;
-            case TESTS:
-                currAppmodeRadio = (RadioButton) findViewById(R.id.radioTests);
-                break; //commented out for public release
-        }
-
-        //check whether refresh is necessary
-        if (currAppmodeRadio != null) {
-            onModeChangeRadioButtonClick(currAppmodeRadio);
-            currAppmodeRadio.setChecked(true);
-        }
+        vplanModesLV.setAdapter(modesAdapter);
+        vplanModesLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedItem = i;
+                modesAdapter.notifyDataSetChanged();
+            }
+        });
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
+    }
+
+    private class DrawerListAdapter extends ArrayAdapter {
+
+        private Context context;
+        private String[] items;
+
+        public DrawerListAdapter(Context context, int resource) {
+            super(context, resource);
+            this.context = context;
+            items = this.context.getResources().getStringArray(R.array.vplan_modes);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder view;
+
+            if (convertView == null) {
+                view = new ViewHolder();
+                //get a new instance of the list item layout view
+                convertView = View.inflate(context, R.layout.drawer_list_item, null);
+
+                view.modeView = (TextView) convertView.findViewById(R.id.textView);
+                convertView.setTag(view);
+            } else view = (ViewHolder) convertView.getTag();
+
+            //if this view is selected, change the background color
+            if (selectedItem == position) {
+                convertView.setBackgroundColor(getResources().getColor(R.color.yellow));
+            } else convertView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+
+            view.modeView.setText(items[position]);
+
+            return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return items.length;
+        }
+
+        protected class ViewHolder {
+            protected TextView modeView;
+        }
     }
 
     private int getTodayVplanId() {
@@ -285,41 +309,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
      */
     public void onVplanModeRadioButtonClick(View v) {
 
-        //update the requested vplanmode and check whether a different one has been selected
-        switch (v.getId()) {
-
-            case R.id.radioMinfo:
-
-                rbUiHandler(new int[]{R.id.radioMinfo, R.id.radioOinfo, R.id.radioUinfo}, new int[]{R.id.radioMinfoFrame, R.id.radioOinfoFrame, R.id.radioUinfoFrame});
-
-                requestedVplanMode = MINFO;
-
-                //update current filterlist
-                filterCurrent = filterMittelstufe;
-                break;
-
-            case R.id.radioOinfo:
-
-                rbUiHandler(new int[]{R.id.radioOinfo, R.id.radioMinfo, R.id.radioUinfo}, new int[]{R.id.radioOinfoFrame, R.id.radioMinfoFrame, R.id.radioUinfoFrame});
-
-                requestedVplanMode = OINFO;
-
-                //update current filterlist
-                filterCurrent = filterOberstufe;
-                break;
-
-            case R.id.radioUinfo:
-
-                rbUiHandler(new int[]{R.id.radioUinfo, R.id.radioOinfo, R.id.radioMinfo}, new int[]{R.id.radioUinfoFrame, R.id.radioOinfoFrame, R.id.radioMinfoFrame});
-
-                requestedVplanMode = UINFO;
-
-                //update current filterlist
-                filterCurrent = filterUnterstufe;
-
-                break;
-        }
-
         //save mode in shared prefs
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
@@ -338,22 +327,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //collapse drawer
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawers();
-    }
-
-    public void onModeChangeRadioButtonClick(View v) {
-
-        switch (v.getId()) {
-
-            case R.id.radioTests:
-                rbUiHandler(new int[]{R.id.radioTests, R.id.radioVPlan}, new int[]{R.id.radioTestsFrame, R.id.radioVPlanFrame});
-
-                //nothing
-                break;
-            case R.id.radioVPlan:
-                rbUiHandler(new int[]{R.id.radioVPlan, R.id.radioTests}, new int[]{R.id.radioVPlanFrame, R.id.radioTestsFrame});
-
-                break;
-        }
     }
 
     private void rbUiHandler(int[] buttons, int[] frames) {
