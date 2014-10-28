@@ -43,11 +43,23 @@
     <string name="news">News</string>
     <string name="tests">Tests</string>
     <string name="vplan">Vertretungsplan</string>
-    <string name="msg_hidden_plural">Einträge wegen Filterung verborgen)</string>
-    <string name="msg_hidden_singular">Eintrag wegen Filterung verborgen)</string>
+    <string name="msg_hidden_plural">Einträge wegen Filterung verborgen</string>
+    <string name="msg_hidden_singular">Eintrag wegen Filterung verborgen</string>
     <string name="download_error">Bitte überprüfe die gespeicherten Zugangsdaten und deine Internetverbindung</string>
     <string name="download_error_title">Herunterladen gescheitert</string>
     <string name="download_error_nocreds">Für Unter- und Mittelstufe sind Benutzername und Passwort benötigt. Jetzt eingeben?</string>
     <string name="download_error_nointernet">Bitte die Internetverbindung überprüfen</string>
+    <string name="hidden_items">Verborgene Einträge</string>
+    <string name="bg_updates">Hintergrundaktualisierung</string>
+    <string name="activate_bg_updates">Automatisch aktualisieren</string>
+    <string name="preparing">Vorbereiten...</string>
+    <string name="update_int">Intervall</string>
+    <string name="msg_bg_update">Aktualisiere Daten</string>
+    <string name="files">Dateien</string>
+    <string name="downloaded_prog">heruntergeladen...</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="file">Datei</string>
+    <string name="levels">Stufen</string>
+    <string name="level">Stufe</string>
 
 </resources>

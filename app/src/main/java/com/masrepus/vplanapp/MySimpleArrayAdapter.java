@@ -1,6 +1,7 @@
 package com.masrepus.vplanapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +20,9 @@ public class MySimpleArrayAdapter extends ArrayAdapter {
 
     /**
      * Constructor for the custom arrayadapter
+     *
      * @param activity used for method-calls that require a context parameter
-     * @param list a Row ArrayList that has to be parsed into a listview
+     * @param list     a Row ArrayList that has to be parsed into a listview
      */
     public MySimpleArrayAdapter(Activity activity, ArrayList<Row> list) {
         super(activity, R.layout.vplan_list, list);

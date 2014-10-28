@@ -7,41 +7,66 @@
         <item>Mittelstufe</item>
         <item>Oberstufe</item>
     </string-array>
+    <string-array name="upd_intervals">
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>5 hours</item>
+        <item>12 hours</item>
+        <item>daily</item>
+    </string-array>
+    <string-array name="upd_int_values">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>12</item>
+        <item>24</item>
+    </string-array>
     <string-array name="grade_5">
         <item>5A</item>
         <item>5B</item>
         <item>5C</item>
         <item>5D</item>
+        <item>5E</item>
     </string-array>
     <string-array name="grade_6">
         <item>6A</item>
         <item>6B</item>
         <item>6C</item>
         <item>6D</item>
+        <item>6E</item>
+        <item>6F</item>
     </string-array>
     <string-array name="grade_7">
         <item>7A</item>
         <item>7B</item>
         <item>7C</item>
         <item>7D</item>
+        <item>7E</item>
     </string-array>
     <string-array name="grade_8">
         <item>8A</item>
         <item>8B</item>
         <item>8C</item>
         <item>8D</item>
+        <item>8E</item>
+        <item>8F</item>
     </string-array>
     <string-array name="grade_9">
         <item>9A</item>
         <item>9B</item>
         <item>9C</item>
         <item>9D</item>
+        <item>9E</item>
+        <item>9F</item>
     </string-array>
     <string-array name="grade_10">
         <item>10A</item>
         <item>10B</item>
         <item>10C</item>
         <item>10D</item>
+        <item>10E</item>
+        <item>10F</item>
+        <item>10G</item>
     </string-array>
     <string-array name="q_11_d">
         <item>1D1</item>
@@ -157,13 +182,13 @@
         <item>2Ph1A</item>
     </string-array>
     <string-array name="q_11_ch">
-        <item>1Ch1</item>
-        <item>1Ch2</item>
-        <item>1Ch3</item>
+        <item>1C1</item>
+        <item>1C2</item>
+        <item>1C3</item>
     </string-array>
     <string-array name="q_12_ch">
-        <item>2Ch1</item>
-        <item>2Ch2</item>
+        <item>2C1</item>
+        <item>2C2</item>
     </string-array>
     <string-array name="q_11_inf">
         <item>1Inf</item>

@@ -150,12 +150,27 @@
     <string name="pref_key_ekon_q12" translatable="false">pref_key_ekon_q12</string>
     <string name="bigb" translatable="false">Bigband</string>
     <string name="pref_key_bigb_q12" translatable="false">pref_key_bigb_q12</string>
-    <string name="msg_hidden_plural"> items hidden because of filtering)</string>
-    <string name="msg_hidden_singular">item hidden because of filtering)</string>
+    <string name="msg_hidden_plural">items hidden because of filtering</string>
+    <string name="msg_hidden_singular">item hidden because of filtering</string>
     <string name="download_error">Please check the saved credentials and your internet connection...</string>
     <string name="download_error_title">Error while downloading</string>
     <string name="download_error_nointernet">Please check your internet connection</string>
     <string name="download_error_nocreds">You first have to enter username and password for Unterstufe and Mittelstufe. Do this now?</string>
     <string name="news">news</string>
+    <string name="hidden_items">Hidden items</string>
+    <string name="bg_updates">Background updates</string>
+    <string name="activate_bg_updates">Activate background updates</string>
+    <string name="update_int">Update interval</string>
+    <string name="pref_key_upd_int" translatable="false">pref_key_upd_int</string>
+    <string name="pref_key_bg_updates" translatable="false">pref_key_bg_updates</string>
+    <string name="msg_bg_update">Updating data</string>
+    <string name="preparing">Preparing...</string>
+    <string name="downloaded_prog"> downloaded...</string>
+    <string name="files"> files</string>
+    <string name="retry">Retry</string>
+    <string name="levels">Class levels</string>
+    <string name="pref_key_bg_upd_levels">pref_key_bg_upd_levels</string>
+    <string name="file">file</string>
+    <string name="level">level</string>
 
 </resources>

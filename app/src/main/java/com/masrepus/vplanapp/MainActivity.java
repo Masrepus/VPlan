@@ -1,57 +1,54 @@
 package com.masrepus.vplanapp;
 
-import android.app.ActionBar;
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Base64;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends FragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, AdapterView.OnItemClickListener {
     public static final String PREFS_NAME = "mPrefs";
     public static final String PREF_LAST_UPDATE = "lastUpdate";
     public static final String PREF_VPLAN_MODE = "mode";
@@ -60,29 +57,32 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     public static final String PREF_IS_FILTER_ACTIVE = "isFilterActive";
     public static final String PREF_APPMODE = "appmode";
     public static final String PREF_TODAY_VPLAN = "todayVplan";
-    private static final int BASIC = 0;
+    public static final String PREF_IS_BG_UPD_ACTIVE = "isBgUpdActive";
+    public static final String PREF_CURR_BG_INT = "currInt";
+    public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
+    public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
+    public static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
     public static final int OINFO = 3;
-    public static int inflateStatus = 0;
-    java.text.DateFormat format = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
-    private int appMode = VPLAN; //at the moment tests is not available
+    public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final int VPLAN = 0;
+    private int appMode = VPLAN; //at the moment tests is not available
     public static final int TESTS = 1;
+    public static int inflateStatus = 0;
+    public ArrayList<String> filterCurrent = new ArrayList<String>();
+    public ArrayList<String> filterUnterstufe = new ArrayList<String>();
+    public ArrayList<String> filterMittelstufe = new ArrayList<String>();
+    public ArrayList<String> filterOberstufe = new ArrayList<String>();
     private int requestedVplanMode;
     private int requestedVplanId;
     private boolean isOnlineRequested;
     private VPlanDataSource datasource;
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
-    private String timePublished;
-    public ArrayList<String> filterCurrent = new ArrayList<String>();
-    public ArrayList<String> filterUnterstufe = new ArrayList<String>();
-    public ArrayList<String> filterMittelstufe = new ArrayList<String>();
-    public ArrayList<String> filterOberstufe = new ArrayList<String>();
     private Map<String, ?> keys;
     private String currentVPlanLink;
-    public enum ProgressCode {STARTED, PARSING_FINISHED, FINISHED_ALL, ERR_NO_INTERNET, ERR_NO_CREDS, ERR_NO_INTERNET_OR_NO_CREDS}
+    private int selectedItem;
 
     /**
      * Called when the activity is first created.
@@ -95,11 +95,15 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        final TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-        welcome.setVisibility(View.VISIBLE);
-
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        pref.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                requestedVplanId = sharedPreferences.getInt(PREF_REQUESTED_VPLAN_ID, 0);
+                currentVPlanLink = sharedPreferences.getString(PREF_CURR_VPLAN_LINK, "");
+            }
+        });
         requestedVplanMode = pref.getInt(PREF_VPLAN_MODE, UINFO);
         appMode = pref.getInt(PREF_APPMODE, VPLAN);
         if (pref.getBoolean(PREF_IS_FILTER_ACTIVE, false)) {
@@ -121,17 +125,14 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         refreshFilters();
 
         //activate adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+        datasource.open();
+        if (!datasource.hasData(MySQLiteHelper.TABLE_LINKS)) {
+            TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+            welcome.setVisibility(View.VISIBLE);
+        }
+        datasource.close();
 
-        //if the adapter's number of fragments is 0, then display the no data layout on top of it
-
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(vplanPagerAdapter);
-
-        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-        viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
+        new PagerAdapterLoader().execute(this);
 
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
         tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
@@ -141,13 +142,15 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         settings.setText(getString(R.string.settings).toUpperCase());
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        final ActionBar actionBar = getActionBar();
-        final Context context = this;
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+
         if (actionBar != null) {
 
-            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_closed) {
+            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
 
                 private int currMode;
 
@@ -168,30 +171,13 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                             actionBar.setTitle(R.string.oberstufe);
                             break;
                     }
-
-                    if (currMode != requestedVplanMode) {
-
-                        welcome.setVisibility(View.VISIBLE);
-
-                        //refresh adapter for viewPager
-                        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
-                        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                        viewPager.setAdapter(vplanPagerAdapter);
-
-                        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-                        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-                        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-                        viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
-                    }
                 }
 
                 @Override
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
-                    getActionBar().setTitle(R.string.sgp);
 
-                    //save the content of requestedVplanMode for later check for change
-                    currMode = requestedVplanMode;
+                    actionBar.setTitle(R.string.sgp);
                 }
             };
 
@@ -221,49 +207,155 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         tv.setVisibility(View.VISIBLE);
         tv.setText(lastUpdate);
 
-        //restore the last checked radio button
-        RadioButton currModeRadio = null;
-        switch (requestedVplanMode) {
+        //prepare vplan mode listview
+        final ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
+        final DrawerListAdapter modesAdapter = new DrawerListAdapter(this, R.layout.drawer_list_item);
 
-            case UINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioUinfo);
-                break;
-            case MINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioMinfo);
-                break;
-            case OINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioOinfo);
-                break;
-        }
+        vplanModesLV.setAdapter(modesAdapter);
+        vplanModesLV.setOnItemClickListener(this);
 
-        //check whether refresh is necessary
-        if (currModeRadio != null) {
-            onVplanModeRadioButtonClick(currModeRadio);
-            currModeRadio.setChecked(true);
-        }
-
-        //restore the last checked appmode radiobutton
-        RadioButton currAppmodeRadio = null;
-        switch (appMode) {
-
-            case VPLAN:
-                currAppmodeRadio = (RadioButton) findViewById(R.id.radioVPlan);
-                break;
-            case TESTS:
-                currAppmodeRadio = (RadioButton) findViewById(R.id.radioTests);
-                break; //commented out for public release
-        }
-
-        //check whether refresh is necessary
-        if (currAppmodeRadio != null) {
-            onModeChangeRadioButtonClick(currAppmodeRadio);
-            currAppmodeRadio.setChecked(true);
-        }
+        //restore last vplanmode
+        selectedItem = requestedVplanMode - 1;
+        modesAdapter.notifyDataSetChanged();
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        //check whether there was a change in the selection
+        if (requestedVplanMode != i + 1) {
+
+        selectedItem = i;
+        ListView vplanModes = (ListView) adapterView;
+        DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
+        modesAdapter.notifyDataSetChanged();
+
+        //change requested vplan mode and save it in shared prefs
+            requestedVplanMode = i + 1;
+            getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
+
+            //select the right filter
+            switch (requestedVplanMode) {
+
+                case UINFO:
+                    filterCurrent = filterUnterstufe;
+                    break;
+                case MINFO:
+                    filterCurrent = filterMittelstufe;
+                    break;
+                case OINFO:
+                    filterCurrent = filterOberstufe;
+                    break;
+            }
+
+            //recreate the pageradapter
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+
+            //now start the adapter loading in a separate thread
+            new PagerAdapterLoader().execute(this);
+        } //else just ignore the click
+    }
+
+    /**
+     * PagerAdapter that only displays one dummy fragment containing a progressbar
+     */
+    private class LoadingAdapter extends FragmentStatePagerAdapter {
+
+        public LoadingAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            Bundle args = new Bundle();
+            args.putBoolean(VplanFragment.FLAG_VPLAN_LOADING_DUMMY, true);
+            Fragment loadingFragment = new VplanFragment();
+            loadingFragment.setArguments(args);
+
+            return loadingFragment;
+        }
+
+        @Override
+        public int getCount() {
+            return 1;
+        }
+    }
+
+    /**
+     * Loads a VplanPagerAdapter in a background task
+     */
+    private class PagerAdapterLoader extends AsyncTask<Activity, Void, VplanPagerAdapter> {
+
+        @Override
+        protected VplanPagerAdapter doInBackground(Activity... activities) {
+            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
+        }
+
+        @Override
+        protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(vplanPagerAdapter);
+
+            //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+            pager.setCurrentItem(getTodayVplanId(), false);
+        }
+    }
+
+    private class DrawerListAdapter extends ArrayAdapter {
+
+        private Context context;
+        private String[] items;
+
+        public DrawerListAdapter(Context context, int resource) {
+            super(context, resource);
+            this.context = context;
+            items = this.context.getResources().getStringArray(R.array.vplan_modes);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder view;
+
+            if (convertView == null) {
+                view = new ViewHolder();
+                //get a new instance of the list item layout view
+                convertView = View.inflate(context, R.layout.drawer_list_item, null);
+
+                view.modeView = (TextView) convertView.findViewById(R.id.textView);
+                convertView.setTag(view);
+            } else view = (ViewHolder) convertView.getTag();
+
+            //if this view is selected, change the background color
+            if (selectedItem == position) {
+                convertView.setBackgroundColor(getResources().getColor(R.color.yellow));
+                view.modeView.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                convertView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                view.modeView.setTypeface(Typeface.DEFAULT);
+            }
+
+            view.modeView.setText(items[position]);
+
+            return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return items.length;
+        }
+
+        protected class ViewHolder {
+            protected TextView modeView;
+        }
     }
 
     private int getTodayVplanId() {
@@ -281,98 +373,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         //refresh the pager adapter
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
-    }
-
-    /**
-     * Called when one of the RadioButtons in the navigation drawer is clicked
-     */
-    public void onVplanModeRadioButtonClick(View v) {
-
-        //update the requested vplanmode and check whether a different one has been selected
-        switch (v.getId()) {
-
-            case R.id.radioMinfo:
-
-                rbUiHandler(new int[]{R.id.radioMinfo, R.id.radioOinfo, R.id.radioUinfo}, new int[]{R.id.radioMinfoFrame, R.id.radioOinfoFrame, R.id.radioUinfoFrame});
-
-                requestedVplanMode = MINFO;
-
-                //update current filterlist
-                filterCurrent = filterMittelstufe;
-                break;
-
-            case R.id.radioOinfo:
-
-                rbUiHandler(new int[]{R.id.radioOinfo, R.id.radioMinfo, R.id.radioUinfo}, new int[]{R.id.radioOinfoFrame, R.id.radioMinfoFrame, R.id.radioUinfoFrame});
-
-                requestedVplanMode = OINFO;
-
-                //update current filterlist
-                filterCurrent = filterOberstufe;
-                break;
-
-            case R.id.radioUinfo:
-
-                rbUiHandler(new int[]{R.id.radioUinfo, R.id.radioOinfo, R.id.radioMinfo}, new int[]{R.id.radioUinfoFrame, R.id.radioOinfoFrame, R.id.radioMinfoFrame});
-
-                requestedVplanMode = UINFO;
-
-                //update current filterlist
-                filterCurrent = filterUnterstufe;
-
-                break;
-        }
-
-        //save mode in shared prefs
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(PREF_VPLAN_MODE, requestedVplanMode);
-        editor.apply();
-    }
-
-    public void onModeChangeRadioButtonClick(View v) {
-
-        switch (v.getId()) {
-
-            case R.id.radioTests:
-                rbUiHandler(new int[]{R.id.radioTests, R.id.radioVPlan}, new int[]{R.id.radioTestsFrame, R.id.radioVPlanFrame});
-
-                new TestsParse().execute(this);
-                break;
-            case R.id.radioVPlan:
-                rbUiHandler(new int[]{R.id.radioVPlan, R.id.radioTests}, new int[]{R.id.radioVPlanFrame, R.id.radioTestsFrame});
-
-                break;
-        }
-    }
-
-    private void rbUiHandler(int[] buttons, int[] frames) {
-
-        //add all radiobuttons associated to the given id's to an arraylist and then handle the layout changes automatically
-        ArrayList<RadioButton> radioButtons = new ArrayList<RadioButton>(buttons.length);
-
-        for (int id : buttons) {
-            radioButtons.add((RadioButton) findViewById(id));
-        }
-
-        radioButtons.get(0).setTypeface(Typeface.DEFAULT_BOLD);
-
-        for (int i = 1; i <= radioButtons.size() - 1; i++) {
-            radioButtons.get(i).setTypeface(Typeface.DEFAULT);
-        }
-
-        //same thing for the framelayouts
-        ArrayList<FrameLayout> frameLayouts = new ArrayList<FrameLayout>(frames.length);
-
-        for (int id : frames) {
-            frameLayouts.add((FrameLayout) findViewById(id));
-        }
-
-        frameLayouts.get(0).setEnabled(true);
-
-        for (int i = 1; i <= frameLayouts.size() - 1; i++) {
-            frameLayouts.get(i).setEnabled(false);
-        }
     }
 
     /**
@@ -394,7 +394,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent));
+        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
     }
 
     /**
@@ -406,100 +406,6 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         drawerToggle.syncState();
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setCurrentItem(getTodayVplanId());
-    }
-
-    /**
-     * Checks whether the device is online and if this is true it fetches the currently available files from the right internet page by calling findRequestedVplan()
-     */
-    private void updateAvailableFilesList() throws Exception {
-
-        //load the list of files that are available just now, if internet connection is available, else just skip that
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
-
-        if (activeNetwork != null && activeNetwork.isConnected()) {
-
-            //we are online
-
-            //encode uname and pw for http post
-            String encoding = encodeCredentials();
-
-            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
-
-                Document doc = null;
-                try {
-                    doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    if (encoding == null) throw new Exception("failed to connect oinfo");
-                    else throw new Exception("failed to connect");
-                }
-
-                if (doc != null) {
-
-                    //tempContent contains all found tables
-                    Elements tempContent = doc.select("table[class=hyphenate]");
-                    //first table is the wanted one for available files list
-                    Elements availableFiles;
-
-                    try {
-                        availableFiles = tempContent.get(0).child(0).children();
-                    } catch (Exception e) {
-                        availableFiles = null;
-                    }
-
-                    //db input of available files + url's
-                    if (availableFiles != null) {
-
-                        int position = 0;
-                        datasource.open();
-                        datasource.newTable(MySQLiteHelper.TABLE_LINKS);
-
-                        //now distribute the contents of availableFiles into a new list for the selection spinner
-                        for (Element row : availableFiles) {
-                            String url;
-                            String tag;
-
-                            tag = row.child(0).text();
-                            url = row.child(0).child(0).attributes().get("href");
-
-                            //sql insert
-                            datasource.createRowLinks(position, tag, url);
-
-                            position++;
-                        }
-
-                        datasource.close();
-                    }
-                }
-        }
-    }
-
-    /**
-     * Called in order to find the correct url for the currently requested vplan mode. To accomplish that, it passes the request on to getVPlanUrl with the current mode
-     *
-     * @return the url as a String
-     */
-    private String findRequestedVPlan() {
-
-        //return the appropriate vplan for the requested mode, if it hasn't been initialised for any reason, return the uinfo url
-        String url = "";
-
-        switch (requestedVplanMode) {
-
-            case UINFO:
-                url = getVPlanUrl(UINFO, false);
-                break;
-            case MINFO:
-                url = getVPlanUrl(MINFO, false);
-                break;
-            case OINFO:
-                url = getVPlanUrl(OINFO, false);
-                break;
-        }
-
-        if (url != "") return url;
-        else return getVPlanUrl(UINFO, false);
     }
 
     /**
@@ -583,6 +489,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
             case R.id.action_refresh:
                 refresh(item);
                 return true;
+            case R.id.tester:
+                startService(new Intent(this, DownloaderService.class));
+                return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));
@@ -614,10 +523,8 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
                     filterWarning.setText(R.string.filter_enabled);
                 }
                 //refresh adapter for viewPager
-                VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
-                ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                viewPager.setAdapter(vplanPagerAdapter);
-                viewPager.setCurrentItem(getTodayVplanId());
+                new PagerAdapterLoader().execute(this);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -647,7 +554,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         isOnlineRequested = true;
 
         //get data and put it into db, viewpager adapter is automatically refreshed
-        new BgParse().execute(this);
+        new BgDownloader().execute(this);
     }
 
     /**
@@ -672,6 +579,9 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+        if (sharedPreferences == getSharedPreferences(PREFS_NAME, 0)) {
+            if (key.contentEquals(PREF_LAST_UPDATE)) activatePagerAdapter();
+        }
         //settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
     }
@@ -697,8 +607,19 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
             //skip pwd or uname
-            if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd)))
+            if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd))
+                    || entry.getKey().contentEquals(getString(R.string.pref_key_upd_int)))
                 continue;
+
+            //treat bg updates separately
+            if (entry.getKey().contentEquals(getString(R.string.pref_key_bg_updates))) {
+
+                int interval = Integer.valueOf(pref.getString(getString(R.string.pref_key_upd_int), ""));
+
+                refreshBgUpdates(Boolean.valueOf(entry.getValue().toString()), interval);
+
+                continue;
+            }
 
             if (Arrays.asList(uinfoKeys).contains(entry.getKey())) {
                 mode = UINFO;
@@ -744,6 +665,45 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         }
     }
 
+    private void refreshBgUpdates(Boolean activated, int interval) {
+
+        //find out whether we have to update the pending intent
+        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+
+        Boolean wasActiveBefore = pref.getBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+        int flag;
+        if (wasActiveBefore) {
+            flag = PendingIntent.FLAG_UPDATE_CURRENT;
+
+            //only update the alarm if the interval really changed, else just skip this unless it has to be deactivated
+            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated) saveAlarm(activated, interval, flag, editor);
+        } else saveAlarm(activated, interval, 0, editor);
+
+        editor.apply();
+    }
+
+    private void saveAlarm(boolean activated, long interval, int flag, SharedPreferences.Editor editor) {
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Intent downloadIntent = new Intent(this, DownloaderService.class);
+        PendingIntent pendingDownloadIntent = PendingIntent.getService(this, 0, downloadIntent, flag);
+
+        if (activated) {
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
+
+            //save that it is active now and also save the current interval
+            editor.putBoolean(PREF_IS_BG_UPD_ACTIVE, true);
+            editor.putLong(PREF_CURR_BG_INT, interval);
+        } else {
+            alarmManager.cancel(pendingDownloadIntent);
+
+            //save that it isn't active anymore
+            editor.putBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+        }
+    }
+
     /**
      * Called when the grey statusbar displaying the filter status is clicked; shows a dialog displaying the contents of the current filter
      */
@@ -769,135 +729,7 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         } else {
             builder.setItems(filterCurrent.toArray(new String[filterCurrent.size()]), null);
         }
-        AlertDialog dialog = builder.show();
-    }
-
-    private class TestsParse extends AsyncTask<Context, Integer, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Context... context) {
-
-            //get the tests for q11
-            Document doc;
-            Elements tableRows;
-            try {
-                doc = Jsoup.connect(getString(R.string.vplan_base_url) + "oinfo/scha11.html").get();
-            } catch (IOException e) {
-                e.printStackTrace();
-                doc = null;
-                publishProgress(99);
-            }
-            if (doc == null) return false;
-
-            publishProgress(1);
-
-            try {
-                tableRows = doc.select("table").first().child(0).children();
-            } catch (Exception e) {
-                e.printStackTrace();
-                tableRows = null;
-                publishProgress(999);
-            }
-
-            if (tableRows != null) {
-
-                datasource.open();
-
-                //clear the existing tests table
-                datasource.newTable(MySQLiteHelper.TABLE_TESTS);
-
-                String lastDate = null;
-
-                for (Element row : tableRows) {
-
-                    //skip the first row as it just contains the title
-                    if (row.elementSiblingIndex() == 0) continue;
-
-                    String[] columns = new String[row.children().size()];
-                    String klasse;
-                    String date = "";
-
-                    //distribute the row's content into an array in order to get the columns
-                    for (Element column : row.children()) {
-                        columns[column.elementSiblingIndex()] = column.text();
-                    }
-
-                    //put the data into the right strings, no 1 is the date and no 2 is the class
-                    if (columns.length > 0) {
-
-                        //if the date column is empty, this means that it has already been used, so look for the last date
-                        if (columns[0].contentEquals("")) {
-                            if (lastDate != null && !lastDate.contentEquals("")) {
-                                date = lastDate;
-                            }
-                        } else {
-                            date = columns[0];
-                            lastDate = date;
-                        }
-
-                        klasse = columns[1];
-
-                        //sql insert the two values
-                        datasource.createRowTests(date, klasse);
-                    }
-                }
-                datasource.close();
-            }
-
-            Toast t = new Toast(context[0]);
-            t.setText("TestsParse erfolgreich beendet");
-            //TODO fehler
-
-            return true;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            switch (values[0]) {
-
-                case 1:
-                    //downloading has ended
-                    break;
-                case 99:
-                    //error while downloading
-                    break;
-                case 999:
-                    //error because there was no data to extract
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Encodes the saved username and password with Base64 encoder
-     *
-     * @return the credentials as single, encoded String; null if there was any error
-     */
-    public String encodeCredentials() {
-        //encode uname and pw for http post
-        //uname and pwd are stored in settings sharedPrefs
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String uname = pref.getString(getString(R.string.key_uname), "");
-        String pwd = pref.getString(getString(R.string.key_pwd), "");
-
-        if (uname.contentEquals("") || pwd.contentEquals("")) return null;
-
-        String creds = uname + ":" + pwd;
-
-        byte[] data = null;
-        try {
-            data = creds.getBytes("UTF-8");
-        } catch (UnsupportedOperationException e) {
-            e.printStackTrace();
-            Log.e(getPackageName(), getString(R.string.err_getBytes));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Log.e(getPackageName(), getString(R.string.err_getBytes));
-        }
-        String encoding = Base64.encodeToString(data, Base64.DEFAULT);
-
-        return encoding;
+        builder.show();
     }
 
     public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
@@ -935,358 +767,111 @@ public class MainActivity extends FragmentActivity implements SharedPreferences.
         builder.show();
     }
 
-    /**
-     * The async task used for background-parsing of online data
-     */
-    private class BgParse extends AsyncTask<Context, Enum, Boolean> {
+    public void activatePagerAdapter() {
 
-        ProgressCode progress;
-        int downloaded;
-        int total_downloads;
-        Context context;
-        ProgressBar progressBar;
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
 
-        /**
-         * Starts the process of parsing
-         *
-         * @param context Used for method calls that require a context parameter
-         * @return returns true if everything went well
-         */
-        protected Boolean doInBackground(Context... context) {
+        //activate adapter for viewPager
+        new PagerAdapterLoader().execute(this);
+    }
 
-            this.context = context[0];
 
-            //download new data and then refresh pager adapter
+    public void displayLastUpdate(String lastUpdate) {
 
-            try {
-                publishProgress(ProgressCode.STARTED);
-                updateAvailableFilesList();
-            } catch (Exception e) {
-                //check whether this is because of missing creds
-                if (e.getMessage() == "no creds available") {
-                    publishProgress(ProgressCode.ERR_NO_CREDS);
-                    return false;
-                } else if (e.getMessage().contentEquals("failed to connect")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
-                    return false;
-                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET);
-                    return false;
-                }
-            }
+        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
+        lastUpdateTv.setText(lastUpdate);
+    }
 
-            datasource.open();
+    public void resetRefreshAnimation() {
 
-            Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
-
-            try {
-                total_downloads = c.getCount();
-                downloaded = 0;
-
-                while (c.moveToNext()) {
-                    //load every available vplan into the db
-                    requestedVplanId = c.getPosition();
-                    currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
-                    parseDataToSql();
-
-                    downloaded = c.getPosition() + 1;
-                    publishProgress(ProgressCode.PARSING_FINISHED);
-                }
-
-                publishProgress(ProgressCode.FINISHED_ALL);
-
-                return true;
-            } catch (Exception e) {
-
-                //check whether this is because of missing creds
-                if (e.getMessage() == "no creds available") {
-                    publishProgress(ProgressCode.ERR_NO_CREDS);
-                } else if (e.getMessage().contentEquals("failed to connect")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
-                } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                    publishProgress(ProgressCode.ERR_NO_INTERNET);
-                } else {
-                    e.printStackTrace();
-                }
-                return false;
+        //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+        if (refreshItem != null) {
+            if (refreshItem.getActionView() != null) {
+                refreshItem.getActionView().clearAnimation();
+                refreshItem.setActionView(null);
             }
         }
+    }
 
-        /**
-         * Called if the progress is updated
-         *
-         * @param values Only [0] in use: 0 is dowloading, 1 is download finished, 99 is error because no data available, 9999 is error because of missing credentials
-         */
+    public void stopProgressBar() {
+
+        //stop progress bar
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
+        if (pb != null) {
+
+            //if pb is null, then data is already displayed, so no dummy layout available
+            pb.setIndeterminate(false);
+            pb.setVisibility(View.GONE);
+        }
+    }
+
+    public enum ProgressCode {STARTED, PARSING_FINISHED, FINISHED_ALL, ERR_NO_INTERNET, ERR_NO_CREDS, ERR_NO_INTERNET_OR_NO_CREDS}
+
+    private class BgDownloader extends AsyncDownloader {
+
         @Override
         protected void onProgressUpdate(Enum... values) {
+            super.onProgressUpdate(values);
 
-            switch ((ProgressCode)values[0]) {
+            switch ((ProgressCode) values[0]) {
                 case STARTED:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar = (ProgressBar) findViewById(R.id.progressBar);
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar.setIndeterminate(true);
                     break;
                 case PARSING_FINISHED:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setIndeterminate(false);
-                    progressBar.setProgress((int)(100 * (double)downloaded/total_downloads));
+                    progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
                     break;
                 case ERR_NO_CREDS:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
+
+                    resetRefreshAnimation();
+
                     break;
                 case ERR_NO_INTERNET:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
+
+                    resetRefreshAnimation();
+
                     break;
                 case ERR_NO_INTERNET_OR_NO_CREDS:
-                    progress = (ProgressCode)values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
+
+                    resetRefreshAnimation();
+
                     break;
             }
         }
 
-        /**
-         * Called when background parsing has finished and refreshes the whole ui, activates the adapter for the viewpager etc
-         *
-         * @param success is true if there was no error, false if an error occured, the user is being notified about that, unless error was because of missing credentials where the user has already been notified
-         */
         @Override
         protected void onPostExecute(Boolean success) {
+
+            super.onPostExecute(success);
             if (success) {
-                //stop progress bar
-                ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
-                if (pb != null) {
 
-                    //if pb is null, then data is already displayed, so no dummy layout available
-                    pb.setIndeterminate(false);
-                    pb.setVisibility(View.GONE);
-                }
+                stopProgressBar();
 
-                //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
-                if (refreshItem != null) {
-                    if (refreshItem.getActionView() != null) {
-                        refreshItem.getActionView().clearAnimation();
-                        refreshItem.setActionView(null);
-                    }
-                }
+                resetRefreshAnimation();
 
                 //notify about success
                 Toast.makeText(getApplicationContext(), getString(R.string.parsing_finished), Toast.LENGTH_SHORT).show();
 
-                //save and display last update timestamp
-                Calendar calendar = Calendar.getInstance();
-                String lastUpdate = format.format(calendar.getTime());
+                displayLastUpdate(refreshLastUpdate());
 
-                SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putString(PREF_LAST_UPDATE, lastUpdate);
-                editor.apply();
-
-                TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
-                lastUpdateTv.setText(lastUpdate);
-
-                //activate adapter for viewPager
-                VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
-                ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                viewPager.setAdapter(vplanPagerAdapter);
-
-                //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-                DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-                viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-                viewPager.setPageMarginDrawable(R.drawable.divider_vertical);
-                viewPager.setCurrentItem(getTodayVplanId());
-            }
-        }
-
-
-        /**
-         * Takes care of all the downloading and db-inserting
-         *
-         * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null
-         */
-        public void parseDataToSql() throws Exception {
-
-            String encoding = encodeCredentials();
-
-            if (encoding == null && requestedVplanMode != OINFO) throw new Exception("no creds available");
-
-            Document doc;
-
-            //load vplan xhtml file and select the right table into Elements table
-            try {
-                doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
-            } catch (Exception e) {
-                if (encoding == null) {
-                    if (requestedVplanMode != OINFO) throw new Exception("failed to connect without creds");
-                    else throw new Exception("failed to connect oinfo");
-                } else throw new Exception("failed to connect");
-            }
-
-            //tempContent contains all found tables
-            Elements tempContent = doc.select("table[class=hyphenate]");
-            //the desired table is second child of tempContent
-            //each child of tableRows is one table row:
-            Element headerCurrentDate;
-            Elements tableRows;
-            Elements availableFiles;
-            try {
-                tableRows = tempContent.get(1).child(0).children();
-            } catch (Exception e) {
-                tableRows = null;
-            }
-
-            //put the text of the h2 element after availableFiles table into headerCurrentDate
-            try {
-                headerCurrentDate = doc.select("h2").first();
-            } catch (Exception e) {
-                headerCurrentDate = null;
-            }
-
-            //only take the current day of the week and the date out of the header text; delete the space before the split string
-            String[] separated = null;
-            if (headerCurrentDate != null) {
-                separated = headerCurrentDate.text().split("für");
-            }
-            String currentDate = null;
-            if (separated != null) {
-                if (separated.length <= 2) currentDate = separated[1].trim();
-                else currentDate = separated[2].trim();
-            }
-
-            //get timePublished timestamp
-            try {
-                timePublished = doc.select("p").first().text();
-            } catch (Exception e) {
-                timePublished = "";
-            }
-
-
-            //now save the current loaded vplan's date and its last-changed timestamp for later usage
-            SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanId), currentDate);
-            editor.putString(PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanId), timePublished);
-            editor.apply();
-
-            //put the contents of the first table (available files) into another elements object for further processing
-            try {
-                availableFiles = tempContent.get(0).children().first().children();
-            } catch (Exception e) {
-                availableFiles = null;
-            }
-
-            if (tableRows != null) {
-                int position = 0;
-
-                datasource.open();
-
-                //clear the existing table for the requested vplan
-                switch (requestedVplanId) {
-                    case 0:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_0);
-                        break;
-                    case 1:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_1);
-                        break;
-                    case 2:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_2);
-                        break;
-                    case 3:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
-                        break;
-                    case 4:
-                        datasource.newTable(MySQLiteHelper.TABLE_VPLAN_4);
-                        break;
-                }
-
-                for (Element row : tableRows) {
-
-
-                    String[] columns = new String[row.children().size()];
-                    String stunde = null;
-                    String klasse = null;
-                    String status = null;
-
-                    //distribute the row's content into an array in order to get the columns
-                    for (int c = 0; c + 1 <= row.children().size(); c++) {
-                        columns[c] = row.child(c).text();
-                    }
-
-                    //put the data into the right strings, all strings from columns >= column 3 into status column
-                    if (columns.length > 1) {
-                        klasse = columns[0];
-                        stunde = columns[1];
-
-                        if (columns.length > 2) {
-                            //insert the third column into status, then add all the remaining columns to it as well
-                            status = columns[2];
-                        } else status = "";
-                    }
-
-                    for (int i = 3; i + 1 <= row.children().size(); i++) {
-                        status += " ";
-                        status += columns[i];
-                    }
-
-
-                    //sql insert of all three columns, but only if they aren't all empty
-                    if (stunde != null && !klasse.contentEquals("Klasse")) {
-
-                        switch (requestedVplanId) {
-                            case 0:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
-                                break;
-                            case 1:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_1, position, stunde, klasse, status);
-                                break;
-                            case 2:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_2, position, stunde, klasse, status);
-                                break;
-                            case 3:
-                                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_3, position, stunde, klasse, status);
-                                break;
-                            case 4:
-                                datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
-                                break;
-                        }
-
-                    }
-
-                    position++;
-                }
-                datasource.close();
-            }
-
-            if (availableFiles != null) {
-
-                int position = 0;
-                datasource.open();
-                datasource.newTable(MySQLiteHelper.TABLE_LINKS);
-
-                //now distribute the contents of availableFiles into a new list for the selection spinner
-                for (Element row : availableFiles) {
-                    String url;
-                    String tag;
-
-                    tag = row.child(0).text();
-                    url = row.child(0).child(0).attributes().get("href");
-
-                    //sql insert
-                    datasource.createRowLinks(position, tag, url);
-
-                    position++;
-                }
-
-                datasource.close();
+                activatePagerAdapter();
             }
         }
     }

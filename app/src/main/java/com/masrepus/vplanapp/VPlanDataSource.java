@@ -25,6 +25,7 @@ public class VPlanDataSource {
 
     /**
      * Creates instances of MySQLiteHelper for U/M/Oinfo
+     *
      * @param context passed to MySQLiteHelper constructor
      */
     public VPlanDataSource(Context context) {
@@ -54,7 +55,8 @@ public class VPlanDataSource {
 
     /**
      * Takes care of inserting all columns of a vplan item into its table
-     * @param tableName the table where the columns will be inserted
+     *
+     * @param tableName               the table where the columns will be inserted
      * @param id,stunde,klasse,status the columns to insert
      */
     public void createRowVplan(String tableName, Integer id, String stunde, String klasse, String status) {
@@ -83,6 +85,7 @@ public class VPlanDataSource {
 
     /**
      * Inserts the passed values into the available files table
+     *
      * @param id,tag,url the columns to insert
      */
     public void createRowLinks(Integer id, String tag, String url) {
@@ -130,7 +133,8 @@ public class VPlanDataSource {
 
     /**
      * Passes queries to the right database by checking which vplan mode is currently active
-     * @param name the table name
+     *
+     * @param name       the table name
      * @param projection the columns to query for
      * @return a cursor object containing the queried columns
      */
@@ -199,6 +203,7 @@ public class VPlanDataSource {
 
     /**
      * Checks whether a specific table contains data by querying for _id columns. If that cursor is empty, the table must be empty, too.
+     *
      * @return false if table is empty, otherwise true
      */
     public boolean hasData(String tablename) {
