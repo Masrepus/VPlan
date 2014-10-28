@@ -76,7 +76,7 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             updateAvailableFilesList();
         } catch (Exception e) {
             //check whether this is because of missing creds
-            if (e.getMessage() == "no creds available") {
+            if (e.getMessage().contentEquals("failed to connect without creds")) {
                 publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
                 return false;
             } else if (e.getMessage().contentEquals("failed to connect")) {
@@ -124,7 +124,7 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         } catch (Exception e) {
 
             //check whether this is because of missing creds
-            if (e.getMessage() == "no creds available") {
+            if (e.getMessage().contentEquals("failed to connect without creds")) {
                 publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
             } else if (e.getMessage().contentEquals("failed to connect")) {
                 publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);

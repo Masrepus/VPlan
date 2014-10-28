@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerTabStrip;
+import android.view.View;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,7 +76,9 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public ArrayList<Row> getHiddenItems(int id) {
-        return hiddenItems.get(id);
+
+        if (hiddenItems.size() > id) return hiddenItems.get(id);
+        else return null;
     }
 
     public void fillWithData(int id) {
@@ -106,6 +111,13 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         if (datasource.hasData(tableName)) {
+
+            TextView welcome = (TextView) activity.findViewById(R.id.welcome_textView);
+            welcome.setVisibility(View.GONE);
+
+            PagerTabStrip tabStrip = (PagerTabStrip) activity.findViewById(R.id.pager_title_strip);
+            tabStrip.setVisibility(View.VISIBLE);
+
             Cursor c = datasource.query(tableName, new String[]{MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_KLASSE, MySQLiteHelper.COLUMN_STUNDE,
                     MySQLiteHelper.COLUMN_STATUS});
 

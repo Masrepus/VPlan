@@ -46,10 +46,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
         if (pref == null) {
             pref = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
         }
-        TextView welcome = (TextView) getActivity().findViewById(R.id.welcome_textView);
-        welcome.setVisibility(View.GONE);
 
-        //if the data is still loading then only display a dummy fragment
+        //if requested, only display a dummy fragment
         if (args.getBoolean(FLAG_VPLAN_LOADING_DUMMY)) {
 
             View rootView = inflater.inflate(
