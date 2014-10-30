@@ -61,5 +61,7 @@
     <string name="file">Datei</string>
     <string name="levels">Stufen</string>
     <string name="level">Stufe</string>
+    <string name="date">Datum</string>
+    <string name="subject">Fach</string>
 
 </resources>

@@ -169,8 +169,10 @@
     <string name="files"> files</string>
     <string name="retry">Retry</string>
     <string name="levels">Class levels</string>
-    <string name="pref_key_bg_upd_levels">pref_key_bg_upd_levels</string>
+    <string name="pref_key_bg_upd_levels" translatable="false">pref_key_bg_upd_levels</string>
     <string name="file">file</string>
     <string name="level">level</string>
+    <string name="subject">Subject</string>
+    <string name="date">Date</string>
 
 </resources>
