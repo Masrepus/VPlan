@@ -48,7 +48,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, AdapterView.OnItemClickListener {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
     public static final String PREFS_NAME = "mPrefs";
     public static final String PREF_LAST_UPDATE = "lastUpdate";
     public static final String PREF_VPLAN_MODE = "mode";
@@ -61,6 +61,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public static final String PREF_CURR_BG_INT = "currInt";
     public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
     public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
+
     public static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
@@ -208,14 +209,21 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         tv.setText(lastUpdate);
 
         //prepare vplan mode listview
-        final ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
-        final DrawerListAdapter modesAdapter = new DrawerListAdapter(this, R.layout.drawer_list_item);
+        ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
+
+        //build the entries array
+        String[] appModes = getResources().getStringArray(R.array.appmodes);
+        String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
+
+        //build the item list
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2);
+
+        DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
 
         vplanModesLV.setAdapter(modesAdapter);
-        vplanModesLV.setOnItemClickListener(this);
 
         //restore last vplanmode
-        selectedItem = requestedVplanMode - 1;
+        selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4
         modesAdapter.notifyDataSetChanged();
 
         //register change listener for settings sharedPrefs
@@ -225,41 +233,47 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onClick(View view) {
 
-        //check whether there was a change in the selection
-        if (requestedVplanMode != i + 1) {
+        //check whether this is a vplan mode item or not
+        Integer vplanMode = (Integer) view.getTag(R.id.TAG_VPLAN_MODE);
+        Integer position = (Integer) view.getTag(R.id.TAG_POSITION);
+        if (vplanMode != null) {
 
-        selectedItem = i;
-        ListView vplanModes = (ListView) adapterView;
-        DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
-        modesAdapter.notifyDataSetChanged();
+            //check whether there was a change in the selection
+            if (requestedVplanMode != vplanMode) {
 
-        //change requested vplan mode and save it in shared prefs
-            requestedVplanMode = i + 1;
-            getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
+                selectedItem = position;
+                ListView vplanModes = (ListView) findViewById(R.id.vplanModeList);
+                DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
+                modesAdapter.notifyDataSetChanged();
 
-            //select the right filter
-            switch (requestedVplanMode) {
+                //change requested vplan mode and save it in shared prefs
+                requestedVplanMode = vplanMode;
+                getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
 
-                case UINFO:
-                    filterCurrent = filterUnterstufe;
-                    break;
-                case MINFO:
-                    filterCurrent = filterMittelstufe;
-                    break;
-                case OINFO:
-                    filterCurrent = filterOberstufe;
-                    break;
-            }
+                //select the right filter
+                switch (requestedVplanMode) {
 
-            //recreate the pageradapter
-            ViewPager pager = (ViewPager) findViewById(R.id.pager);
-            pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+                    case UINFO:
+                        filterCurrent = filterUnterstufe;
+                        break;
+                    case MINFO:
+                        filterCurrent = filterMittelstufe;
+                        break;
+                    case OINFO:
+                        filterCurrent = filterOberstufe;
+                        break;
+                }
 
-            //now start the adapter loading in a separate thread
-            new PagerAdapterLoader().execute(this);
-        } //else just ignore the click
+                //recreate the pageradapter
+                ViewPager pager = (ViewPager) findViewById(R.id.pager);
+                pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+
+                //now start the adapter loading in a separate thread
+                new PagerAdapterLoader().execute(this);
+            } //else just ignore the click
+        }
     }
 
     /**
@@ -309,52 +323,81 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
     }
 
-    private class DrawerListAdapter extends ArrayAdapter {
+    private class DrawerListAdapter extends ArrayAdapter<Item> {
 
         private Context context;
-        private String[] items;
+        private Activity activity;
+        private ArrayList<Item> items;
 
-        public DrawerListAdapter(Context context, int resource) {
-            super(context, resource);
+        public DrawerListAdapter(Activity activity, Context context, ArrayList<Item> items) {
+            super(context, 0, items);
+            this.activity = activity;
             this.context = context;
-            items = this.context.getResources().getStringArray(R.array.vplan_modes);
+            this.items = items;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
             ViewHolder view;
+            final Item i = items.get(position);
 
-            if (convertView == null) {
-                view = new ViewHolder();
-                //get a new instance of the list item layout view
-                convertView = View.inflate(context, R.layout.drawer_list_item, null);
+            if (i != null) {
+                if (i.isSection()) {
+                    //this is a header item
+                    SectionItem section = (SectionItem) i;
 
-                view.modeView = (TextView) convertView.findViewById(R.id.textView);
-                convertView.setTag(view);
-            } else view = (ViewHolder) convertView.getTag();
+                    if (convertView == null) {
+                        view = new ViewHolder();
+                        convertView = View.inflate(context, R.layout.section_item, null);
+                    }
+                    else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
 
-            //if this view is selected, change the background color
-            if (selectedItem == position) {
-                convertView.setBackgroundColor(getResources().getColor(R.color.yellow));
-                view.modeView.setTypeface(Typeface.DEFAULT_BOLD);
-            } else {
-                convertView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-                view.modeView.setTypeface(Typeface.DEFAULT);
+                    view.titleView = (TextView) convertView.findViewById(R.id.title);
+                    view.titleView.setText(section.getTitle());
+                    convertView.setOnClickListener(null);
+
+                    convertView.setTag(R.id.TAG_VIEWHOLDER, view);
+                } else {
+                    EntryItem entry = (EntryItem) i;
+
+                    if (convertView == null) {
+                        view = new ViewHolder();
+                        convertView = View.inflate(context, R.layout.drawer_list_item, null);
+                    } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
+
+                    view.titleView = (TextView) convertView.findViewById(R.id.title);
+                    view.titleView.setText(entry.getTitle());
+                    convertView.setClickable(true);
+                    convertView.setOnClickListener(((MainActivity) activity));
+
+                    //if this item has a vplan mode attached to it, add it as a tag
+                    if (entry.isVlanMode()) convertView.setTag(R.id.TAG_VPLAN_MODE, entry.getVplanMode());
+                    convertView.setTag(R.id.TAG_POSITION, position);
+
+                    //if this view is selected, change the background color
+                    if (selectedItem == position) {
+                        convertView.setBackgroundColor(getResources().getColor(R.color.yellow));
+                        view.titleView.setTypeface(Typeface.DEFAULT_BOLD);
+                    } else {
+                        convertView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        view.titleView.setTypeface(Typeface.DEFAULT);
+                    }
+
+                    convertView.setTag(R.id.TAG_VIEWHOLDER, view);
+                }
             }
-
-            view.modeView.setText(items[position]);
 
             return convertView;
         }
 
         @Override
         public int getCount() {
-            return items.length;
+            return items.size();
         }
 
         protected class ViewHolder {
-            protected TextView modeView;
+            protected TextView titleView;
         }
     }
 

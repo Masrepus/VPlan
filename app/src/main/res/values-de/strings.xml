@@ -63,5 +63,8 @@
     <string name="level">Stufe</string>
     <string name="date">Datum</string>
     <string name="subject">Fach</string>
+    <string name="substitutions">Vertretungen</string>
+    <string name="exams">Prüfungen</string>
+    <string name="appmodes_header">Ansichten</string>
 
 </resources>

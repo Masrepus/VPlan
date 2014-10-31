@@ -8,8 +8,12 @@
         <item>Oberstufe</item>
     </string-array>
     <string-array name="appmodes">
-        <item>Substitutions</item>
-        <item>Exams</item>
+        <item>@string/substitutions</item>
+        <item>@string/exams</item>
+    </string-array>
+    <string-array name="sectionHeaders">
+        <item>@string/appmodes_header</item>
+        <item>@string/levels</item>
     </string-array>
     <string-array name="upd_intervals">
         <item>1 hour</item>

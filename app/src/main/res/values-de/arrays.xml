@@ -7,8 +7,4 @@
         <item>12 Stunden</item>
         <item>Täglich</item>
     </string-array>
-    <string-array name="appmodes">
-        <item>Vertretungen</item>
-        <item>Prüfungen</item>
-    </string-array>
 </resources>

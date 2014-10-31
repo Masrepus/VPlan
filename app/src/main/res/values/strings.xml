@@ -66,7 +66,7 @@
     <string name="curr_filter">Currently filtered classes</string>
     <string name="no_filter">Add class…</string>
     <string name="tests">Tests</string>
-    <string name="vplan">Vertretungsplan</string>
+    <string name="vplan">Ver</string>
     <string name="deutsch" translatable="false">Deutsch</string>
     <string name="key_deutsch_q11" translatable="false">pref_key_d_q11</string>
     <string name="key_deutsch_q12" translatable="false">pref_key_d_q12</string>
@@ -174,5 +174,8 @@
     <string name="level">level</string>
     <string name="subject">Subject</string>
     <string name="date">Date</string>
+    <string name="substitutions">Substitutions</string>
+    <string name="exams">Exams</string>
+    <string name="appmodes_header">Views</string>
 
 </resources>

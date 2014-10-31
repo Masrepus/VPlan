@@ -30,6 +30,7 @@
             android:layout_gravity="left|center_vertical"
             android:textStyle="bold"
             android:paddingLeft="5dp"
-            android:paddingRight="5dp" />
+            android:paddingRight="5dp"
+            android:visibility="visible" />
     </FrameLayout>
 </LinearLayout>
