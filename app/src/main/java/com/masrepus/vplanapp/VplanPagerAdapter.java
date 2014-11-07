@@ -235,7 +235,13 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         //the id of the requested vplan for this fragment is the fragment's id; also pass hidden items count, data list size, original list size before filtering
         args.putInt(VplanFragment.ARG_REQUESTED_VPLAN_ID, i);
         args.putInt(VplanFragment.ARG_VPLAN_MODE, vplanMode);
-        if (hiddenItems.size() > i) args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
+        if (adapters.size() > i) {
+            args.putSerializable(VplanFragment.ARG_ADAPTER, adapters.get(i));
+        }
+        if (hiddenItems.size() > i) {
+            args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
+            args.putSerializable(VplanFragment.ARG_HIDDEN_ITEMS, hiddenItems.get(i));
+        }
         else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
 
         if (dataLists.size() > i) {

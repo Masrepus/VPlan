@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by samuel on 27.07.14.
  */
-public class MySimpleArrayAdapter extends ArrayAdapter {
+public class MySimpleArrayAdapter extends ArrayAdapter implements Serializable {
 
     private final Activity activity;
     private final ArrayList<Row> list;

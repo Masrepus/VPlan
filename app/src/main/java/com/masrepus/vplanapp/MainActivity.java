@@ -323,6 +323,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
     }
 
+
+
     private class DrawerListAdapter extends ArrayAdapter<Item> {
 
         private Context context;
@@ -814,6 +816,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+        pager.setOffscreenPageLimit(4);
 
         //activate adapter for viewPager
         new PagerAdapterLoader().execute(this);

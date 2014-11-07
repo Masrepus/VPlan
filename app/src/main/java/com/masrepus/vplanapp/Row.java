@@ -1,9 +1,11 @@
 package com.masrepus.vplanapp;
 
+import java.io.Serializable;
+
 /**
  * Used to bundle class, lesson and status of a specific list item
  */
-public class Row {
+public class Row implements Serializable {
     private long id;
     private String klasse;
     private String stunde;

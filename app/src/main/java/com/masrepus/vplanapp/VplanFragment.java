@@ -2,10 +2,8 @@ package com.masrepus.vplanapp;
 
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by samuel on 19.08.14.
@@ -29,6 +24,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     public static final String ARG_LIST_SIZE = "size";
     public static final String ARG_HIDDEN_ITEMS_COUNT = "hiddenCount";
     public static final String ARG_LIST_SIZE_ORIGINAL = "listSizeBeforeFilter";
+    public static final String ARG_ADAPTER = "adapter";
+    public static final String ARG_HIDDEN_ITEMS = "hiddenItems";
     private SharedPreferences pref;
     private ArrayList<Row> hiddenItems;
     private int requestedVplanMode;
@@ -48,6 +45,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
         }
 
         //if requested, only display a dummy fragment
+
         if (args.getBoolean(FLAG_VPLAN_LOADING_DUMMY)) {
 
             View rootView = inflater.inflate(
@@ -60,9 +58,6 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             View rootView = inflater.inflate(
                     R.layout.vplan_list, container, false);
 
-            ViewPager pager = (ViewPager) getActivity().findViewById(R.id.pager);
-            VplanPagerAdapter pagerAdapter = (VplanPagerAdapter) pager.getAdapter();
-
                 //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
             if (listSizeBeforeFilter > 0) {
                 if (listSize == 0) {
@@ -73,21 +68,24 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     timePublishedTV.setText(currTimePublished);
 
                     //get the hidden items
-                    hiddenItems = pagerAdapter.getHiddenItems(id);
+                    //hiddenItems = pagerAdapter.getHiddenItems(id);
+                    hiddenItems = ((ArrayList<Row>)args.getSerializable(ARG_HIDDEN_ITEMS));
                     displayHiddenItemsCount(rootView, hiddenItemsCount);
 
                     MainActivity.inflateStatus = 1;
                     return rootView;
                 } else {
 
-                    MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
+                    //MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
+                    MySimpleArrayAdapter adapter = (MySimpleArrayAdapter) args.getSerializable(ARG_ADAPTER);
 
 
                     //display everything
                     ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
 
                     //get hidden items and activate the onclick listener for the footer
-                    hiddenItems = pagerAdapter.getHiddenItems(id);
+                    //hiddenItems = pagerAdapter.getHiddenItems(id);
+                    hiddenItems = ((ArrayList<Row>)args.getSerializable(ARG_HIDDEN_ITEMS));
                     addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
 
                     listView.setAdapter(adapter);
