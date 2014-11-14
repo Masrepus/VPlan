@@ -3,9 +3,9 @@
 
     <string name="hello" translatable="false">Hello World, MainActivity!</string>
     <string name="app_name" translatable="false">SGP</string>
-	<string name="no_lesson">not available</string>
-	<string name="all_grades" translatable="false">all grades</string>
-	<string name="no_status">no status available</string>
+    <string name="no_lesson">not available</string>
+    <string name="all_grades" translatable="false">all grades</string>
+    <string name="no_status">no status available</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="headingListview" translatable="false">Vertretungsplan:</string>
@@ -21,7 +21,8 @@
     <string name="err_encryptCredentials" translatable="false">Exception while encrypting uname/pwd</string>
     <string name="downloading">Downloading…</string>
     <string name="no_data">No data available, click to refresh</string>
-    <string name="refresh">refresh</string><string name="still_parsing">Action not available!
+    <string name="refresh">refresh</string>
+    <string name="still_parsing">Action not available!
  Parsing of data still in progress!</string>
     <string name="vplan_base_url" translatable="false">http://app.schyren-gymnasium.de:80/</string>
     <string name="vplan_base_cred" translatable="false">app.schyren-gymnasium.de:80/</string>
@@ -182,5 +183,6 @@
     <string name="pref_key_filter_minfo" translatable="false">pref_key_filter_minfo</string>
     <string name="pref_key_filter_oinfo" translatable="false">pref_key_filter_oinfo</string>
     <string name="pref_key_filter_uinfo" translatable="false">pref_key_filter_uinfo</string>
+    <string name="title_activity_exams">Exams</string>
 
 </resources>

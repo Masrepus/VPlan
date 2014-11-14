@@ -49,7 +49,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, View.OnFocusChangeListener {
     public static final String PREFS_NAME = "mPrefs";
     public static final String PREF_LAST_UPDATE = "lastUpdate";
     public static final String PREF_VPLAN_MODE = "mode";
@@ -236,45 +236,59 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     public void onClick(View view) {
 
-        //check whether this is a vplan mode item or not
-        Integer vplanMode = (Integer) view.getTag(R.id.TAG_VPLAN_MODE);
-        Integer position = (Integer) view.getTag(R.id.TAG_POSITION);
-        if (vplanMode != null) {
+        //check whether this is an appmode item
+        Boolean isAppModeItem = (Boolean) view.getTag(R.id.TAG_APPMODE);
 
-            //check whether there was a change in the selection
-            if (requestedVplanMode != vplanMode) {
+        if (isAppModeItem != null) {
+            if (isAppModeItem) {
+                startActivity(new Intent(this, ExamsActivity.class));
+            }
+        } else {
+            //check whether this is a vplan mode item or not
+            Integer vplanMode = (Integer) view.getTag(R.id.TAG_VPLAN_MODE);
+            Integer position = (Integer) view.getTag(R.id.TAG_POSITION);
+            if (vplanMode != null) {
 
-                selectedItem = position;
-                ListView vplanModes = (ListView) findViewById(R.id.vplanModeList);
-                DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
-                modesAdapter.notifyDataSetChanged();
+                //check whether there was a change in the selection
+                if (requestedVplanMode != vplanMode) {
 
-                //change requested vplan mode and save it in shared prefs
-                requestedVplanMode = vplanMode;
-                getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
+                    selectedItem = position;
+                    ListView vplanModes = (ListView) findViewById(R.id.vplanModeList);
+                    DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
+                    modesAdapter.notifyDataSetChanged();
 
-                //select the right filter
-                switch (requestedVplanMode) {
+                    //change requested vplan mode and save it in shared prefs
+                    requestedVplanMode = vplanMode;
+                    getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
 
-                    case UINFO:
-                        filterCurrent = filterUnterstufe;
-                        break;
-                    case MINFO:
-                        filterCurrent = filterMittelstufe;
-                        break;
-                    case OINFO:
-                        filterCurrent = filterOberstufe;
-                        break;
-                }
+                    //select the right filter
+                    switch (requestedVplanMode) {
 
-                //recreate the pageradapter
-                ViewPager pager = (ViewPager) findViewById(R.id.pager);
-                pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+                        case UINFO:
+                            filterCurrent = filterUnterstufe;
+                            break;
+                        case MINFO:
+                            filterCurrent = filterMittelstufe;
+                            break;
+                        case OINFO:
+                            filterCurrent = filterOberstufe;
+                            break;
+                    }
 
-                //now start the adapter loading in a separate thread
-                new PagerAdapterLoader().execute(this);
-            } //else just ignore the click
+                    //recreate the pageradapter
+                    ViewPager pager = (ViewPager) findViewById(R.id.pager);
+                    pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+
+                    //now start the adapter loading in a separate thread
+                    new PagerAdapterLoader().execute(this);
+                } //else just ignore the click
+            }
         }
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean b) {
+        view.setBackgroundColor(getResources().getColor(R.color.yellow_focused));
     }
 
     /**
@@ -394,10 +408,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     view.titleView.setText(entry.getTitle());
                     convertView.setClickable(true);
                     convertView.setOnClickListener(((MainActivity) activity));
+                    convertView.setOnFocusChangeListener(((MainActivity) activity));
 
                     //if this item has a vplan mode attached to it, add it as a tag
-                    if (entry.isVlanMode())
+                    if (entry.isVplanMode()) {
                         convertView.setTag(R.id.TAG_VPLAN_MODE, entry.getVplanMode());
+                    } else convertView.setTag(R.id.TAG_APPMODE, true);
+
                     convertView.setTag(R.id.TAG_POSITION, position);
 
                     //if this view is selected, change the background color

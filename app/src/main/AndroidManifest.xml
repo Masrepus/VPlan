@@ -24,7 +24,7 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings">
+            android:label="@string/settings" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -35,11 +35,25 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-        <receiver android:name=".BootReceiver">
+
+        <receiver android:name=".BootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".ExamsActivity"
+            android:label="@string/title_activity_exams" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

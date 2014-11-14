@@ -32,7 +32,7 @@ public class EntryItem implements Item {
         return title;
     }
 
-    public boolean isVlanMode() {
+    public boolean isVplanMode() {
         return vplanMode != 0;
     }
 
