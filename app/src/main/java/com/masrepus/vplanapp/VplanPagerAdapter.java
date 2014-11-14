@@ -24,6 +24,7 @@ import java.util.Set;
  */
 public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
+    private int count;
     private Context context;
     private Activity activity;
     private VPlanDataSource datasource;
@@ -34,6 +35,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     private int[] listSizesBeforeFilter;
     private int vplanMode;
     private boolean hasData;
+    private boolean didCount = false;
 
     /**
      * Initialisation of the datasource using the passed context and saving the passed filter arraylist as a local variable
@@ -48,6 +50,12 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         vplanMode = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
 
+        //get the amount of available days from database
+        datasource.open();
+        Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_ID});
+        count = c.getCount();
+        datasource.close();
+
         initData();
     }
 
@@ -57,10 +65,16 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
     public void initData() {
 
-        int count = getCount();
         adapters = new ArrayList<MySimpleArrayAdapter>(count);
         hiddenItems = new ArrayList<ArrayList<Row>>(count);
         dataLists = new ArrayList<ArrayList<Row>>(count);
+
+        //fill the arraylists with null items
+        for (int i = 0; i < count; i++) {
+            adapters.add(null);
+            hiddenItems.add(null);
+            dataLists.add(null);
+        }
         listSizesBeforeFilter = new int[count];
 
         for (int i=0; i<count; i++) {
@@ -197,8 +211,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 }
 
                 //now save the differences in the hiddenItems list
-                dataLists.add(id, list);
-                hiddenItems.add(id, new ArrayList<Row>(nonOverLap(tempList, list)));
+                dataLists.set(id, list);
+                hiddenItems.set(id, new ArrayList<Row>(nonOverLap(tempList, list)));
                 listSizesBeforeFilter[id] = tempList.size();
 
             } else {
@@ -219,12 +233,14 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
                 }
 
-                dataLists.add(id, list);
+                dataLists.set(id, list);
                 listSizesBeforeFilter[id] = list.size();
             }
         } else {
-            dataLists.add(id, null);
-            hiddenItems.add(id, null);
+            dataLists.set(id, null);
+            try {
+                hiddenItems.set(id, null);
+            } catch (Exception e) {}
         }
         datasource.close();
     }
@@ -269,18 +285,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         return fragment;
     }
 
-    /**
-     * Gets the amount of available days from the db and returns this value
-     */
     @Override
     public int getCount() {
-
-        //get the amount of available days from database
-        datasource.open();
-        Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_ID});
-        int count = c.getCount();
-        datasource.close();
-
         return count;
     }
 

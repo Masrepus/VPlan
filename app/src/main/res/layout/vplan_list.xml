@@ -13,7 +13,9 @@
         android:layout_height="match_parent"
         android:id="@+id/linearLayout"
         android:divider="@drawable/divider"
-        android:showDividers="middle">
+        android:showDividers="middle"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp">
 
         <FrameLayout
             android:layout_width="match_parent"
