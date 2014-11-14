@@ -177,5 +177,10 @@
     <string name="substitutions">Substitutions</string>
     <string name="exams">Exams</string>
     <string name="appmodes_header">Views</string>
+    <string name="tests_base_url" translatable="false">http://app.schyren-gymnasium.de/schulaufgaben.php?kl=</string>
+    <string name="tests_base_oinfo" translatable="false">http://app.schyren-gymnasium.de/oinfo/scha</string>
+    <string name="pref_key_filter_minfo" translatable="false">pref_key_filter_minfo</string>
+    <string name="pref_key_filter_oinfo" translatable="false">pref_key_filter_oinfo</string>
+    <string name="pref_key_filter_uinfo" translatable="false">pref_key_filter_uinfo</string>
 
 </resources>

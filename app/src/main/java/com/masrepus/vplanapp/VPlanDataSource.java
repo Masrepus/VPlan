@@ -110,9 +110,10 @@ public class VPlanDataSource {
         }
     }
 
-    public void createRowTests(String date, String klasse) {
+    public void createRowTests(int id, String date, String klasse) {
 
         ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_ID, id);
         values.put(MySQLiteHelper.COLUMN_DATE, date);
         values.put(MySQLiteHelper.COLUMN_KLASSE, klasse);
 

@@ -33,6 +33,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     private ArrayList<ArrayList<Row>> dataLists;
     private int[] listSizesBeforeFilter;
     private int vplanMode;
+    private boolean hasData;
 
     /**
      * Initialisation of the datasource using the passed context and saving the passed filter arraylist as a local variable
@@ -48,6 +49,10 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         vplanMode = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
 
         initData();
+    }
+
+    public boolean hasData() {
+        return hasData;
     }
 
     public void initData() {
@@ -67,7 +72,10 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         for (int i=0; i<count; i++) {
 
             //create the right adapter for each fragment's listview, if the specific data list is empty, just leave the adapter on null
-            if (dataLists.size() > 0 && dataLists.get(i) != null && dataLists.get(i).size() > 0) adapters.add(i, new MySimpleArrayAdapter(activity, dataLists.get(i)));
+            try {
+                if (dataLists.size() > 0 && dataLists.get(i) != null && dataLists.get(i).size() > 0)
+                    adapters.add(i, new MySimpleArrayAdapter(activity, dataLists.get(i)));
+            } catch(Exception e) {}
         }
     }
 
@@ -112,11 +120,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         if (datasource.hasData(tableName)) {
 
-            TextView welcome = (TextView) activity.findViewById(R.id.welcome_textView);
-            welcome.setVisibility(View.GONE);
-
-            PagerTabStrip tabStrip = (PagerTabStrip) activity.findViewById(R.id.pager_title_strip);
-            tabStrip.setVisibility(View.VISIBLE);
+            //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
+            hasData = true;
 
             Cursor c = datasource.query(tableName, new String[]{MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_KLASSE, MySQLiteHelper.COLUMN_STUNDE,
                     MySQLiteHelper.COLUMN_STATUS});
@@ -217,6 +222,9 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 dataLists.add(id, list);
                 listSizesBeforeFilter[id] = list.size();
             }
+        } else {
+            dataLists.add(id, null);
+            hiddenItems.add(id, null);
         }
         datasource.close();
     }
@@ -236,16 +244,21 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         args.putInt(VplanFragment.ARG_REQUESTED_VPLAN_ID, i);
         args.putInt(VplanFragment.ARG_VPLAN_MODE, vplanMode);
         if (adapters.size() > i) {
-            args.putSerializable(VplanFragment.ARG_ADAPTER, adapters.get(i));
+            if (adapters.get(i) != null) {
+                args.putSerializable(VplanFragment.ARG_ADAPTER, adapters.get(i));
+            }
         }
         if (hiddenItems.size() > i) {
-            args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
-            args.putSerializable(VplanFragment.ARG_HIDDEN_ITEMS, hiddenItems.get(i));
-        }
-        else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
+            if (hiddenItems.get(i) != null) {
+                args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
+                args.putSerializable(VplanFragment.ARG_HIDDEN_ITEMS, hiddenItems.get(i));
+            }
+        } else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
 
         if (dataLists.size() > i) {
-            args.putInt(VplanFragment.ARG_LIST_SIZE, dataLists.get(i).size());
+            if (dataLists.get(i) != null) {
+                args.putInt(VplanFragment.ARG_LIST_SIZE, dataLists.get(i).size());
+            }
         } else args.putInt(VplanFragment.ARG_LIST_SIZE, 0);
 
         if (listSizesBeforeFilter.length > i) args.putInt(VplanFragment.ARG_LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);

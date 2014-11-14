@@ -18,11 +18,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -33,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -42,13 +41,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable {
     public static final String PREFS_NAME = "mPrefs";
     public static final String PREF_LAST_UPDATE = "lastUpdate";
     public static final String PREF_VPLAN_MODE = "mode";
@@ -313,6 +314,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         @Override
         protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
+
+            //check whether disabling of welcome tv and activation of tabstrip must be done
+            if (vplanPagerAdapter.hasData()) {
+
+                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+                welcome.setVisibility(View.GONE);
+
+                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+                tabStrip.setVisibility(View.VISIBLE);
+            }
+
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
             pager.setAdapter(vplanPagerAdapter);
 
@@ -322,7 +334,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             pager.setCurrentItem(getTodayVplanId(), false);
         }
     }
-
 
 
     private class DrawerListAdapter extends ArrayAdapter<Item> {
@@ -350,10 +361,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     SectionItem section = (SectionItem) i;
 
                     if (convertView == null) {
-                        view = new ViewHolder();
+                        view = new ViewHolder(true);
                         convertView = View.inflate(context, R.layout.section_item, null);
+                    } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
+
+                    //if this was an entry item before, re-inflate and update viewholder
+                    if (!view.isSection) {
+                        convertView = View.inflate(context, R.layout.section_item, null);
+                        view = new ViewHolder(true);
                     }
-                    else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
 
                     view.titleView = (TextView) convertView.findViewById(R.id.title);
                     view.titleView.setText(section.getTitle());
@@ -364,9 +380,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     EntryItem entry = (EntryItem) i;
 
                     if (convertView == null) {
-                        view = new ViewHolder();
+                        view = new ViewHolder(false);
                         convertView = View.inflate(context, R.layout.drawer_list_item, null);
                     } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
+
+                    //if this was an entry item before, re-inflate and update viewholder
+                    if (view.isSection) {
+                        convertView = View.inflate(context, R.layout.drawer_list_item, null);
+                        view = new ViewHolder(false);
+                    }
 
                     view.titleView = (TextView) convertView.findViewById(R.id.title);
                     view.titleView.setText(entry.getTitle());
@@ -374,7 +396,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     convertView.setOnClickListener(((MainActivity) activity));
 
                     //if this item has a vplan mode attached to it, add it as a tag
-                    if (entry.isVlanMode()) convertView.setTag(R.id.TAG_VPLAN_MODE, entry.getVplanMode());
+                    if (entry.isVlanMode())
+                        convertView.setTag(R.id.TAG_VPLAN_MODE, entry.getVplanMode());
                     convertView.setTag(R.id.TAG_POSITION, position);
 
                     //if this view is selected, change the background color
@@ -400,6 +423,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         protected class ViewHolder {
             protected TextView titleView;
+            protected boolean isSection;
+
+            public ViewHolder(boolean isSection) {
+                this.isSection = isSection;
+            }
         }
     }
 
@@ -535,7 +563,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 refresh(item);
                 return true;
             case R.id.tester:
-                startService(new Intent(this, DownloaderService.class));
+                new AsyncDownloader().execute(this);
                 return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
@@ -651,9 +679,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
-            //skip pwd or uname
+            //skip selected keys
             if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd))
-                    || entry.getKey().contentEquals(getString(R.string.pref_key_upd_int)))
+                    || entry.getKey().contentEquals(getString(R.string.pref_key_upd_int)) || entry.getKey().contentEquals(getString(R.string.pref_key_bg_upd_levels)))
                 continue;
 
             //treat bg updates separately
@@ -708,6 +736,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 filterCurrent = filterOberstufe;
                 break;
         }
+
+        //save the filters in shared prefs
+        pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        Set<String> unterstufeSet = new HashSet<String>(filterUnterstufe);
+        Set<String> mittelstufeSet = new HashSet<String>(filterMittelstufe);
+        Set<String> oberstufeSet = new HashSet<String>(filterOberstufe);
+        editor.putStringSet(getString(R.string.pref_key_filter_uinfo), unterstufeSet)
+                .putStringSet(getString(R.string.pref_key_filter_minfo), mittelstufeSet)
+                .putStringSet(getString(R.string.pref_key_filter_oinfo), oberstufeSet)
+                .apply();
     }
 
     private void refreshBgUpdates(Boolean activated, int interval) {
@@ -722,7 +761,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             flag = PendingIntent.FLAG_UPDATE_CURRENT;
 
             //only update the alarm if the interval really changed, else just skip this unless it has to be deactivated
-            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated) saveAlarm(activated, interval, flag, editor);
+            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated)
+                saveAlarm(activated, interval, flag, editor);
         } else saveAlarm(activated, interval, 0, editor);
 
         editor.apply();
