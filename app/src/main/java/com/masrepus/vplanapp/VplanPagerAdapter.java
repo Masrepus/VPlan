@@ -35,7 +35,6 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     private int[] listSizesBeforeFilter;
     private int vplanMode;
     private boolean hasData;
-    private boolean didCount = false;
 
     /**
      * Initialisation of the datasource using the passed context and saving the passed filter arraylist as a local variable
