@@ -214,10 +214,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //build the entries array
         String[] appModes = getResources().getStringArray(R.array.appmodes);
-        String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
+        /*String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
 
         //build the item list
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2);
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2); */
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, new String[]{"Stufen"}, getResources().getStringArray(R.array.vplan_modes), 0);
 
         DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
 
