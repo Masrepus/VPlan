@@ -25,10 +25,10 @@ public class BootReceiver extends BroadcastReceiver {
         //set the alarm
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        refreshBgUpdates(pref.getBoolean(context.getString(R.string.pref_key_bg_updates), false), Integer.valueOf(pref.getString(context.getString(R.string.pref_key_upd_int), "")));
+        refreshBgUpdates(pref.getBoolean(context.getString(R.string.pref_key_bg_updates), false), pref.getString(context.getString(R.string.pref_key_upd_int), ""));
     }
 
-    private void refreshBgUpdates(boolean activated, int interval) {
+    private void refreshBgUpdates(boolean activated, String interval) {
 
         //get the download intent from downloadservice and use it for alarmmanager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -36,8 +36,8 @@ public class BootReceiver extends BroadcastReceiver {
 
         PendingIntent pendingDownloadIntent = PendingIntent.getService(context, 0, downloadIntent, 0);
 
-        if (activated) {
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
+        if (activated && !interval.contentEquals("")) {
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + Integer.valueOf(interval) * AlarmManager.INTERVAL_HOUR, Integer.valueOf(interval) * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
             Log.d(context.getPackageName(), "successfully set alarm for auto update");
         }
     }
