@@ -225,7 +225,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         vplanModesLV.setAdapter(modesAdapter);
 
         //restore last vplanmode
-        selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4
+        /*selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4*/
+        selectedItem = requestedVplanMode;
         modesAdapter.notifyDataSetChanged();
 
         //register change listener for settings sharedPrefs
