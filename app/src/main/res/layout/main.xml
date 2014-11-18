@@ -106,7 +106,6 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/lastUpdateStatic"
                     android:textStyle="bold|italic"
-                    android:textColor="@color/blue"
                     android:text="@string/last_update"
                     android:layout_gravity="center"
                     android:paddingTop="10dp" />
@@ -117,7 +116,6 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/lastUpdate"
                     android:textStyle="bold|italic"
-                    android:textColor="@color/blue"
                     android:paddingBottom="10dp"
                     android:text="@string/last_update"
                     android:layout_gravity="center" />
@@ -127,11 +125,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/vplanModeList"
-                android:layout_below="@+id/lastUpdateFrame"
                 android:choiceMode="singleChoice"
                 android:layout_above="@+id/settings_frame"
                 android:divider="@null"
-                android:listSelector="@drawable/yellow_selector"/>
+                android:listSelector="@drawable/yellow_selector"
+                android:layout_below="@+id/lastUpdateFrame" />
 
             <FrameLayout
                 android:layout_width="match_parent"

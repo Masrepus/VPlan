@@ -2,10 +2,8 @@ package com.masrepus.vplanapp;
 
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by samuel on 19.08.14.
@@ -29,6 +24,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     public static final String ARG_LIST_SIZE = "size";
     public static final String ARG_HIDDEN_ITEMS_COUNT = "hiddenCount";
     public static final String ARG_LIST_SIZE_ORIGINAL = "listSizeBeforeFilter";
+    public static final String ARG_ADAPTER = "adapter";
+    public static final String ARG_HIDDEN_ITEMS = "hiddenItems";
     private SharedPreferences pref;
     private ArrayList<Row> hiddenItems;
     private int requestedVplanMode;
@@ -37,7 +34,6 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Bundle args = getArguments();
-        int id = args.getInt(ARG_REQUESTED_VPLAN_ID);
         requestedVplanMode = args.getInt(ARG_VPLAN_MODE);
         int listSize = args.getInt(ARG_LIST_SIZE);
         int hiddenItemsCount = args.getInt(ARG_HIDDEN_ITEMS_COUNT);
@@ -48,6 +44,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
         }
 
         //if requested, only display a dummy fragment
+
         if (args.getBoolean(FLAG_VPLAN_LOADING_DUMMY)) {
 
             View rootView = inflater.inflate(
@@ -60,9 +57,6 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             View rootView = inflater.inflate(
                     R.layout.vplan_list, container, false);
 
-            ViewPager pager = (ViewPager) getActivity().findViewById(R.id.pager);
-            VplanPagerAdapter pagerAdapter = (VplanPagerAdapter) pager.getAdapter();
-
                 //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
             if (listSizeBeforeFilter > 0) {
                 if (listSize == 0) {
@@ -73,21 +67,23 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     timePublishedTV.setText(currTimePublished);
 
                     //get the hidden items
-                    hiddenItems = pagerAdapter.getHiddenItems(id);
+                    hiddenItems = ((ArrayList<Row>)args.getSerializable(ARG_HIDDEN_ITEMS));
                     displayHiddenItemsCount(rootView, hiddenItemsCount);
 
                     MainActivity.inflateStatus = 1;
                     return rootView;
                 } else {
 
-                    MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
+                    //MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
+                    MySimpleArrayAdapter adapter = (MySimpleArrayAdapter) args.getSerializable(ARG_ADAPTER);
 
 
                     //display everything
                     ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
 
                     //get hidden items and activate the onclick listener for the footer
-                    hiddenItems = pagerAdapter.getHiddenItems(id);
+                    //hiddenItems = pagerAdapter.getHiddenItems(id);
+                    hiddenItems = ((ArrayList<Row>)args.getSerializable(ARG_HIDDEN_ITEMS));
                     addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
 
                     listView.setAdapter(adapter);
@@ -116,10 +112,15 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.hidden_items);
-        builder.setAdapter(new MySimpleArrayAdapter(getActivity(), hiddenItems), null);
-        builder.show();
+
+        if (hiddenItems != null) {
+            if (hiddenItems.size() > 0) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.hidden_items);
+                builder.setAdapter(new MySimpleArrayAdapter(getActivity(), hiddenItems), null);
+                builder.show();
+            } //else there is no data to be shown and would cause an error
+        }
     }
 
     private void addHiddenItemsCountFooter(ListView listView, int hiddenItemsCount) {

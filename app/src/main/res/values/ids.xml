@@ -3,4 +3,8 @@
 <resources>
     <item type="id" name="TAG_DAY"/>
     <item type="id" name="TAG_VPLAN_ID"/>
+    <item type="id" name="TAG_POSITION"/>
+    <item type="id" name="TAG_VIEWHOLDER"/>
+    <item type="id" name="TAG_VPLAN_MODE"/>
+    <item type="id" name="TAG_APPMODE"/>
 </resources>

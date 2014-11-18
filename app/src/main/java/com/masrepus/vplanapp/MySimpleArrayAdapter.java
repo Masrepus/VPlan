@@ -8,14 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by samuel on 27.07.14.
  */
-public class MySimpleArrayAdapter extends ArrayAdapter {
+public class MySimpleArrayAdapter extends ArrayAdapter implements Serializable {
 
-    private final Activity activity;
     private final ArrayList<Row> list;
 
     /**
@@ -26,7 +26,6 @@ public class MySimpleArrayAdapter extends ArrayAdapter {
      */
     public MySimpleArrayAdapter(Activity activity, ArrayList<Row> list) {
         super(activity, R.layout.vplan_list, list);
-        this.activity = activity;
         this.list = list;
     }
 
@@ -40,8 +39,7 @@ public class MySimpleArrayAdapter extends ArrayAdapter {
 
         if (rowView == null) {
             //get a new instance of the row layout view
-            LayoutInflater inflater = activity.getLayoutInflater();
-            rowView = inflater.inflate(R.layout.vplanlist_element, parent, false);
+            rowView = View.inflate(getContext(), R.layout.vplanlist_element, null);
 
             //hold the view objects in an object, that way they don't need to be "re- found"
             view = new ViewHolder();

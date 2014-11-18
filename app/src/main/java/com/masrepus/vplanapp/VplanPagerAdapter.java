@@ -24,6 +24,7 @@ import java.util.Set;
  */
 public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
+    private int count;
     private Context context;
     private Activity activity;
     private VPlanDataSource datasource;
@@ -33,6 +34,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     private ArrayList<ArrayList<Row>> dataLists;
     private int[] listSizesBeforeFilter;
     private int vplanMode;
+    private boolean hasData;
 
     /**
      * Initialisation of the datasource using the passed context and saving the passed filter arraylist as a local variable
@@ -47,15 +49,31 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         vplanMode = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
 
+        //get the amount of available days from database
+        datasource.open();
+        Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_ID});
+        count = c.getCount();
+        datasource.close();
+
         initData();
+    }
+
+    public boolean hasData() {
+        return hasData;
     }
 
     public void initData() {
 
-        int count = getCount();
         adapters = new ArrayList<MySimpleArrayAdapter>(count);
         hiddenItems = new ArrayList<ArrayList<Row>>(count);
         dataLists = new ArrayList<ArrayList<Row>>(count);
+
+        //fill the arraylists with null items
+        for (int i = 0; i < count; i++) {
+            adapters.add(null);
+            hiddenItems.add(null);
+            dataLists.add(null);
+        }
         listSizesBeforeFilter = new int[count];
 
         for (int i=0; i<count; i++) {
@@ -67,7 +85,10 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         for (int i=0; i<count; i++) {
 
             //create the right adapter for each fragment's listview, if the specific data list is empty, just leave the adapter on null
-            if (dataLists.size() > 0 && dataLists.get(i) != null && dataLists.get(i).size() > 0) adapters.add(i, new MySimpleArrayAdapter(activity, dataLists.get(i)));
+            try {
+                if (dataLists.size() > 0 && dataLists.get(i) != null && dataLists.get(i).size() > 0)
+                    adapters.add(i, new MySimpleArrayAdapter(activity, dataLists.get(i)));
+            } catch(Exception e) {}
         }
     }
 
@@ -112,11 +133,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         if (datasource.hasData(tableName)) {
 
-            TextView welcome = (TextView) activity.findViewById(R.id.welcome_textView);
-            welcome.setVisibility(View.GONE);
-
-            PagerTabStrip tabStrip = (PagerTabStrip) activity.findViewById(R.id.pager_title_strip);
-            tabStrip.setVisibility(View.VISIBLE);
+            //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
+            hasData = true;
 
             Cursor c = datasource.query(tableName, new String[]{MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_KLASSE, MySQLiteHelper.COLUMN_STUNDE,
                     MySQLiteHelper.COLUMN_STATUS});
@@ -192,8 +210,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 }
 
                 //now save the differences in the hiddenItems list
-                dataLists.add(id, list);
-                hiddenItems.add(id, new ArrayList<Row>(nonOverLap(tempList, list)));
+                dataLists.set(id, list);
+                hiddenItems.set(id, new ArrayList<Row>(nonOverLap(tempList, list)));
                 listSizesBeforeFilter[id] = tempList.size();
 
             } else {
@@ -214,9 +232,14 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
                 }
 
-                dataLists.add(id, list);
+                dataLists.set(id, list);
                 listSizesBeforeFilter[id] = list.size();
             }
+        } else {
+            dataLists.set(id, null);
+            try {
+                hiddenItems.set(id, null);
+            } catch (Exception e) {}
         }
         datasource.close();
     }
@@ -235,11 +258,22 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         //the id of the requested vplan for this fragment is the fragment's id; also pass hidden items count, data list size, original list size before filtering
         args.putInt(VplanFragment.ARG_REQUESTED_VPLAN_ID, i);
         args.putInt(VplanFragment.ARG_VPLAN_MODE, vplanMode);
-        if (hiddenItems.size() > i) args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
-        else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
+        if (adapters.size() > i) {
+            if (adapters.get(i) != null) {
+                args.putSerializable(VplanFragment.ARG_ADAPTER, adapters.get(i));
+            }
+        }
+        if (hiddenItems.size() > i) {
+            if (hiddenItems.get(i) != null) {
+                args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
+                args.putSerializable(VplanFragment.ARG_HIDDEN_ITEMS, hiddenItems.get(i));
+            }
+        } else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
 
         if (dataLists.size() > i) {
-            args.putInt(VplanFragment.ARG_LIST_SIZE, dataLists.get(i).size());
+            if (dataLists.get(i) != null) {
+                args.putInt(VplanFragment.ARG_LIST_SIZE, dataLists.get(i).size());
+            }
         } else args.putInt(VplanFragment.ARG_LIST_SIZE, 0);
 
         if (listSizesBeforeFilter.length > i) args.putInt(VplanFragment.ARG_LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);
@@ -250,18 +284,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         return fragment;
     }
 
-    /**
-     * Gets the amount of available days from the db and returns this value
-     */
     @Override
     public int getCount() {
-
-        //get the amount of available days from database
-        datasource.open();
-        Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_ID});
-        int count = c.getCount();
-        datasource.close();
-
         return count;
     }
 
