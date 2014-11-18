@@ -1,6 +1,6 @@
 package com.masrepus.vplanapp;
 
-import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -9,55 +9,47 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, View.OnFocusChangeListener {
     public static final String PREFS_NAME = "mPrefs";
     public static final String PREF_LAST_UPDATE = "lastUpdate";
     public static final String PREF_VPLAN_MODE = "mode";
@@ -70,6 +62,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public static final String PREF_CURR_BG_INT = "currInt";
     public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
     public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
+
     public static final int BASIC = 0;
     public static final int UINFO = 1;
     public static final int MINFO = 2;
@@ -89,9 +82,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private VPlanDataSource datasource;
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
-    private String timePublished;
     private Map<String, ?> keys;
     private String currentVPlanLink;
+    private int selectedItem;
 
     /**
      * Called when the activity is first created.
@@ -104,9 +97,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        final TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-        welcome.setVisibility(View.VISIBLE);
-
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
         pref.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -114,7 +104,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 requestedVplanId = sharedPreferences.getInt(PREF_REQUESTED_VPLAN_ID, 0);
                 currentVPlanLink = sharedPreferences.getString(PREF_CURR_VPLAN_LINK, "");
-                timePublished = sharedPreferences.getString(PREF_PREFIX_VPLAN_TIME_PUBLISHED, "");
             }
         });
         requestedVplanMode = pref.getInt(PREF_VPLAN_MODE, UINFO);
@@ -138,16 +127,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         refreshFilters();
 
         //activate adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
+        datasource.open();
+        if (!datasource.hasData(MySQLiteHelper.TABLE_LINKS)) {
+            TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+            welcome.setVisibility(View.VISIBLE);
+        }
+        datasource.close();
 
-        //if the adapter's number of fragments is 0, then display the no data layout on top of it
-
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(vplanPagerAdapter);
-
-        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+        new PagerAdapterLoader().execute(this);
 
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
         tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
@@ -162,7 +149,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         setSupportActionBar(toolbar);
 
         final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        final Context context = this;
+
         if (actionBar != null) {
 
             drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
@@ -186,20 +173,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                             actionBar.setTitle(R.string.oberstufe);
                             break;
                     }
-
-                    if (currMode != requestedVplanMode) {
-
-                        welcome.setVisibility(View.VISIBLE);
-                    }
                 }
 
                 @Override
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
-                    actionBar.setTitle(R.string.sgp);
 
-                    //save the content of requestedVplanMode for later check for change
-                    currMode = requestedVplanMode;
+                    actionBar.setTitle(R.string.sgp);
                 }
             };
 
@@ -229,49 +209,244 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         tv.setVisibility(View.VISIBLE);
         tv.setText(lastUpdate);
 
-        //restore the last checked radio button
-        RadioButton currModeRadio = null;
-        switch (requestedVplanMode) {
+        //prepare vplan mode listview
+        ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
 
-            case UINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioUinfo);
-                break;
-            case MINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioMinfo);
-                break;
-            case OINFO:
-                currModeRadio = (RadioButton) findViewById(R.id.radioOinfo);
-                break;
-        }
+        //build the entries array
+        String[] appModes = getResources().getStringArray(R.array.appmodes);
+        /*String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
 
-        //check whether refresh is necessary
-        if (currModeRadio != null) {
-            onVplanModeRadioButtonClick(currModeRadio);
-            currModeRadio.setChecked(true);
-        }
+        //build the item list
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2); */
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, new String[]{"Stufen"}, getResources().getStringArray(R.array.vplan_modes), 0);
 
-        //restore the last checked appmode radiobutton
-        RadioButton currAppmodeRadio = null;
-        switch (appMode) {
+        DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
 
-            case VPLAN:
-                currAppmodeRadio = (RadioButton) findViewById(R.id.radioVPlan);
-                break;
-            case TESTS:
-                currAppmodeRadio = (RadioButton) findViewById(R.id.radioTests);
-                break; //commented out for public release
-        }
+        vplanModesLV.setAdapter(modesAdapter);
 
-        //check whether refresh is necessary
-        if (currAppmodeRadio != null) {
-            onModeChangeRadioButtonClick(currAppmodeRadio);
-            currAppmodeRadio.setChecked(true);
-        }
+        //restore last vplanmode
+        selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4
+        modesAdapter.notifyDataSetChanged();
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        //check whether this is an appmode item
+        Boolean isAppModeItem = (Boolean) view.getTag(R.id.TAG_APPMODE);
+
+        if (isAppModeItem != null) {
+            if (isAppModeItem) {
+                startActivity(new Intent(this, ExamsActivity.class));
+            }
+        } else {
+            //check whether this is a vplan mode item or not
+            Integer vplanMode = (Integer) view.getTag(R.id.TAG_VPLAN_MODE);
+            Integer position = (Integer) view.getTag(R.id.TAG_POSITION);
+            if (vplanMode != null) {
+
+                //check whether there was a change in the selection
+                if (requestedVplanMode != vplanMode) {
+
+                    selectedItem = position;
+                    ListView vplanModes = (ListView) findViewById(R.id.vplanModeList);
+                    DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
+                    modesAdapter.notifyDataSetChanged();
+
+                    //change requested vplan mode and save it in shared prefs
+                    requestedVplanMode = vplanMode;
+                    getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
+
+                    //select the right filter
+                    switch (requestedVplanMode) {
+
+                        case UINFO:
+                            filterCurrent = filterUnterstufe;
+                            break;
+                        case MINFO:
+                            filterCurrent = filterMittelstufe;
+                            break;
+                        case OINFO:
+                            filterCurrent = filterOberstufe;
+                            break;
+                    }
+
+                    //recreate the pageradapter
+                    ViewPager pager = (ViewPager) findViewById(R.id.pager);
+                    pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+
+                    //now start the adapter loading in a separate thread
+                    new PagerAdapterLoader().execute(this);
+                } //else just ignore the click
+            }
+        }
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean b) {
+        view.setBackgroundColor(getResources().getColor(R.color.yellow_focused));
+    }
+
+    /**
+     * PagerAdapter that only displays one dummy fragment containing a progressbar
+     */
+    private class LoadingAdapter extends FragmentStatePagerAdapter {
+
+        public LoadingAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            Bundle args = new Bundle();
+            args.putBoolean(VplanFragment.FLAG_VPLAN_LOADING_DUMMY, true);
+            Fragment loadingFragment = new VplanFragment();
+            loadingFragment.setArguments(args);
+
+            return loadingFragment;
+        }
+
+        @Override
+        public int getCount() {
+            return 1;
+        }
+    }
+
+    /**
+     * Loads a VplanPagerAdapter in a background task
+     */
+    private class PagerAdapterLoader extends AsyncTask<Activity, Void, VplanPagerAdapter> {
+
+        @Override
+        protected VplanPagerAdapter doInBackground(Activity... activities) {
+            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
+        }
+
+        @Override
+        protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
+
+            //check whether disabling of welcome tv and activation of tabstrip must be done
+            if (vplanPagerAdapter.hasData()) {
+
+                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+                welcome.setVisibility(View.GONE);
+
+                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+                tabStrip.setVisibility(View.VISIBLE);
+            }
+
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(vplanPagerAdapter);
+
+            //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+            pager.setCurrentItem(getTodayVplanId(), false);
+        }
+    }
+
+
+    private class DrawerListAdapter extends ArrayAdapter<Item> {
+
+        private Context context;
+        private Activity activity;
+        private ArrayList<Item> items;
+
+        public DrawerListAdapter(Activity activity, Context context, ArrayList<Item> items) {
+            super(context, 0, items);
+            this.activity = activity;
+            this.context = context;
+            this.items = items;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder view;
+            final Item i = items.get(position);
+
+            if (i != null) {
+                if (i.isSection()) {
+                    //this is a header item
+                    SectionItem section = (SectionItem) i;
+
+                    if (convertView == null) {
+                        view = new ViewHolder(true);
+                        convertView = View.inflate(context, R.layout.section_item, null);
+                    } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
+
+                    //if this was an entry item before, re-inflate and update viewholder
+                    if (!view.isSection) {
+                        convertView = View.inflate(context, R.layout.section_item, null);
+                        view = new ViewHolder(true);
+                    }
+
+                    view.titleView = (TextView) convertView.findViewById(R.id.title);
+                    view.titleView.setText(section.getTitle());
+                    convertView.setOnClickListener(null);
+
+                    convertView.setTag(R.id.TAG_VIEWHOLDER, view);
+                } else {
+                    EntryItem entry = (EntryItem) i;
+
+                    if (convertView == null) {
+                        view = new ViewHolder(false);
+                        convertView = View.inflate(context, R.layout.drawer_list_item, null);
+                    } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
+
+                    //if this was an entry item before, re-inflate and update viewholder
+                    if (view.isSection) {
+                        convertView = View.inflate(context, R.layout.drawer_list_item, null);
+                        view = new ViewHolder(false);
+                    }
+
+                    view.titleView = (TextView) convertView.findViewById(R.id.title);
+                    view.titleView.setText(entry.getTitle());
+                    convertView.setClickable(true);
+                    convertView.setOnClickListener(((MainActivity) activity));
+                    convertView.setOnFocusChangeListener(((MainActivity) activity));
+
+                    //if this item has a vplan mode attached to it, add it as a tag
+                    if (entry.isVplanMode()) {
+                        convertView.setTag(R.id.TAG_VPLAN_MODE, entry.getVplanMode());
+                    } else convertView.setTag(R.id.TAG_APPMODE, true);
+
+                    convertView.setTag(R.id.TAG_POSITION, position);
+
+                    //if this view is selected, change the background color
+                    if (selectedItem == position) {
+                        convertView.setBackgroundColor(getResources().getColor(R.color.yellow));
+                        view.titleView.setTypeface(Typeface.DEFAULT_BOLD);
+                    } else {
+                        convertView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                        view.titleView.setTypeface(Typeface.DEFAULT);
+                    }
+
+                    convertView.setTag(R.id.TAG_VIEWHOLDER, view);
+                }
+            }
+
+            return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        protected class ViewHolder {
+            protected TextView titleView;
+            protected boolean isSection;
+
+            public ViewHolder(boolean isSection) {
+                this.isSection = isSection;
+            }
+        }
     }
 
     private int getTodayVplanId() {
@@ -289,107 +464,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //refresh the pager adapter
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
-    }
-
-    /**
-     * Called when one of the RadioButtons in the navigation drawer is clicked
-     */
-    public void onVplanModeRadioButtonClick(View v) {
-
-        //update the requested vplanmode and check whether a different one has been selected
-        switch (v.getId()) {
-
-            case R.id.radioMinfo:
-
-                rbUiHandler(new int[]{R.id.radioMinfo, R.id.radioOinfo, R.id.radioUinfo}, new int[]{R.id.radioMinfoFrame, R.id.radioOinfoFrame, R.id.radioUinfoFrame});
-
-                requestedVplanMode = MINFO;
-
-                //update current filterlist
-                filterCurrent = filterMittelstufe;
-                break;
-
-            case R.id.radioOinfo:
-
-                rbUiHandler(new int[]{R.id.radioOinfo, R.id.radioMinfo, R.id.radioUinfo}, new int[]{R.id.radioOinfoFrame, R.id.radioMinfoFrame, R.id.radioUinfoFrame});
-
-                requestedVplanMode = OINFO;
-
-                //update current filterlist
-                filterCurrent = filterOberstufe;
-                break;
-
-            case R.id.radioUinfo:
-
-                rbUiHandler(new int[]{R.id.radioUinfo, R.id.radioOinfo, R.id.radioMinfo}, new int[]{R.id.radioUinfoFrame, R.id.radioOinfoFrame, R.id.radioMinfoFrame});
-
-                requestedVplanMode = UINFO;
-
-                //update current filterlist
-                filterCurrent = filterUnterstufe;
-
-                break;
-        }
-
-        //save mode in shared prefs
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(PREF_VPLAN_MODE, requestedVplanMode);
-        editor.apply();
-
-        //refresh adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(vplanPagerAdapter);
-
-        //set a 1 dp margin between the fragments
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-    }
-
-    public void onModeChangeRadioButtonClick(View v) {
-
-        switch (v.getId()) {
-
-            case R.id.radioTests:
-                rbUiHandler(new int[]{R.id.radioTests, R.id.radioVPlan}, new int[]{R.id.radioTestsFrame, R.id.radioVPlanFrame});
-
-                //nothing
-                break;
-            case R.id.radioVPlan:
-                rbUiHandler(new int[]{R.id.radioVPlan, R.id.radioTests}, new int[]{R.id.radioVPlanFrame, R.id.radioTestsFrame});
-
-                break;
-        }
-    }
-
-    private void rbUiHandler(int[] buttons, int[] frames) {
-
-        //add all radiobuttons associated to the given id's to an arraylist and then handle the layout changes automatically
-        ArrayList<RadioButton> radioButtons = new ArrayList<RadioButton>(buttons.length);
-
-        for (int id : buttons) {
-            radioButtons.add((RadioButton) findViewById(id));
-        }
-
-        radioButtons.get(0).setTypeface(Typeface.DEFAULT_BOLD);
-
-        for (int i = 1; i <= radioButtons.size() - 1; i++) {
-            radioButtons.get(i).setTypeface(Typeface.DEFAULT);
-        }
-
-        //same thing for the framelayouts
-        ArrayList<FrameLayout> frameLayouts = new ArrayList<FrameLayout>(frames.length);
-
-        for (int id : frames) {
-            frameLayouts.add((FrameLayout) findViewById(id));
-        }
-
-        frameLayouts.get(0).setEnabled(true);
-
-        for (int i = 1; i <= frameLayouts.size() - 1; i++) {
-            frameLayouts.get(i).setEnabled(false);
-        }
     }
 
     /**
@@ -411,7 +485,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent));
+        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
     }
 
     /**
@@ -506,6 +580,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             case R.id.action_refresh:
                 refresh(item);
                 return true;
+            case R.id.tester:
+                new AsyncDownloader().execute(this);
+                return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));
@@ -537,10 +614,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     filterWarning.setText(R.string.filter_enabled);
                 }
                 //refresh adapter for viewPager
-                VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), this, filterCurrent);
-                ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                viewPager.setAdapter(vplanPagerAdapter);
-                viewPager.setCurrentItem(getTodayVplanId(), false);
+                new PagerAdapterLoader().execute(this);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -596,7 +671,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
         if (sharedPreferences == getSharedPreferences(PREFS_NAME, 0)) {
-            if (key.contentEquals(PREF_LAST_UPDATE)) activatePagerAdapter(this);
+            if (key.contentEquals(PREF_LAST_UPDATE)) activatePagerAdapter();
         }
         //settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
@@ -622,9 +697,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
-            //skip pwd or uname
+            //skip selected keys
             if (entry.getKey().contentEquals(getString(R.string.key_uname)) || entry.getKey().contentEquals(getString(R.string.key_pwd))
-                    || entry.getKey().contentEquals(getString(R.string.pref_key_upd_int)))
+                    || entry.getKey().contentEquals(getString(R.string.pref_key_upd_int)) || entry.getKey().contentEquals(getString(R.string.pref_key_bg_upd_levels)))
                 continue;
 
             //treat bg updates separately
@@ -679,6 +754,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 filterCurrent = filterOberstufe;
                 break;
         }
+
+        //save the filters in shared prefs
+        pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        Set<String> unterstufeSet = new HashSet<String>(filterUnterstufe);
+        Set<String> mittelstufeSet = new HashSet<String>(filterMittelstufe);
+        Set<String> oberstufeSet = new HashSet<String>(filterOberstufe);
+        editor.putStringSet(getString(R.string.pref_key_filter_uinfo), unterstufeSet)
+                .putStringSet(getString(R.string.pref_key_filter_minfo), mittelstufeSet)
+                .putStringSet(getString(R.string.pref_key_filter_oinfo), oberstufeSet)
+                .apply();
     }
 
     private void refreshBgUpdates(Boolean activated, int interval) {
@@ -693,7 +779,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             flag = PendingIntent.FLAG_UPDATE_CURRENT;
 
             //only update the alarm if the interval really changed, else just skip this unless it has to be deactivated
-            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated) saveAlarm(activated, interval, flag, editor);
+            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated)
+                saveAlarm(activated, interval, flag, editor);
         } else saveAlarm(activated, interval, 0, editor);
 
         editor.apply();
@@ -745,7 +832,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         } else {
             builder.setItems(filterCurrent.toArray(new String[filterCurrent.size()]), null);
         }
-        AlertDialog dialog = builder.show();
+        builder.show();
     }
 
     public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
@@ -783,17 +870,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         builder.show();
     }
 
-    public void activatePagerAdapter(Context context) {
+    public void activatePagerAdapter() {
+
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+        pager.setOffscreenPageLimit(4);
 
         //activate adapter for viewPager
-        VplanPagerAdapter vplanPagerAdapter = new VplanPagerAdapter(getSupportFragmentManager(), context, filterCurrent);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.setAdapter(vplanPagerAdapter);
-
-        //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        viewPager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-        viewPager.setCurrentItem(getTodayVplanId(), false);
+        new PagerAdapterLoader().execute(this);
     }
 
 
@@ -891,7 +975,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                 displayLastUpdate(refreshLastUpdate());
 
-                activatePagerAdapter(context);
+                activatePagerAdapter();
             }
         }
     }

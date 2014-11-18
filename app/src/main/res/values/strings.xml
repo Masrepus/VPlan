@@ -3,9 +3,9 @@
 
     <string name="hello" translatable="false">Hello World, MainActivity!</string>
     <string name="app_name" translatable="false">SGP</string>
-	<string name="no_lesson">not available</string>
-	<string name="all_grades" translatable="false">all grades</string>
-	<string name="no_status">no status available</string>
+    <string name="no_lesson">not available</string>
+    <string name="all_grades" translatable="false">all grades</string>
+    <string name="no_status">no status available</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="headingListview" translatable="false">Vertretungsplan:</string>
@@ -21,7 +21,8 @@
     <string name="err_encryptCredentials" translatable="false">Exception while encrypting uname/pwd</string>
     <string name="downloading">Downloading…</string>
     <string name="no_data">No data available, click to refresh</string>
-    <string name="refresh">refresh</string><string name="still_parsing">Action not available!
+    <string name="refresh">refresh</string>
+    <string name="still_parsing">Action not available!
  Parsing of data still in progress!</string>
     <string name="vplan_base_url" translatable="false">http://app.schyren-gymnasium.de:80/</string>
     <string name="vplan_base_cred" translatable="false">app.schyren-gymnasium.de:80/</string>
@@ -66,7 +67,7 @@
     <string name="curr_filter">Currently filtered classes</string>
     <string name="no_filter">Add class…</string>
     <string name="tests">Tests</string>
-    <string name="vplan">Vertretungsplan</string>
+    <string name="vplan">Ver</string>
     <string name="deutsch" translatable="false">Deutsch</string>
     <string name="key_deutsch_q11" translatable="false">pref_key_d_q11</string>
     <string name="key_deutsch_q12" translatable="false">pref_key_d_q12</string>
@@ -168,5 +169,20 @@
     <string name="downloaded_prog"> downloaded...</string>
     <string name="files"> files</string>
     <string name="retry">Retry</string>
+    <string name="levels">Class levels</string>
+    <string name="pref_key_bg_upd_levels" translatable="false">pref_key_bg_upd_levels</string>
+    <string name="file">file</string>
+    <string name="level">level</string>
+    <string name="subject">Subject</string>
+    <string name="date">Date</string>
+    <string name="substitutions">Substitutions</string>
+    <string name="exams">Exams</string>
+    <string name="appmodes_header">Views</string>
+    <string name="tests_base_url" translatable="false">http://app.schyren-gymnasium.de/schulaufgaben.php?kl=</string>
+    <string name="tests_base_oinfo" translatable="false">http://app.schyren-gymnasium.de/oinfo/scha</string>
+    <string name="pref_key_filter_minfo" translatable="false">pref_key_filter_minfo</string>
+    <string name="pref_key_filter_oinfo" translatable="false">pref_key_filter_oinfo</string>
+    <string name="pref_key_filter_uinfo" translatable="false">pref_key_filter_uinfo</string>
+    <string name="title_activity_exams">Exams</string>
 
 </resources>

@@ -7,6 +7,14 @@
         <item>Mittelstufe</item>
         <item>Oberstufe</item>
     </string-array>
+    <string-array name="appmodes">
+        <item>@string/substitutions</item>
+        <item>@string/exams</item>
+    </string-array>
+    <string-array name="sectionHeaders">
+        <item>@string/appmodes_header</item>
+        <item>@string/levels</item>
+    </string-array>
     <string-array name="upd_intervals">
         <item>1 hour</item>
         <item>3 hours</item>

@@ -18,6 +18,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -82,6 +83,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             MultiSelectListPreference multiPref = (MultiSelectListPreference) p;
 
             //get the values that were saved in this preference item and join them with commas
+            //treat bg update levels separately
             Set<String> values = preferences.getStringSet(multiPref.getKey(), null);
 
             StringBuilder builder = new StringBuilder();

@@ -64,6 +64,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";
     private static final int DATABASE_VERSION = 1;
+    public static final String[] tablesVplan = {TABLE_VPLAN_0, TABLE_VPLAN_1, TABLE_VPLAN_2, TABLE_VPLAN_3, TABLE_VPLAN_4};
 
     public MySQLiteHelper(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);

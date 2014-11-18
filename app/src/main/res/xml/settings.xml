@@ -365,6 +365,11 @@
         <CheckBoxPreference
             android:title="@string/activate_bg_updates"
             android:key="@string/pref_key_bg_updates" />
+        <MultiSelectListPreference
+            android:title="@string/levels"
+            android:key="@string/pref_key_bg_upd_levels"
+            android:entries="@array/vplan_modes"
+            android:entryValues="@array/vplan_modes" />
         <ListPreference
             android:title="@string/update_int"
             android:key="@string/pref_key_upd_int"

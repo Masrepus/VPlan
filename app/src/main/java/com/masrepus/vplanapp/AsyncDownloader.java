@@ -14,7 +14,6 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -23,12 +22,13 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
  * The async task used for background-parsing of online data
  */
-abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
+public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     private static final int BASIC = MainActivity.BASIC;
     private static final int UINFO = MainActivity.UINFO;
@@ -44,6 +44,24 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private String currentVPlanLink;
     private String timePublished;
     private int requestedVplanMode;
+    private int appMode;
+    private String grade;
+    private ArrayList<ArrayList<String>> filters;
+    private boolean downloaded11 = false;
+    private boolean downloaded12 = false;
+
+    protected int getRequestedVplanMode() {
+        //externalised so that the service can override this
+        SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        return pref.getInt(MainActivity.PREF_VPLAN_MODE, UINFO);
+    }
+
+    protected int getAppMode() {
+        //possibility of overriding
+        /*SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        return pref.getInt(MainActivity.PREF_APPMODE, MainActivity.VPLAN);*/
+        return MainActivity.VPLAN;
+    }
 
     /**
      * Starts the process of parsing
@@ -60,7 +78,84 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
-        requestedVplanMode = pref.getInt(MainActivity.PREF_VPLAN_MODE, UINFO);
+        //get the requested vplan mode
+        requestedVplanMode = getRequestedVplanMode();
+
+        //get the appmode
+        appMode = getAppMode();
+
+        switch (appMode) {
+
+            case MainActivity.VPLAN:
+                return downloadVplan(editor);
+            case MainActivity.TESTS:
+                return downloadTests();
+            default:
+                return downloadVplan(editor);
+        }
+
+    }
+
+    private boolean downloadTests() {
+
+        publishProgress(MainActivity.ProgressCode.STARTED);
+        downloaded = 0;
+        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+
+        //get the filter sets
+        filters = new ArrayList<ArrayList<String>>();
+        filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_uinfo), null)));
+
+        filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_minfo), null)));
+
+        filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_oinfo), null)));
+
+        //get total downloads to do
+        for (ArrayList<String> filter : filters) {
+            total_downloads += filter.size();
+        }
+
+        //call parseTestsToSql for each filtered grade/course
+        for (ArrayList<String> currFilter : filters) {
+
+            for (String currGrade : currFilter) {
+                grade = currGrade;
+                try {
+                    if (currFilter == filters.get(2)) {
+
+                        requestedVplanMode = OINFO;
+                        if (grade.charAt(0) == '1') {
+                            grade = "11"; //1XY means grade 11, 2XY grade 12
+                            //check whether this grade has been downloaded already
+                            if (downloaded11) continue;
+                            downloaded11 = true;
+                        }
+                        else {
+                            grade = "12";
+                            if (downloaded12) continue;
+                            downloaded12 = true;
+                        }
+                        parseOinfoTests();
+                    }
+                    else {
+                        requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
+                        parseTests();
+                    }
+                } catch (Exception e) {
+                    if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                        publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                        return false;
+                    } else return false;
+                }
+                downloaded++;
+                publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+            }
+        }
+
+        return true;
+    }
+
+    private boolean downloadVplan(SharedPreferences.Editor editor) {
 
         //download new data and then refresh pager adapter
 
@@ -69,7 +164,7 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             updateAvailableFilesList();
         } catch (Exception e) {
             //check whether this is because of missing creds
-            if (e.getMessage() == "no creds available") {
+            if (e.getMessage().contentEquals("failed to connect without creds")) {
                 publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
                 return false;
             } else if (e.getMessage().contentEquals("failed to connect")) {
@@ -117,7 +212,7 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         } catch (Exception e) {
 
             //check whether this is because of missing creds
-            if (e.getMessage() == "no creds available") {
+            if (e.getMessage().contentEquals("failed to connect without creds")) {
                 publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
             } else if (e.getMessage().contentEquals("failed to connect")) {
                 publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
@@ -133,6 +228,38 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     @Override
     protected void onPostExecute(Boolean success) {
         if (success) refreshLastUpdate();
+    }
+
+    public void parseTests() throws Exception {
+
+        Document doc;
+
+        try {
+            doc = Jsoup.connect(findRequestedTestsPage()).get();
+        } catch (IOException e) {
+            throw new Exception("failed to connect oinfo");
+        }
+    }
+
+    public void parseOinfoTests() throws Exception {
+
+        Document doc;
+
+        try {
+            doc = Jsoup.connect(findRequestedTestsPage()).get();
+        } catch (IOException e) {
+            throw new Exception("failed to connect oinfo");
+        }
+
+        //get the table element
+        Element list = doc.select("li").first();
+        Element table = list.child(0);
+
+        //get the last updated timestamp
+        String lastUpdate = list.textNodes().get(2).text();
+
+        Elements tableRows = table.child(0).children();
+        parseTestData(tableRows);
     }
 
     /**
@@ -205,28 +332,13 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     public void insertVplanRow(String stunde, String klasse, String status, int position) {
 
-        //sql insert of all three columns, but only if they aren't all empty
+        //sql insert of all three columns, but only if they aren't all empty or header items
+
         if (stunde != null && !klasse.contentEquals("Klasse")) {
 
-            switch (requestedVplanId) {
-                case 0:
-                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_0, position, stunde, klasse, status);
-                    break;
-                case 1:
-                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_1, position, stunde, klasse, status);
-                    break;
-                case 2:
-                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_2, position, stunde, klasse, status);
-                    break;
-                case 3:
-                    datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
-                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_3, position, stunde, klasse, status);
-                    break;
-                case 4:
-                    datasource.createRowVplan(MySQLiteHelper.TABLE_VPLAN_4, position, stunde, klasse, status);
-                    break;
+            if (requestedVplanId <= 4) {
+                datasource.createRowVplan(MySQLiteHelper.tablesVplan[requestedVplanId], position, stunde, klasse, status);
             }
-
         }
     }
 
@@ -265,12 +377,56 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             else currentDate = separated[2].trim();
         }
 
-        //now save the current loaded vplan's date and its last-changed timestamp for later usage
+        //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
         SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanId), currentDate);
-        editor.putString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanId), timePublished);
+        editor.putString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), currentDate);
+        editor.putString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), timePublished);
         editor.apply();
+    }
+
+    public void parseTestData(Elements tableRows) {
+
+        if (tableRows != null) {
+
+            int position = 0;
+            String currDate = "";
+
+            datasource.open();
+            datasource.newTable(MySQLiteHelper.TABLE_TESTS);
+
+            //iterate through the rows
+            for (Element row : tableRows) {
+
+                String[] columns = new String[row.children().size()];
+                String date;
+                String course;
+
+                //distribute the row's content into an array in order to get the columns
+                for (int i = 0; i < row.children().size(); i++) {
+                    columns[i] = row.child(i).text();
+                }
+
+                //put the data into the right strings
+                if (columns.length == 2) { //this makes it skip the title row
+                    date = columns[0];
+                    course = columns[1];
+
+                    if (date.contentEquals("\u00a0")) {
+
+                        //we have to insert the current date manually as the same date is never repeated in the table
+                        date = currDate;
+                    } else currDate = date;
+
+                    //sql insert, but skip this if the course column is empty
+                    if (!course.contentEquals("\u00a0")) {
+                        datasource.createRowTests(position, date, course);
+                        position++;
+                    }
+                }
+            }
+            datasource.close();
+        }
     }
 
     public void parseVplan(Elements tableRows) {
@@ -368,8 +524,28 @@ abstract class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 break;
         }
 
-        if (url != "") return url;
+        if (!url.contentEquals("")) return url;
         else return getVPlanUrl(MainActivity.UINFO, false);
+    }
+
+    private String findRequestedTestsPage() {
+
+        //return the right url for the requested mode and grade: u/minfo have the same, only oinfo has a different one
+        String url = "";
+
+        switch (requestedVplanMode) {
+
+            case UINFO:
+            case MINFO:
+                url = context.getString(R.string.tests_base_url) + grade;
+                break;
+            case OINFO:
+                url = context.getString(R.string.tests_base_oinfo) + grade + ".html";
+                break;
+        }
+
+        if (!url.contentEquals("")) return url;
+        else return context.getString(R.string.tests_base_url) + grade;
     }
 
     /**
