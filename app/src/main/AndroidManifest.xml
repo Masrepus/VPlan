@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     package="com.masrepus.vplanapp"
     android:versionCode="3"
-    android:versionName="1.5" >
+    android:versionName="1.5.1" >
 
     <uses-sdk tools:node="replace" />
 
