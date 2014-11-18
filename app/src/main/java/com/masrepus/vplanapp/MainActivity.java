@@ -214,19 +214,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //build the entries array
         String[] appModes = getResources().getStringArray(R.array.appmodes);
-        /*String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
+        String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
 
         //build the item list
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2); */
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, new String[]{"Stufen"}, getResources().getStringArray(R.array.vplan_modes), 0);
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2);
 
         DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
 
         vplanModesLV.setAdapter(modesAdapter);
 
         //restore last vplanmode
-        /*selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4*/
-        selectedItem = requestedVplanMode;
+        selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4
         modesAdapter.notifyDataSetChanged();
 
         //register change listener for settings sharedPrefs
