@@ -8,9 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerTabStrip;
-import android.view.View;
-import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -154,8 +151,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
                     //only add to list if row isn't null
                     String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE));
-                    if (help == "Klasse") continue;
-                    if (help == "") continue;
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
 
                     row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE)));
                     row.setStunde(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STUNDE)));

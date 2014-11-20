@@ -1,8 +1,6 @@
 package com.masrepus.vplanapp;
 
-import android.app.ListFragment;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -10,16 +8,7 @@ import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
-import android.text.InputType;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
 /**

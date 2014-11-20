@@ -386,15 +386,16 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     if (convertView == null) {
                         view = new ViewHolder(true);
                         convertView = View.inflate(context, R.layout.section_item, null);
+                        view.titleView = (TextView) convertView.findViewById(R.id.title);
                     } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
 
                     //if this was an entry item before, re-inflate and update viewholder
                     if (!view.isSection) {
                         convertView = View.inflate(context, R.layout.section_item, null);
                         view = new ViewHolder(true);
+                        view.titleView = (TextView) convertView.findViewById(R.id.title);
                     }
 
-                    view.titleView = (TextView) convertView.findViewById(R.id.title);
                     view.titleView.setText(section.getTitle());
                     convertView.setOnClickListener(null);
 

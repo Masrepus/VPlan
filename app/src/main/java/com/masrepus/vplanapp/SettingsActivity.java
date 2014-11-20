@@ -1,12 +1,8 @@
 package com.masrepus.vplanapp;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 /**
  * Created by samuel on 01.09.14.

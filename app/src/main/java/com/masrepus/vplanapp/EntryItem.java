@@ -1,7 +1,5 @@
 package com.masrepus.vplanapp;
 
-import android.content.ClipData;
-
 /**
  * Normal list entry item
  * Created by samuel on 30.10.14.
