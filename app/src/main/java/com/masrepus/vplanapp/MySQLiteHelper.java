@@ -56,10 +56,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //Tests table
     public static final String TABLE_TESTS = "teststable";
     public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_TYPE = "type";
     private static final String TESTS_CREATE = "create table "
             + TABLE_TESTS + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_KLASSE
-            + " text, " + COLUMN_DATE + " text);";
+            + " text, " + COLUMN_TYPE + " text, " + COLUMN_DATE + " text);";
     public static final String DATABASE_UINFO = "uinfo.db";
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";

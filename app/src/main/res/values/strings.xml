@@ -184,5 +184,6 @@
     <string name="pref_key_filter_oinfo" translatable="false">pref_key_filter_oinfo</string>
     <string name="pref_key_filter_uinfo" translatable="false">pref_key_filter_uinfo</string>
     <string name="title_activity_exams">Exams</string>
+    <string name="exam">Exam</string>
 
 </resources>

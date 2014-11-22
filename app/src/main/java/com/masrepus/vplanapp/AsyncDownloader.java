@@ -15,15 +15,19 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * The async task used for background-parsing of online data
@@ -115,6 +119,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             total_downloads += filter.size();
         }
 
+        datasource.newTable(MySQLiteHelper.TABLE_TESTS);
+
         //call parseTestsToSql for each filtered grade/course
         for (ArrayList<String> currFilter : filters) {
 
@@ -122,6 +128,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 grade = currGrade;
                 try {
                     if (currFilter == filters.get(2)) {
+                        //oinfo
 
                         requestedVplanMode = OINFO;
                         if (grade.charAt(0) == '1') {
@@ -138,7 +145,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         parseOinfoTests();
                     }
                     else {
-                        requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
+                        //uinfo or minfo
+                        requestedVplanMode = UINFO; //this is important for findRequestedTestsPage; same for uinfo and minfo, as they have the same tests url
                         parseTests();
                     }
                 } catch (Exception e) {
@@ -236,9 +244,42 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         try {
             doc = Jsoup.connect(findRequestedTestsPage()).get();
-        } catch (IOException e) {
+        } catch (HttpStatusException e) {
             throw new Exception("failed to connect oinfo");
         }
+
+        Element list = doc.select("li").first();
+
+        //get the nodes containing the relevant test information
+        List<TextNode> testNodes = list.textNodes();
+
+        int position = 0;
+        datasource.open();
+
+        for (TextNode node : testNodes) {
+
+            String completeText = node.text();
+
+            //separate date and subject which are connected by ':'
+            String[] split = completeText.split(":");
+            String date = split[0];
+
+            String[] split2 = split[1].trim().split(" ");
+            String type = split2[0].trim();
+            String subject = split2[2].trim();
+
+            //rest goes into subject
+            for (int i = 3; i < split2.length; i++) {
+                subject += " " + split2[i];
+            }
+
+            subject = subject.replace('\uFFFD', 'ö');
+
+            datasource.createRowTests(position, date, subject, type);
+            position++;
+        }
+
+        datasource.close();
     }
 
     public void parseOinfoTests() throws Exception {
@@ -393,7 +434,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             String currDate = "";
 
             datasource.open();
-            datasource.newTable(MySQLiteHelper.TABLE_TESTS);
 
             //iterate through the rows
             for (Element row : tableRows) {
@@ -420,7 +460,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                     //sql insert, but skip this if the course column is empty
                     if (!course.contentEquals("\u00a0")) {
-                        datasource.createRowTests(position, date, course);
+                        datasource.createRowTests(position, date, course, context.getString(R.string.exam)); //in oinfo, all tests are of the same type
                         position++;
                     }
                 }

@@ -67,5 +67,6 @@
     <string name="exams">Prüfungen</string>
     <string name="appmodes_header">Ansichten</string>
     <string name="title_activity_exams">Prüfungen</string>
+    <string name="exam">Schulaufgabe</string>
 
 </resources>

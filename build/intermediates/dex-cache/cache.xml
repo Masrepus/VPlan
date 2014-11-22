@@ -8,12 +8,6 @@
         revision="20.0.0"
         sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da"/>
     <item
-        dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.0-378c2290376beef6638284489077839c19792e20.jar"
-        jar="/home/samuel/android-studio/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.0/support-annotations-21.0.0.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e"/>
-    <item
         dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.0-5f5bb566ba64bd7ae0f59d422e09fd2476427e7f.jar"
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/libs/internal_impl-21.0.0.jar"
         jumboMode="false"
@@ -37,5 +31,11 @@
         jumboMode="false"
         revision="20.0.0"
         sha1="686344a780033e4ba22b926cd225f8d4941247e6"/>
+    <item
+        dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.0-a22531cc21091fdc46d1bf88ee810ff0f2166e24.jar"
+        jar="/home/samuel/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.0/support-annotations-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e"/>
 
 </pre-dex-items>

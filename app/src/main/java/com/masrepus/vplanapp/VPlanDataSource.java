@@ -110,12 +110,13 @@ public class VPlanDataSource {
         }
     }
 
-    public void createRowTests(int id, String date, String klasse) {
+    public void createRowTests(int id, String date, String klasse, String type) {
 
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_ID, id);
         values.put(MySQLiteHelper.COLUMN_DATE, date);
         values.put(MySQLiteHelper.COLUMN_KLASSE, klasse);
+        values.put(MySQLiteHelper.COLUMN_TYPE, type);
 
         //find out which db is currently in use
         SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
