@@ -133,7 +133,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
             hasData = true;
 
-            Cursor c = datasource.query(tableName, new String[]{MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_KLASSE, MySQLiteHelper.COLUMN_STUNDE,
+            Cursor c = datasource.query(tableName, new String[]{MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_GRADE, MySQLiteHelper.COLUMN_STUNDE,
                     MySQLiteHelper.COLUMN_STATUS});
 
             ArrayList<Row> list = new ArrayList<Row>();
@@ -150,11 +150,11 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE));
+                    String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE));
                     if (help.contentEquals("Klasse")) continue;
                     if (help.contentEquals("")) continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE)));
+                    row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE)));
                     row.setStunde(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STUNDE)));
                     row.setStatus(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STATUS)));
 
@@ -217,11 +217,11 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE));
+                    String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE));
                     if (help == "Klasse") continue;
                     if (help == "") continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE)));
+                    row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE)));
                     row.setStunde(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STUNDE)));
                     row.setStatus(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STATUS)));
 

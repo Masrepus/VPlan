@@ -2,14 +2,32 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="54dp"
+        android:layout_height="83dp"
         android:id="@+id/frameLayout"
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Large Text"
+            android:id="@+id/grade"
+            android:layout_gravity="right|center_vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_alignParentRight="false"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="false"
+            android:textColor="@android:color/secondary_text_light" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -21,7 +39,8 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -34,7 +53,25 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:visibility="visible"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true" />
+            android:layout_alignParentLeft="false"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@+id/grade" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/type"
+            android:layout_gravity="right|center_vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_alignParentRight="false"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/grade" />
     </RelativeLayout>
 </LinearLayout>

@@ -1,26 +1,37 @@
 package com.masrepus.vplanapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
 public class ExamsActivity extends ActionBarActivity {
 
     private ArrayList<ExamsRow> examsList;
+    private MenuItem refreshItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +50,14 @@ public class ExamsActivity extends ActionBarActivity {
     public void refreshAdapter() {
         //set listadapter
         examsList = initData();
+        //sort by date
+        Collections.sort(examsList, new Comparator<ExamsRow>() {
+            @Override
+            public int compare(ExamsRow examsRow, ExamsRow examsRow2) {
+                return examsRow.getDate().compareTo(examsRow2.getDate());
+            }
+        });
+
         ListView listView = (ListView) findViewById(R.id.examsList);
         ExamsListAdapter adapter = new ExamsListAdapter(this, R.layout.exam_list_element, examsList);
         listView.setAdapter(adapter);
@@ -58,7 +77,7 @@ public class ExamsActivity extends ActionBarActivity {
         switch (id) {
 
             case R.id.action_refresh:
-                new BgDownloader().execute(this);
+                refresh(item);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -71,20 +90,115 @@ public class ExamsActivity extends ActionBarActivity {
 
         ArrayList<ExamsRow> examsList = new ArrayList<ExamsRow>();
 
-        Cursor c = datasource.query(MySQLiteHelper.TABLE_TESTS, new String[]{MySQLiteHelper.COLUMN_DATE, MySQLiteHelper.COLUMN_KLASSE});
+        //now get the data from all 3 db's: uinfo, minfo and oinfo
+        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        int vplanModeBefore = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.putInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
+        editor.apply();
+
+        examsList.addAll(examsList(datasource));
+
+        editor.putInt(MainActivity.PREF_VPLAN_MODE, MainActivity.MINFO);
+        editor.apply();
+
+        examsList.addAll(examsList(datasource));
+
+        editor.putInt(MainActivity.PREF_VPLAN_MODE, MainActivity.OINFO);
+        editor.apply();
+
+        examsList.addAll(examsList(datasource));
+
+        datasource.close();
+
+        //now reset the vplanmode
+        editor.putInt(MainActivity.PREF_VPLAN_MODE, vplanModeBefore);
+        editor.apply();
+
+        return examsList;
+    }
+
+    private ArrayList<ExamsRow> examsList(VPlanDataSource datasource) {
+
+        ArrayList<ExamsRow> examsList = new ArrayList<ExamsRow>();
+
+        Cursor c = datasource.query(MySQLiteHelper.TABLE_TESTS, new String[]{MySQLiteHelper.COLUMN_DATE, MySQLiteHelper.COLUMN_GRADE, MySQLiteHelper.COLUMN_TYPE, MySQLiteHelper.COLUMN_SUBJECT});
 
         //fill arraylist
         while (c.moveToNext()) {
             String date = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_DATE));
-            String subject = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_KLASSE));
+            String subject = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_SUBJECT));
+            String type = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_TYPE));
+            String grade = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE));
 
-            ExamsRow row = new ExamsRow(date, subject);
+            ExamsRow row = new ExamsRow(date, grade, subject, type);
             examsList.add(row);
         }
 
-        datasource.close();
-
         return examsList;
+    }
+
+    private void refresh(MenuItem item) {
+
+        //rotate the refresh button
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
+
+        Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
+        rotation.setRepeatCount(Animation.INFINITE);
+        iv.startAnimation(rotation);
+        item.setActionView(iv);
+
+        refreshItem = item;
+
+        new BgDownloader().execute(this);
+    }
+
+    public void resetRefreshAnimation() {
+
+        //reset the refresh button to normal, non-rotating layout (if it has been initialised yet)
+        if (refreshItem != null) {
+            if (refreshItem.getActionView() != null) {
+                refreshItem.getActionView().clearAnimation();
+                refreshItem.setActionView(null);
+            }
+        }
+    }
+
+    public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(titleStringRes)
+                .setMessage(msgStringRes);
+
+        //if buttoncount is 1, then there should be only one ok button, otherwise also add a cancel one
+        switch (buttonCount) {
+            case 1:
+                builder.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                break;
+            case 2:
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivityForResult(new Intent(context, SettingsActivity.class), 0);
+                    }
+                })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                break;
+        }
+
+        builder.show();
     }
 
     private class ExamsListAdapter extends ArrayAdapter<ExamsRow> {
@@ -112,13 +226,17 @@ public class ExamsActivity extends ActionBarActivity {
                     convertView = View.inflate(context, R.layout.exam_list_element, null);
                     view.date = (TextView) convertView.findViewById(R.id.date);
                     view.subject = (TextView) convertView.findViewById(R.id.subject);
+                    view.type = (TextView) convertView.findViewById(R.id.type);
+                    view.grade = (TextView) convertView.findViewById(R.id.grade);
                 } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
 
-                view.date.setText(row.getDate());
+                view.date.setText(row.getDateString());
                 view.subject.setText(row.getSubject());
+                view.type.setText(row.getType());
+                view.grade.setText(row.getGrade());
 
                 convertView.setTag(R.id.TAG_VIEWHOLDER, view);
-                convertView.setTag(R.id.TAG_DATE, row.getDate());
+                convertView.setTag(R.id.TAG_DATE, row.getDateString());
                 convertView.setTag(R.id.TAG_SUBJECT, row.getSubject());
             }
 
@@ -128,6 +246,8 @@ public class ExamsActivity extends ActionBarActivity {
         protected class ViewHolder {
             protected TextView date;
             protected TextView subject;
+            protected TextView type;
+            protected TextView grade;
         }
     }
 
@@ -142,7 +262,57 @@ public class ExamsActivity extends ActionBarActivity {
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
 
+            progressBar.setVisibility(View.GONE);
+
+            resetRefreshAnimation();
+
             refreshAdapter();
+        }
+
+        @Override
+        protected void onProgressUpdate(Enum... values) {
+            super.onProgressUpdate(values);
+
+            switch ((MainActivity.ProgressCode) values[0]) {
+                case STARTED:
+                    progress = (MainActivity.ProgressCode) values[0];
+                    progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setIndeterminate(true);
+                    break;
+                case PARSING_FINISHED:
+                    progress = (MainActivity.ProgressCode) values[0];
+                    progressBar.setIndeterminate(false);
+                    progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
+                    break;
+                case ERR_NO_CREDS:
+                    progress = (MainActivity.ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
+
+                    resetRefreshAnimation();
+
+                    break;
+                case ERR_NO_INTERNET:
+                    progress = (MainActivity.ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
+
+                    resetRefreshAnimation();
+
+                    break;
+                case ERR_NO_INTERNET_OR_NO_CREDS:
+                    progress = (MainActivity.ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.download_error_title, R.string.download_error, 1);
+
+                    resetRefreshAnimation();
+
+                    break;
+            }
         }
     }
 }

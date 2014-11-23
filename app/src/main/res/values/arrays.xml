@@ -7,6 +7,14 @@
         <item>Mittelstufe</item>
         <item>Oberstufe</item>
     </string-array>
+    <string-array name="test_types">
+        <item>Schulaufgabe</item>
+        <item>Kurzarbeit</item>
+    </string-array>
+    <string-array name="test_types_short">
+        <item>SA</item>
+        <item>KA</item>
+    </string-array>
     <string-array name="appmodes">
         <item>@string/substitutions</item>
         <item>@string/exams</item>

@@ -8,13 +8,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_VPLAN_0 = "vplantable0";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_KLASSE = "klasse";
+    public static final String COLUMN_GRADE = "klasse";
     public static final String COLUMN_STUNDE = "stunde";
     public static final String COLUMN_STATUS = "status";
     //VPlantable creation sql statement
     private static final String VPLAN_0_CREATE = "create table "
             + TABLE_VPLAN_0 + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_KLASSE
+            + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
     public static final String TABLE_LINKS = "linktable";
@@ -29,38 +29,39 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //VPlantable 1
     private static final String VPLAN_1_CREATE = "create table "
             + TABLE_VPLAN_1 + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_KLASSE
+            + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
     public static final String TABLE_VPLAN_2 = "vplantable2";
     //VPlantable 2
     private static final String VPLAN_2_CREATE = "create table "
             + TABLE_VPLAN_2 + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_KLASSE
+            + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
     public static final String TABLE_VPLAN_3 = "vplantable3";
     //VPlantable 3
     private static final String VPLAN_3_CREATE = "create table "
             + TABLE_VPLAN_3 + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_KLASSE
+            + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
     public static final String TABLE_VPLAN_4 = "vplantable4";
     //VPlantable 4
     private static final String VPLAN_4_CREATE = "create table "
             + TABLE_VPLAN_4 + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_KLASSE
+            + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
     //Tests table
     public static final String TABLE_TESTS = "teststable";
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_SUBJECT = "subject";
     private static final String TESTS_CREATE = "create table "
             + TABLE_TESTS + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_KLASSE
-            + " text, " + COLUMN_TYPE + " text, " + COLUMN_DATE + " text);";
+            + " integer primary key autoincrement, " + COLUMN_GRADE
+            + " text, " + COLUMN_TYPE + " text, " + COLUMN_SUBJECT + " text, " + COLUMN_DATE + " text);";
     public static final String DATABASE_UINFO = "uinfo.db";
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";
@@ -110,31 +111,31 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
      * Re-creates a single table in a db
      */
     public void newTable(SQLiteDatabase db, String tableName) {
-        if (tableName == TABLE_VPLAN_0) {
+        if (tableName.contentEquals(TABLE_VPLAN_0)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_0);
             db.execSQL(VPLAN_0_CREATE);
         }
-        if (tableName == TABLE_VPLAN_1) {
+        if (tableName.contentEquals(TABLE_VPLAN_1)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_1);
             db.execSQL(VPLAN_1_CREATE);
         }
-        if (tableName == TABLE_VPLAN_2) {
+        if (tableName.contentEquals(TABLE_VPLAN_2)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_2);
             db.execSQL(VPLAN_2_CREATE);
         }
-        if (tableName == TABLE_VPLAN_3) {
+        if (tableName.contentEquals(TABLE_VPLAN_3)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_3);
             db.execSQL(VPLAN_3_CREATE);
         }
-        if (tableName == TABLE_VPLAN_4) {
+        if (tableName.contentEquals(TABLE_VPLAN_4)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_4);
             db.execSQL(VPLAN_4_CREATE);
         }
-        if (tableName == TABLE_LINKS) {
+        if (tableName.contentEquals(TABLE_LINKS)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_LINKS);
             db.execSQL(LINK_CREATE);
         }
-        if (tableName == TABLE_TESTS) {
+        if (tableName.contentEquals(TABLE_TESTS)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS);
             db.execSQL(TESTS_CREATE);
         }

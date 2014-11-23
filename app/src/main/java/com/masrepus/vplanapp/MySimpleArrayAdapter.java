@@ -41,7 +41,7 @@ public class MySimpleArrayAdapter extends ArrayAdapter implements Serializable {
 
             //hold the view objects in an object, that way they don't need to be "re- found"
             view = new ViewHolder();
-            view.klasseView = (TextView) rowView.findViewById(R.id.klasse);
+            view.klasseView = (TextView) rowView.findViewById(R.id.grade);
             view.stundeView = (TextView) rowView.findViewById(R.id.stunde);
             view.statusView = (TextView) rowView.findViewById(R.id.status);
 

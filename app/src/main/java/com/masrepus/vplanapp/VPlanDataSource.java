@@ -64,7 +64,7 @@ public class VPlanDataSource {
         //create new ContentValues with the column name as key and the cell data as value
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_STUNDE, stunde);
-        values.put(MySQLiteHelper.COLUMN_KLASSE, klasse);
+        values.put(MySQLiteHelper.COLUMN_GRADE, klasse);
         values.put(MySQLiteHelper.COLUMN_ID, id);
         values.put(MySQLiteHelper.COLUMN_STATUS, status);
 
@@ -110,13 +110,14 @@ public class VPlanDataSource {
         }
     }
 
-    public void createRowTests(int id, String date, String klasse, String type) {
+    public void createRowTests(int id, String grade, String date, String subject, String type) {
 
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_ID, id);
         values.put(MySQLiteHelper.COLUMN_DATE, date);
-        values.put(MySQLiteHelper.COLUMN_KLASSE, klasse);
+        values.put(MySQLiteHelper.COLUMN_SUBJECT, subject);
         values.put(MySQLiteHelper.COLUMN_TYPE, type);
+        values.put(MySQLiteHelper.COLUMN_GRADE, grade);
 
         //find out which db is currently in use
         SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
