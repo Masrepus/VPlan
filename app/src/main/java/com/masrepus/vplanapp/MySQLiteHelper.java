@@ -53,15 +53,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
-    //Tests table
-    public static final String TABLE_TESTS = "teststable";
-    public static final String COLUMN_DATE = "date";
-    public static final String COLUMN_TYPE = "type";
-    public static final String COLUMN_SUBJECT = "subject";
-    private static final String TESTS_CREATE = "create table "
-            + TABLE_TESTS + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_GRADE
-            + " text, " + COLUMN_TYPE + " text, " + COLUMN_SUBJECT + " text, " + COLUMN_DATE + " text);";
+
     public static final String DATABASE_UINFO = "uinfo.db";
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";
@@ -85,7 +77,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(VPLAN_3_CREATE);
         database.execSQL(VPLAN_4_CREATE);
         database.execSQL(LINK_CREATE);
-        database.execSQL(TESTS_CREATE);
     }
 
     /**
@@ -103,7 +94,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_3);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_4);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LINKS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS);
         onCreate(db);
     }
 
@@ -134,10 +124,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         if (tableName.contentEquals(TABLE_LINKS)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_LINKS);
             db.execSQL(LINK_CREATE);
-        }
-        if (tableName.contentEquals(TABLE_TESTS)) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TESTS);
-            db.execSQL(TESTS_CREATE);
         }
     }
 

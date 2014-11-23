@@ -90,47 +90,27 @@ public class ExamsActivity extends ActionBarActivity {
 
         ArrayList<ExamsRow> examsList = new ArrayList<ExamsRow>();
 
-        //now get the data from all 3 db's: uinfo, minfo and oinfo
-        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        int vplanModeBefore = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
-        SharedPreferences.Editor editor = pref.edit();
-
-        editor.putInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
-        editor.apply();
-
-        examsList.addAll(examsList(datasource));
-
-        editor.putInt(MainActivity.PREF_VPLAN_MODE, MainActivity.MINFO);
-        editor.apply();
-
-        examsList.addAll(examsList(datasource));
-
-        editor.putInt(MainActivity.PREF_VPLAN_MODE, MainActivity.OINFO);
-        editor.apply();
-
-        examsList.addAll(examsList(datasource));
-
-        datasource.close();
-
-        //now reset the vplanmode
-        editor.putInt(MainActivity.PREF_VPLAN_MODE, vplanModeBefore);
-        editor.apply();
-
-        return examsList;
-    }
-
-    private ArrayList<ExamsRow> examsList(VPlanDataSource datasource) {
-
-        ArrayList<ExamsRow> examsList = new ArrayList<ExamsRow>();
-
-        Cursor c = datasource.query(MySQLiteHelper.TABLE_TESTS, new String[]{MySQLiteHelper.COLUMN_DATE, MySQLiteHelper.COLUMN_GRADE, MySQLiteHelper.COLUMN_TYPE, MySQLiteHelper.COLUMN_SUBJECT});
+        //get the data from both test tables
+        Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
 
         //fill arraylist
         while (c.moveToNext()) {
-            String date = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_DATE));
-            String subject = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_SUBJECT));
-            String type = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_TYPE));
-            String grade = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE));
+            String date = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
+            String subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
+            String type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
+            String grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
+
+            ExamsRow row = new ExamsRow(date, grade, subject, type);
+            examsList.add(row);
+        }
+
+        c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
+
+        while (c.moveToNext()) {
+            String date = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
+            String subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
+            String type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
+            String grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
 
             ExamsRow row = new ExamsRow(date, grade, subject, type);
             examsList.add(row);

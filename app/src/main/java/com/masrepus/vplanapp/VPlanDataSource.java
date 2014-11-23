@@ -16,10 +16,12 @@ public class VPlanDataSource {
     private SQLiteDatabase databaseUinfo;
     private SQLiteDatabase databaseMinfo;
     private SQLiteDatabase databaseOinfo;
+    private SQLiteDatabase databaseTests;
 
     private MySQLiteHelper dbHelperUinfo;
     private MySQLiteHelper dbHelperMinfo;
     private MySQLiteHelper dbHelperOinfo;
+    private SQLiteHelperTests dbHelperTests;
 
     private Context context;
 
@@ -33,6 +35,7 @@ public class VPlanDataSource {
         dbHelperUinfo = new MySQLiteHelper(context, MySQLiteHelper.DATABASE_UINFO);
         dbHelperMinfo = new MySQLiteHelper(context, MySQLiteHelper.DATABASE_MINFO);
         dbHelperOinfo = new MySQLiteHelper(context, MySQLiteHelper.DATABASE_OINFO);
+        dbHelperTests = new SQLiteHelperTests(context, SQLiteHelperTests.DATABASE_TESTS);
     }
 
     /**
@@ -42,6 +45,7 @@ public class VPlanDataSource {
         databaseUinfo = dbHelperUinfo.getWritableDatabase();
         databaseMinfo = dbHelperMinfo.getWritableDatabase();
         databaseOinfo = dbHelperOinfo.getWritableDatabase();
+        databaseTests = dbHelperTests.getWritableDatabase();
     }
 
     /**
@@ -51,6 +55,7 @@ public class VPlanDataSource {
         dbHelperUinfo.close();
         dbHelperMinfo.close();
         dbHelperOinfo.close();
+        dbHelperTests.close();
     }
 
     /**
@@ -110,78 +115,78 @@ public class VPlanDataSource {
         }
     }
 
-    public void createRowTests(int id, String grade, String date, String subject, String type) {
+    public void createRowTests(String tablename, String grade, String date, String subject, String type) {
 
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_ID, id);
-        values.put(MySQLiteHelper.COLUMN_DATE, date);
-        values.put(MySQLiteHelper.COLUMN_SUBJECT, subject);
-        values.put(MySQLiteHelper.COLUMN_TYPE, type);
-        values.put(MySQLiteHelper.COLUMN_GRADE, grade);
+        values.put(SQLiteHelperTests.COLUMN_DATE, date);
+        values.put(SQLiteHelperTests.COLUMN_SUBJECT, subject);
+        values.put(SQLiteHelperTests.COLUMN_TYPE, type);
+        values.put(SQLiteHelperTests.COLUMN_GRADE, grade);
 
-        //find out which db is currently in use
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-            case MainActivity.UINFO:
-                databaseUinfo.insert(MySQLiteHelper.TABLE_TESTS, null, values);
-                break;
-            case MainActivity.MINFO:
-                databaseMinfo.insert(MySQLiteHelper.TABLE_TESTS, null, values);
-                break;
-            case MainActivity.OINFO:
-                databaseOinfo.insert(MySQLiteHelper.TABLE_TESTS, null, values);
-                break;
-        }
+        databaseTests.insert(tablename, null, values);
     }
 
     /**
      * Passes queries to the right database by checking which vplan mode is currently active
      *
-     * @param name       the table name
+     * @param tableName       the tablename
      * @param projection the columns to query for
      * @return a cursor object containing the queried columns
      */
-    public Cursor query(String name, String[] projection) {
+    public Cursor query(String tableName, String[] projection) {
 
-        //find out which db is currently in use
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-            case MainActivity.UINFO:
-                return databaseUinfo.query(
-                        name,
-                        projection,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-            case MainActivity.MINFO:
-                return databaseMinfo.query(
-                        name,
-                        projection,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-            case MainActivity.OINFO:
-                return databaseOinfo.query(
-                        name,
-                        projection,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-            default:
-                return databaseUinfo.query(
-                        name,
-                        projection,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
+        //check whether we have to query the tests db
+        if (tableName.contains(SQLiteHelperTests.TEST_TABLE_BASIC_NAME)) {
+            return databaseTests.query(
+                    tableName,
+                    projection,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+        } else {
+
+            //find out which db is currently in use
+            SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
+                case MainActivity.UINFO:
+                    return databaseUinfo.query(
+                            tableName,
+                            projection,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+                case MainActivity.MINFO:
+                    return databaseMinfo.query(
+                            tableName,
+                            projection,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+                case MainActivity.OINFO:
+                    return databaseOinfo.query(
+                            tableName,
+                            projection,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+                default:
+                    return databaseUinfo.query(
+                            tableName,
+                            projection,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+            }
         }
     }
 
@@ -189,18 +194,24 @@ public class VPlanDataSource {
      * Passes requests to the right MySQLiteHelper object to re-create a specific table
      */
     public void newTable(String tableName) {
-        //find out which db is currently in use
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-            case MainActivity.UINFO:
-                dbHelperUinfo.newTable(databaseUinfo, tableName);
-                break;
-            case MainActivity.MINFO:
-                dbHelperMinfo.newTable(databaseMinfo, tableName);
-                break;
-            case MainActivity.OINFO:
-                dbHelperOinfo.newTable(databaseOinfo, tableName);
-                break;
+
+        //check whether this is a tests table
+        if (tableName.contains(SQLiteHelperTests.TEST_TABLE_BASIC_NAME)) {
+            dbHelperTests.newTable(databaseTests, tableName);
+        } else {
+            //find out which db is currently in use
+            SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
+                case MainActivity.UINFO:
+                    dbHelperUinfo.newTable(databaseUinfo, tableName);
+                    break;
+                case MainActivity.MINFO:
+                    dbHelperMinfo.newTable(databaseMinfo, tableName);
+                    break;
+                case MainActivity.OINFO:
+                    dbHelperOinfo.newTable(databaseOinfo, tableName);
+                    break;
+            }
         }
     }
 

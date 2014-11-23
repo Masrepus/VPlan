@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import org.jsoup.HttpStatusException;
@@ -54,6 +53,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private ArrayList<ArrayList<String>> filters;
     private boolean downloaded11 = false;
     private boolean downloaded12 = false;
+    private boolean downloadedUinfoMinfo = false;
 
     protected int getRequestedVplanMode() {
         //externalised so that the service can override this
@@ -137,39 +137,33 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                             //check whether this grade has been downloaded already
                             if (downloaded11) continue;
                             else total_downloads++;
+                            parseOinfoTests();
                             downloaded11 = true;
                         }
                         else {
                             grade = "12";
                             if (downloaded12) continue;
                             else total_downloads++;
+                            parseOinfoTests();
                             downloaded12 = true;
                         }
-                        //update shared prefs
-                        editor.putInt(MainActivity.PREF_VPLAN_MODE, requestedVplanMode);
-                        editor.apply();
-                        parseOinfoTests();
                     }
                     else if (currFilter == filters.get(0)){
                         //uinfo or minfo
                         requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
-                        //update shared prefs
-                        editor.putInt(MainActivity.PREF_VPLAN_MODE, requestedVplanMode);
-                        editor.apply();
-                        parseTests(currGrade);
+                        parseUinfoMinfoTests(currGrade);
                     } else {
                         requestedVplanMode = MINFO;
-                        //update shared prefs
-                        editor.putInt(MainActivity.PREF_VPLAN_MODE, requestedVplanMode);
-                        editor.apply();
-                        parseTests(currGrade);
+                        parseUinfoMinfoTests(currGrade);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                        publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
-                        return false;
-                    } else return false;
+                    if (e.getMessage() != null) {
+                        if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                            publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                        }
+                    }
+                    return false;
                 }
                 downloaded++;
                 publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
@@ -178,8 +172,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         //reset shared prefs
         requestedVplanMode = vplanModeBefore;
-        editor.putInt(MainActivity.PREF_VPLAN_MODE, requestedVplanMode);
-        editor.apply();
 
         publishProgress(MainActivity.ProgressCode.FINISHED_ALL);
 
@@ -261,7 +253,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         if (success) refreshLastUpdate();
     }
 
-    public void parseTests(String grade) throws Exception {
+    public void parseUinfoMinfoTests(String grade) throws Exception {
 
         Document doc;
 
@@ -278,9 +270,12 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             //get the nodes containing the relevant test information
             List<TextNode> testNodes = list.textNodes();
 
-            int position = 0;
             datasource.open();
-            datasource.newTable(MySQLiteHelper.TABLE_TESTS);
+
+            //check whether existing test data must be wiped because this is the first round
+            if (!downloadedUinfoMinfo) {
+                datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
+            }
 
             for (TextNode node : testNodes) {
 
@@ -298,7 +293,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     //find position of this test's type in types-array and give it the correct abbreviation
                     ArrayList<String> types = new ArrayList<String>(Arrays.asList(context.getResources().getStringArray(R.array.test_types)));
                     ArrayList<String> types_short = new ArrayList<String>(Arrays.asList(context.getResources().getStringArray(R.array.test_types_short)));
-                    type = types_short.get(types.indexOf(type));
+                    if (types.contains(type)) {
+                        type = types_short.get(types.indexOf(type));
+                    }
 
                     String subject = split2[2].trim();
 
@@ -309,14 +306,14 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                     subject = subject.replace('\uFFFD', 'ö');
 
-                    datasource.createRowTests(position, grade, date, subject, type);
-                    position++;
+                    datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, grade, date, subject, type);
                 }
             }
 
             datasource.close();
         }
 
+        downloadedUinfoMinfo = true;
         publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
     }
 
@@ -470,11 +467,14 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         if (tableRows != null) {
 
-            int position = 0;
             String currDate = "";
 
             datasource.open();
-            datasource.newTable(MySQLiteHelper.TABLE_TESTS);
+
+            //check whether existing test data must be wiped because this is the first round
+            if (!downloaded11 || !downloaded12) {
+                datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
+            }
 
             //iterate through the rows
             for (Element row : tableRows) {
@@ -501,8 +501,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                     //sql insert, but skip this if the course column is empty
                     if (!course.contentEquals("\u00a0")) {
-                        datasource.createRowTests(position, "", date, course, context.getString(R.string.exam)); //in oinfo, all tests are of the same type and grade is not relevant
-                        position++;
+                        datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, "", date, course, context.getString(R.string.exam)); //in oinfo, all tests are of the same type and grade is not relevant
                     }
                 }
             }
