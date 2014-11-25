@@ -38,7 +38,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private static final int UINFO = MainActivity.UINFO;
     private static final int MINFO = MainActivity.MINFO;
     private static final int OINFO = MainActivity.OINFO;
-    MainActivity.ProgressCode progress;
+    ProgressCode progress;
     int downloaded;
     int total_downloads;
     Context context;
@@ -103,7 +103,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     private boolean downloadTests() {
 
-        publishProgress(MainActivity.ProgressCode.STARTED);
+        publishProgress(ProgressCode.STARTED);
         downloaded = 0;
         SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
         int vplanModeBefore = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
@@ -120,6 +120,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //get total downloads to do
         for (int i=0; i<2; i++) {
             total_downloads += filters.get(i).size();
+        }
+
+        if (total_downloads == 0 && !(filters.get(2).size() > 0)) {
+            //there are no filtered classes so no need to download anything; notify user!
+            publishProgress(ProgressCode.NOTHING_TO_DOWNLOAD);
         }
 
         //clear all existing data
@@ -166,20 +171,20 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     e.printStackTrace();
                     if (e.getMessage() != null) {
                         if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                            publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                            publishProgress(ProgressCode.ERR_NO_INTERNET);
                         }
                     }
                     return false;
                 }
                 downloaded++;
-                publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+                publishProgress(ProgressCode.PARSING_FINISHED);
             }
         }
 
         //reset shared prefs
         requestedVplanMode = vplanModeBefore;
 
-        publishProgress(MainActivity.ProgressCode.FINISHED_ALL);
+        publishProgress(ProgressCode.FINISHED_ALL);
 
         return true;
     }
@@ -189,18 +194,18 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //download new data and then refresh pager adapter
 
         try {
-            publishProgress(MainActivity.ProgressCode.STARTED);
+            publishProgress(ProgressCode.STARTED);
             updateAvailableFilesList();
         } catch (Exception e) {
             //check whether this is because of missing creds
             if (e.getMessage().contentEquals("failed to connect without creds")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_CREDS);
                 return false;
             } else if (e.getMessage().contentEquals("failed to connect")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
                 return false;
             } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                publishProgress(ProgressCode.ERR_NO_INTERNET);
                 return false;
             }
         }
@@ -230,10 +235,10 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 parseDataToSql();
 
                 downloaded = c.getPosition() + 1;
-                publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+                publishProgress(ProgressCode.PARSING_FINISHED);
             }
 
-            publishProgress(MainActivity.ProgressCode.FINISHED_ALL);
+            publishProgress(ProgressCode.FINISHED_ALL);
 
             datasource.close();
 
@@ -242,11 +247,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             //check whether this is because of missing creds
             if (e.getMessage().contentEquals("failed to connect without creds")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_CREDS);
             } else if (e.getMessage().contentEquals("failed to connect")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
             } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                publishProgress(ProgressCode.ERR_NO_INTERNET);
             } else {
                 e.printStackTrace();
             }
@@ -320,7 +325,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         }
 
         downloadedUinfoMinfo = true;
-        publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+        publishProgress(ProgressCode.PARSING_FINISHED);
     }
 
     public void parseOinfoTests() throws Exception {
@@ -343,7 +348,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         Elements tableRows = table.child(0).children();
         parseOinfoTests(tableRows);
 
-        publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+        publishProgress(ProgressCode.PARSING_FINISHED);
     }
 
     /**

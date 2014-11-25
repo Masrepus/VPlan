@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,6 +43,7 @@ public class ExamsActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setSubtitle(getString(R.string.exams_activity_subtitle));
 
         refreshAdapter();
     }
@@ -293,20 +293,20 @@ public class ExamsActivity extends ActionBarActivity {
         protected void onProgressUpdate(Enum... values) {
             super.onProgressUpdate(values);
 
-            switch ((MainActivity.ProgressCode) values[0]) {
+            switch ((ProgressCode) values[0]) {
                 case STARTED:
-                    progress = (MainActivity.ProgressCode) values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar = (ProgressBar) findViewById(R.id.progressBar);
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar.setIndeterminate(true);
                     break;
                 case PARSING_FINISHED:
-                    progress = (MainActivity.ProgressCode) values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setIndeterminate(false);
                     progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
                     break;
                 case ERR_NO_CREDS:
-                    progress = (MainActivity.ProgressCode) values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.no_creds, R.string.download_error_nocreds, 2);
@@ -315,7 +315,7 @@ public class ExamsActivity extends ActionBarActivity {
 
                     break;
                 case ERR_NO_INTERNET:
-                    progress = (MainActivity.ProgressCode) values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error_nointernet, 1);
@@ -324,7 +324,7 @@ public class ExamsActivity extends ActionBarActivity {
 
                     break;
                 case ERR_NO_INTERNET_OR_NO_CREDS:
-                    progress = (MainActivity.ProgressCode) values[0];
+                    progress = (ProgressCode) values[0];
                     progressBar.setVisibility(View.GONE);
 
                     showAlert(context, R.string.download_error_title, R.string.download_error, 1);
@@ -332,6 +332,11 @@ public class ExamsActivity extends ActionBarActivity {
                     resetRefreshAnimation();
 
                     break;
+                case NOTHING_TO_DOWNLOAD:
+                    progress = (ProgressCode) values[0];
+                    progressBar.setVisibility(View.GONE);
+
+                    showAlert(context, R.string.nothing_to_download, R.string.nothing_to_download_msg, 2);
             }
         }
     }
