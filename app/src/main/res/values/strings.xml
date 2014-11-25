@@ -186,5 +186,6 @@
     <string name="title_activity_exams">Exams</string>
     <string name="exam">Exam</string>
     <string name="type">Type</string>
+    <string name="standard_test_abbrev">SA</string>
 
 </resources>

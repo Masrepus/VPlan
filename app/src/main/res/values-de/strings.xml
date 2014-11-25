@@ -69,5 +69,6 @@
     <string name="title_activity_exams">Prüfungen</string>
     <string name="exam">Schulaufgabe</string>
     <string name="type">Art</string>
+    <string name="standard_test_abbrev">SA</string>
 
 </resources>

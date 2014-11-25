@@ -122,6 +122,12 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             total_downloads += filters.get(i).size();
         }
 
+        //clear all existing data
+        datasource.open();
+        datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
+        datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
+        datasource.close();
+
         //call parseTestsToSql for each filtered grade/course
         for (ArrayList<String> currFilter : filters) {
 
@@ -335,7 +341,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         String lastUpdate = list.textNodes().get(2).text();
 
         Elements tableRows = table.child(0).children();
-        parseTestData(tableRows);
+        parseOinfoTests(tableRows);
 
         publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
     }
@@ -463,7 +469,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         editor.apply();
     }
 
-    public void parseTestData(Elements tableRows) {
+    public void parseOinfoTests(Elements tableRows) {
 
         if (tableRows != null) {
 
@@ -499,9 +505,14 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         date = currDate;
                     } else currDate = date;
 
+                    String grade;
+                    //set the grade according to the first char in subject
+                    if ("1".contentEquals(String.valueOf(course.charAt(0)))) grade = "Q11";
+                    else grade = "Q12";
+
                     //sql insert, but skip this if the course column is empty
                     if (!course.contentEquals("\u00a0")) {
-                        datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, "", date, course, context.getString(R.string.exam)); //in oinfo, all tests are of the same type and grade is not relevant
+                        datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, grade, date, course, context.getString(R.string.standard_test_abbrev)); //in oinfo, all tests are of the same type and grade is not relevant
                     }
                 }
             }
@@ -626,6 +637,26 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         if (!url.contentEquals("")) return url;
         else return context.getString(R.string.tests_base_url) + grade;
+    }
+
+    public static String findRequestedTestsPage(Context context, int mode) {
+
+        //return the right url for the requested mode and grade: u/minfo have the same, only oinfo has a different one
+        String url = "";
+
+        switch (mode) {
+
+            case UINFO:
+            case MINFO:
+                url = context.getString(R.string.tests_base_url);
+                break;
+            case OINFO:
+                url = context.getString(R.string.vplan_base_url) + "oinfo/" + "srekursiv.php";
+                break;
+        }
+
+        if (!url.contentEquals("")) return url;
+        else return context.getString(R.string.tests_base_url);
     }
 
     /**

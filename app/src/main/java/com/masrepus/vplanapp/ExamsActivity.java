@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -79,6 +80,31 @@ public class ExamsActivity extends ActionBarActivity {
             case R.id.action_refresh:
                 refresh(item);
                 return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_open_browser:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.open_browser) + "...")
+                        .setItems(new CharSequence[]{getString(R.string.unterstufe) + "/" + getString(R.string.mittelstufe), getString(R.string.oberstufe)}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //open the right website
+                                switch (i) {
+                                    case 0:
+                                        //u/minfo
+                                        Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), MainActivity.MINFO));
+                                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                                        break;
+                                    case 1:
+                                        //oinfo
+                                        uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), MainActivity.OINFO));
+                                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                                        break;
+                                }
+                            }
+                        })
+                        .show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -212,7 +238,21 @@ public class ExamsActivity extends ActionBarActivity {
 
                 view.date.setText(row.getDateString());
                 view.subject.setText(row.getSubject());
+
+                //check whether this type is longer than four characters and if needed shorten it
+                if (row.getType().toCharArray().length > 4) {
+                    String shortType = "";
+                    char[] chars = row.getType().toCharArray();
+                    for (int i=0; i<2; i++) {
+                        shortType += chars[i];
+                    }
+                    //at the end add ...
+                    shortType += "…";
+                    view.type.setText(shortType);
+                    convertView.setTag(R.id.TAG_TYPE_FULL, row.getType());
+                }
                 view.type.setText(row.getType());
+
                 view.grade.setText(row.getGrade());
 
                 convertView.setTag(R.id.TAG_VIEWHOLDER, view);
