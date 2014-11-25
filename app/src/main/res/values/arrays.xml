@@ -356,7 +356,7 @@
         <item>2no5bbx</item>
     </string-array>
     <string-array name="foto">
-        <item>1Fot</item>
+        <item>5pho</item>
     </string-array>
     <string-array name="ssp">
         <item>SSp1</item>
@@ -367,7 +367,7 @@
         <item>Chw2</item>
     </string-array>
     <string-array name="orch">
-        <item>1Orc</item>
+        <item>5Orc</item>
         <item>Orw1</item>
         <item>Orw2</item>
         <item>Orc1</item>
@@ -378,9 +378,9 @@
         <item>1psy2</item>
     </string-array>
     <string-array name="q11_spo_add">
-        <item>1S_T</item>
+        <item>1S-T</item>
     </string-array>
     <string-array name="q12_spo_add">
-        <item>2S_T</item>
+        <item>2S-T</item>
     </string-array>
 </resources>

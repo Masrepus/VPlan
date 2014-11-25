@@ -346,7 +346,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         String lastUpdate = list.textNodes().get(2).text();
 
         Elements tableRows = table.child(0).children();
-        parseOinfoTests(tableRows);
+        parseOinfoTestData(tableRows);
 
         publishProgress(ProgressCode.PARSING_FINISHED);
     }
@@ -474,7 +474,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         editor.apply();
     }
 
-    public void parseOinfoTests(Elements tableRows) {
+    public void parseOinfoTestData(Elements tableRows) {
 
         if (tableRows != null) {
 
@@ -515,8 +515,17 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     if ("1".contentEquals(String.valueOf(course.charAt(0)))) grade = "Q11";
                     else grade = "Q12";
 
+                    //perform filtering
+                    boolean isNeeded = false;
+                    for (String currGrade : filters.get(2)) {
+                        if (currGrade.toLowerCase().contentEquals(course)) {
+                            isNeeded = true;
+                            break;
+                        }
+                    }
+
                     //sql insert, but skip this if the course column is empty
-                    if (!course.contentEquals("\u00a0")) {
+                    if (!course.contentEquals("\u00a0") && isNeeded) {
                         datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, grade, date, course, context.getString(R.string.standard_test_abbrev)); //in oinfo, all tests are of the same type and grade is not relevant
                     }
                 }
