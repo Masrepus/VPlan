@@ -483,7 +483,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             datasource.open();
 
             //check whether existing test data must be wiped because this is the first round
-            if (!downloaded11 || !downloaded12) {
+            if (!downloaded11 && !downloaded12) {
                 datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
             }
 
@@ -513,7 +513,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     String grade;
                     //set the grade according to the first char in subject
                     if ("1".contentEquals(String.valueOf(course.charAt(0)))) grade = "Q11";
-                    else grade = "Q12";
+                    else if (String.valueOf(course.charAt(0)).contentEquals("2")) grade = "Q12";
+else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
                     //sql insert, but skip this if the course column is empty
                     if (!course.contentEquals("\u00a0")) {
