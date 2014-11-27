@@ -17,9 +17,13 @@
         android:textColor="@android:color/darker_gray"
         android:text="small text"
         android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
         android:textStyle="bold"
-        android:layout_alignLeft="@+id/relativeLayout" />
+        android:layout_alignLeft="@+id/relativeLayout"
+        android:layout_alignTop="@+id/date"
+        android:paddingTop="4dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -44,7 +48,9 @@
             android:id="@+id/relativeLayout"
         android:layout_centerVertical="true"
         android:layout_below="@+id/grade"
-        android:layout_margin="10dp">
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp">
 
         <TextView
                 android:layout_width="wrap_content"

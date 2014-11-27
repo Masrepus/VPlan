@@ -70,8 +70,8 @@
     <string name="exam">Schulaufgabe</string>
     <string name="type">Art</string>
     <string name="standard_test_abbrev">SA</string>
-    <string name="exams_activity_subtitle">für gefilterte Klassen</string>
     <string name="nothing_to_download">Herunterladen nicht möglich</string>
     <string name="nothing_to_download_msg">In deinem Filter befinden sich noch keine Klassen, weshalb keine Prüfungs-Daten heruntergeladen werden können.\nJetzt Klassen zum Filter hinzufügen?</string>
+    <string name="exams_activity_subtitle">(Klassen im Filter)</string>
 
 </resources>
