@@ -22,9 +22,13 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 
@@ -32,6 +36,7 @@ public class ExamsActivity extends ActionBarActivity {
 
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
+    private boolean noOldItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +110,12 @@ public class ExamsActivity extends ActionBarActivity {
                             }
                         })
                         .show();
+                return true;
+            case R.id.action_activate_filter:
+                item.setChecked(!item.isChecked());
+                noOldItems = item.isChecked();
+                refreshAdapter();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -119,9 +130,27 @@ public class ExamsActivity extends ActionBarActivity {
         //get the data from both test tables
         Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
 
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+
         //fill arraylist
         while (c.moveToNext()) {
+
             String date = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
+
+            //if requested, skip old entries
+            if (noOldItems) {
+                Date currDate;
+                try {
+                    currDate = format.parse(date);
+                } catch (ParseException e) {
+                    currDate = null;
+                }
+                if (currDate != null) {
+                    if (currDate.before(today)) continue;
+                }
+            }
+
             String subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
             String type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
             String grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));

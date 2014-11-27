@@ -190,5 +190,6 @@
     <string name="nothing_to_download">Nothing to download</string>
     <string name="nothing_to_download_msg">There are no classes in your filters yet, so there are no test dates to be downloaded.\nAdd classes to your filter now?</string>
     <string name="exams_activity_subtitle">(classes in filter)</string>
+    <string name="hide_past_exams">Hide old exams</string>
 
 </resources>
