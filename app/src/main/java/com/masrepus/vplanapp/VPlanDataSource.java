@@ -190,6 +190,63 @@ public class VPlanDataSource {
         }
     }
 
+    public Cursor query(String tableName, String[] projection, String selection) {
+
+        //check whether we have to query the tests db
+        if (tableName.contains(SQLiteHelperTests.TEST_TABLE_BASIC_NAME)) {
+            return databaseTests.query(
+                    tableName,
+                    projection,
+                    selection,
+                    null,
+                    null,
+                    null,
+                    null);
+        } else {
+
+            //find out which db is currently in use
+            SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
+                case MainActivity.UINFO:
+                    return databaseUinfo.query(
+                            tableName,
+                            projection,
+                            selection,
+                            null,
+                            null,
+                            null,
+                            null);
+                case MainActivity.MINFO:
+                    return databaseMinfo.query(
+                            tableName,
+                            projection,
+                            selection,
+                            null,
+                            null,
+                            null,
+                            null);
+                case MainActivity.OINFO:
+                    return databaseOinfo.query(
+                            tableName,
+                            projection,
+                            selection,
+                            null,
+                            null,
+                            null,
+                            null);
+                default:
+                    return databaseUinfo.query(
+                            tableName,
+                            projection,
+                            selection,
+                            null,
+                            null,
+                            null,
+                            null);
+            }
+        }
+    }
+
     /**
      * Passes requests to the right MySQLiteHelper object to re-create a specific table
      */

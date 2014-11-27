@@ -525,6 +525,10 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
                         }
                     }
 
+                    //now check whether we got this in the db already (5xy courses are treated as grade 12)
+                    Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_SUBJECT}, SQLiteHelperTests.COLUMN_SUBJECT + " = " + "'" + course + "'");
+                    if (c.getCount() > 0) isNeeded = false;
+
                     //sql insert, but skip this if the course column is empty
                     if (!course.contentEquals("\u00a0") && isNeeded) {
                         datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, grade, date, course, context.getString(R.string.standard_test_abbrev)); //in oinfo, all tests are of the same type and grade is not relevant
