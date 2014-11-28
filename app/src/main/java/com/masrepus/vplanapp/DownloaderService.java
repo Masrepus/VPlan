@@ -82,7 +82,7 @@ public class DownloaderService extends Service {
             String progressText = "";
             String bigTextSuffix = "";
             boolean error = false;
-            switch ((MainActivity.ProgressCode) progress[0]) {
+            switch ((ProgressCode) progress[0]) {
 
                 case STARTED:
                     progressText = getString(R.string.preparing);
@@ -119,7 +119,7 @@ public class DownloaderService extends Service {
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.sgplogob))
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(progressText);
-            if (progress[0] == MainActivity.ProgressCode.FINISHED_ALL) {
+            if (progress[0] == ProgressCode.FINISHED_ALL) {
 
                 //final text is a big one
                 builder.setStyle(new NotificationCompat.BigTextStyle(builder).bigText(progressText + bigTextSuffix));
@@ -129,7 +129,7 @@ public class DownloaderService extends Service {
             PendingIntent retryPending = PendingIntent.getService(context, 0, new Intent(context, DownloaderService.class), 0);
 
             //if downloading hasn't started yet then display indeterminate
-            if (progress[0] == MainActivity.ProgressCode.STARTED) {
+            if (progress[0] == ProgressCode.STARTED) {
                 builder.setProgress(100, 0, true);
                 builder.setOngoing(true);
                 builder.addAction(R.drawable.ic_cancel, getString(R.string.cancel), cancelPending);

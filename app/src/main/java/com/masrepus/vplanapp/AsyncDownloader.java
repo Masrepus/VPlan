@@ -15,15 +15,19 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * The async task used for background-parsing of online data
@@ -34,7 +38,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private static final int UINFO = MainActivity.UINFO;
     private static final int MINFO = MainActivity.MINFO;
     private static final int OINFO = MainActivity.OINFO;
-    MainActivity.ProgressCode progress;
+    ProgressCode progress;
     int downloaded;
     int total_downloads;
     Context context;
@@ -49,6 +53,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private ArrayList<ArrayList<String>> filters;
     private boolean downloaded11 = false;
     private boolean downloaded12 = false;
+    private boolean downloadedUinfoMinfo = false;
 
     protected int getRequestedVplanMode() {
         //externalised so that the service can override this
@@ -98,9 +103,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     private boolean downloadTests() {
 
-        publishProgress(MainActivity.ProgressCode.STARTED);
+        publishProgress(ProgressCode.STARTED);
         downloaded = 0;
         SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        int vplanModeBefore = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
+        SharedPreferences.Editor editor = pref.edit();
 
         //get the filter sets
         filters = new ArrayList<ArrayList<String>>();
@@ -111,9 +118,20 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_oinfo), null)));
 
         //get total downloads to do
-        for (ArrayList<String> filter : filters) {
-            total_downloads += filter.size();
+        for (int i=0; i<2; i++) {
+            total_downloads += filters.get(i).size();
         }
+
+        if (total_downloads == 0 && !(filters.get(2).size() > 0)) {
+            //there are no filtered classes so no need to download anything; notify user!
+            publishProgress(ProgressCode.NOTHING_TO_DOWNLOAD);
+        }
+
+        //clear all existing data
+        datasource.open();
+        datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
+        datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
+        datasource.close();
 
         //call parseTestsToSql for each filtered grade/course
         for (ArrayList<String> currFilter : filters) {
@@ -122,35 +140,51 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 grade = currGrade;
                 try {
                     if (currFilter == filters.get(2)) {
+                        //oinfo
 
                         requestedVplanMode = OINFO;
                         if (grade.charAt(0) == '1') {
                             grade = "11"; //1XY means grade 11, 2XY grade 12
                             //check whether this grade has been downloaded already
                             if (downloaded11) continue;
+                            else total_downloads++;
+                            parseOinfoTests();
                             downloaded11 = true;
                         }
                         else {
                             grade = "12";
                             if (downloaded12) continue;
+                            else total_downloads++;
+                            parseOinfoTests();
                             downloaded12 = true;
                         }
-                        parseOinfoTests();
                     }
-                    else {
+                    else if (currFilter == filters.get(0)){
+                        //uinfo or minfo
                         requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
-                        parseTests();
+                        parseUinfoMinfoTests(currGrade);
+                    } else {
+                        requestedVplanMode = MINFO;
+                        parseUinfoMinfoTests(currGrade);
                     }
                 } catch (Exception e) {
-                    if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                        publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
-                        return false;
-                    } else return false;
+                    e.printStackTrace();
+                    if (e.getMessage() != null) {
+                        if (e.getMessage().contentEquals("failed to connect oinfo")) {
+                            publishProgress(ProgressCode.ERR_NO_INTERNET);
+                        }
+                    }
+                    return false;
                 }
                 downloaded++;
-                publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+                publishProgress(ProgressCode.PARSING_FINISHED);
             }
         }
+
+        //reset shared prefs
+        requestedVplanMode = vplanModeBefore;
+
+        publishProgress(ProgressCode.FINISHED_ALL);
 
         return true;
     }
@@ -160,18 +194,18 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //download new data and then refresh pager adapter
 
         try {
-            publishProgress(MainActivity.ProgressCode.STARTED);
+            publishProgress(ProgressCode.STARTED);
             updateAvailableFilesList();
         } catch (Exception e) {
             //check whether this is because of missing creds
             if (e.getMessage().contentEquals("failed to connect without creds")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_CREDS);
                 return false;
             } else if (e.getMessage().contentEquals("failed to connect")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
                 return false;
             } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                publishProgress(ProgressCode.ERR_NO_INTERNET);
                 return false;
             }
         }
@@ -201,10 +235,10 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 parseDataToSql();
 
                 downloaded = c.getPosition() + 1;
-                publishProgress(MainActivity.ProgressCode.PARSING_FINISHED);
+                publishProgress(ProgressCode.PARSING_FINISHED);
             }
 
-            publishProgress(MainActivity.ProgressCode.FINISHED_ALL);
+            publishProgress(ProgressCode.FINISHED_ALL);
 
             datasource.close();
 
@@ -213,11 +247,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             //check whether this is because of missing creds
             if (e.getMessage().contentEquals("failed to connect without creds")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_CREDS);
             } else if (e.getMessage().contentEquals("failed to connect")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
             } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                publishProgress(MainActivity.ProgressCode.ERR_NO_INTERNET);
+                publishProgress(ProgressCode.ERR_NO_INTERNET);
             } else {
                 e.printStackTrace();
             }
@@ -230,15 +264,68 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         if (success) refreshLastUpdate();
     }
 
-    public void parseTests() throws Exception {
+    public void parseUinfoMinfoTests(String grade) throws Exception {
 
         Document doc;
 
         try {
             doc = Jsoup.connect(findRequestedTestsPage()).get();
-        } catch (IOException e) {
+        } catch (HttpStatusException e) {
             throw new Exception("failed to connect oinfo");
         }
+
+        Element list = doc.select("li").first();
+
+        if (list != null) {
+
+            //get the nodes containing the relevant test information
+            List<TextNode> testNodes = list.textNodes();
+
+            datasource.open();
+
+            //check whether existing test data must be wiped because this is the first round
+            if (!downloadedUinfoMinfo) {
+                datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
+            }
+
+            for (TextNode node : testNodes) {
+
+                String completeText = node.text();
+
+                if (!(completeText.toCharArray().length == 1)) {
+
+                    //separate date and subject which are connected by ':'
+                    String[] split = completeText.split(":");
+                    String date = split[0];
+
+                    String[] split2 = split[1].trim().split(" ");
+                    String type = split2[0].trim();
+
+                    //find position of this test's type in types-array and give it the correct abbreviation
+                    ArrayList<String> types = new ArrayList<String>(Arrays.asList(context.getResources().getStringArray(R.array.test_types)));
+                    ArrayList<String> types_short = new ArrayList<String>(Arrays.asList(context.getResources().getStringArray(R.array.test_types_short)));
+                    if (types.contains(type)) {
+                        type = types_short.get(types.indexOf(type));
+                    }
+
+                    String subject = split2[2].trim();
+
+                    //rest goes into subject
+                    for (int i = 3; i < split2.length; i++) {
+                        subject += " " + split2[i];
+                    }
+
+                    subject = subject.replace('\uFFFD', 'ö');
+
+                    datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, grade, date, subject, type);
+                }
+            }
+
+            datasource.close();
+        }
+
+        downloadedUinfoMinfo = true;
+        publishProgress(ProgressCode.PARSING_FINISHED);
     }
 
     public void parseOinfoTests() throws Exception {
@@ -259,7 +346,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         String lastUpdate = list.textNodes().get(2).text();
 
         Elements tableRows = table.child(0).children();
-        parseTestData(tableRows);
+        parseOinfoTestData(tableRows);
+
+        publishProgress(ProgressCode.PARSING_FINISHED);
     }
 
     /**
@@ -385,15 +474,18 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         editor.apply();
     }
 
-    public void parseTestData(Elements tableRows) {
+    public void parseOinfoTestData(Elements tableRows) {
 
         if (tableRows != null) {
 
-            int position = 0;
             String currDate = "";
 
             datasource.open();
-            datasource.newTable(MySQLiteHelper.TABLE_TESTS);
+
+            //check whether existing test data must be wiped because this is the first round
+            if (!downloaded11 && !downloaded12) {
+                datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
+            }
 
             //iterate through the rows
             for (Element row : tableRows) {
@@ -418,10 +510,28 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         date = currDate;
                     } else currDate = date;
 
+                    String grade;
+                    //set the grade according to the first char in subject
+                    if ("1".contentEquals(String.valueOf(course.charAt(0)))) grade = "Q11";
+                    else if (String.valueOf(course.charAt(0)).contentEquals("2")) grade = "Q12";
+else grade ="Q11/12"; //those other courses belong to both 11 and 12
+
+                    //perform filtering
+                    boolean isNeeded = false;
+                    for (String currGrade : filters.get(2)) {
+                        if (currGrade.toLowerCase().contentEquals(course)) {
+                            isNeeded = true;
+                            break;
+                        }
+                    }
+
+                    //now check whether we got this in the db already (5xy courses are treated as grade 12)
+                    Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_SUBJECT}, SQLiteHelperTests.COLUMN_SUBJECT + " = " + "'" + course + "'");
+                    if (c.getCount() > 0) isNeeded = false;
+
                     //sql insert, but skip this if the course column is empty
-                    if (!course.contentEquals("\u00a0")) {
-                        datasource.createRowTests(position, date, course);
-                        position++;
+                    if (!course.contentEquals("\u00a0") && isNeeded) {
+                        datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, grade, date, course, context.getString(R.string.standard_test_abbrev)); //in oinfo, all tests are of the same type and grade is not relevant
                     }
                 }
             }
@@ -546,6 +656,26 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         if (!url.contentEquals("")) return url;
         else return context.getString(R.string.tests_base_url) + grade;
+    }
+
+    public static String findRequestedTestsPage(Context context, int mode) {
+
+        //return the right url for the requested mode and grade: u/minfo have the same, only oinfo has a different one
+        String url = "";
+
+        switch (mode) {
+
+            case UINFO:
+            case MINFO:
+                url = context.getString(R.string.tests_base_url);
+                break;
+            case OINFO:
+                url = context.getString(R.string.vplan_base_url) + "oinfo/" + "srekursiv.php";
+                break;
+        }
+
+        if (!url.contentEquals("")) return url;
+        else return context.getString(R.string.tests_base_url);
     }
 
     /**

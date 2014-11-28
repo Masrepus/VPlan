@@ -16,6 +16,11 @@
         android:id="@+id/action_settings"
         android:title="@string/settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_activate_filter"
+        android:title="@string/hide_past_exams"
+        android:checkable="true"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/tester"

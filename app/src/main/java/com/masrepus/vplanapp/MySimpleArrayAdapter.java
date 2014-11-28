@@ -1,8 +1,6 @@
 package com.masrepus.vplanapp;
 
 import android.app.Activity;
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -43,7 +41,7 @@ public class MySimpleArrayAdapter extends ArrayAdapter implements Serializable {
 
             //hold the view objects in an object, that way they don't need to be "re- found"
             view = new ViewHolder();
-            view.klasseView = (TextView) rowView.findViewById(R.id.klasse);
+            view.klasseView = (TextView) rowView.findViewById(R.id.grade);
             view.stundeView = (TextView) rowView.findViewById(R.id.stunde);
             view.statusView = (TextView) rowView.findViewById(R.id.status);
 

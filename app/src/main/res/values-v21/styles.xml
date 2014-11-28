@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeYellow" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/yellow</item>
+        <item name="colorAccent">@color/blue</item>
+        <item name="android:alertDialogTheme">@style/ThemeYellow.AlertDialog</item>
+    </style>
+
+    <style name="ThemeYellow.AlertDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorPrimary">@color/yellow</item>
+        <item name="android:colorPrimaryDark">@color/yellow</item>
+        <item name="android:colorAccent">@color/blue</item>
+    </style>
+
+    <color name="yellow">#f7dd2b</color>
+    <color name="yellow_focused">@color/yellow</color>
+    <color name="blue">#274595</color>
+    <color name="blue_focused">#5e6d95</color>
+</resources>

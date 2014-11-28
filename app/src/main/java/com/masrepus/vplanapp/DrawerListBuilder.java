@@ -3,7 +3,6 @@ package com.masrepus.vplanapp;
 import android.content.Context;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by samuel on 31.10.14.

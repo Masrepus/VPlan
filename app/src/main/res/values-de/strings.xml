@@ -67,5 +67,13 @@
     <string name="exams">Prüfungen</string>
     <string name="appmodes_header">Ansichten</string>
     <string name="title_activity_exams">Prüfungen</string>
+    <string name="exam">Schulaufgabe</string>
+    <string name="type">Art</string>
+    <string name="standard_test_abbrev">SA</string>
+    <string name="nothing_to_download">Herunterladen nicht möglich</string>
+    <string name="nothing_to_download_msg">In deinem Filter befinden sich noch keine Klassen, weshalb keine Prüfungs-Daten heruntergeladen werden können.\nJetzt Klassen zum Filter hinzufügen?</string>
+    <string name="exams_activity_subtitle">(Klassen im Filter)</string>
+    <string name="hide_past_exams">Alte Prüfungen ausblenden</string>
+    <string name="hidden_exams_info">Alte Einträge ausgeblendet</string>
 
 </resources>

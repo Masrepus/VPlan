@@ -84,7 +84,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private ActionBarDrawerToggle drawerToggle;
     private Map<String, ?> keys;
     private String currentVPlanLink;
-    private int selectedItem;
+    private int selectedVplanItem;
+    private int selectedAppmodeItem;
 
     /**
      * Called when the activity is first created.
@@ -214,18 +215,20 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //build the entries array
         String[] appModes = getResources().getStringArray(R.array.appmodes);
-        /*String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
+        String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
 
         //build the item list
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2); */
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, new String[]{"Stufen"}, getResources().getStringArray(R.array.vplan_modes), 0);
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2);
 
         DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
 
         vplanModesLV.setAdapter(modesAdapter);
 
         //restore last vplanmode
-        selectedItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4
+        selectedVplanItem = 1 + appModes.length + requestedVplanMode; //for uinfo and two appmodes, this must return 4
+
+        //restore last appmode
+        selectedAppmodeItem = 1 + appMode;
         modesAdapter.notifyDataSetChanged();
 
         //register change listener for settings sharedPrefs
@@ -238,10 +241,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public void onClick(View view) {
 
         //check whether this is an appmode item
-        Boolean isAppModeItem = (Boolean) view.getTag(R.id.TAG_APPMODE);
+        Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
 
-        if (isAppModeItem != null) {
-            if (isAppModeItem) {
+        if (appModeTag != null) {
+
+            //update the current appmode
+            appMode = appModeTag;
+
+            if (appMode == TESTS) {
+                appMode = TESTS;
                 startActivity(new Intent(this, ExamsActivity.class));
             }
         } else {
@@ -253,7 +261,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 //check whether there was a change in the selection
                 if (requestedVplanMode != vplanMode) {
 
-                    selectedItem = position;
+                    selectedVplanItem = position;
                     ListView vplanModes = (ListView) findViewById(R.id.vplanModeList);
                     DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
                     modesAdapter.notifyDataSetChanged();
@@ -378,15 +386,16 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     if (convertView == null) {
                         view = new ViewHolder(true);
                         convertView = View.inflate(context, R.layout.section_item, null);
+                        view.titleView = (TextView) convertView.findViewById(R.id.title);
                     } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
 
                     //if this was an entry item before, re-inflate and update viewholder
                     if (!view.isSection) {
                         convertView = View.inflate(context, R.layout.section_item, null);
                         view = new ViewHolder(true);
+                        view.titleView = (TextView) convertView.findViewById(R.id.title);
                     }
 
-                    view.titleView = (TextView) convertView.findViewById(R.id.title);
                     view.titleView.setText(section.getTitle());
                     convertView.setOnClickListener(null);
 
@@ -399,7 +408,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                         convertView = View.inflate(context, R.layout.drawer_list_item, null);
                     } else view = (ViewHolder) convertView.getTag(R.id.TAG_VIEWHOLDER);
 
-                    //if this was an entry item before, re-inflate and update viewholder
+                    //if this was a section item before, re-inflate and update viewholder
                     if (view.isSection) {
                         convertView = View.inflate(context, R.layout.drawer_list_item, null);
                         view = new ViewHolder(false);
@@ -414,12 +423,20 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     //if this item has a vplan mode attached to it, add it as a tag
                     if (entry.isVplanMode()) {
                         convertView.setTag(R.id.TAG_VPLAN_MODE, entry.getVplanMode());
-                    } else convertView.setTag(R.id.TAG_APPMODE, true);
+                    } else {
+
+                        //set the appmode tag according to title
+                        int appmodeTag;
+                        if (entry.getTitle().contentEquals(getString(R.string.substitutions))) appmodeTag = VPLAN;
+                        else appmodeTag = TESTS;
+
+                        convertView.setTag(R.id.TAG_APPMODE, appmodeTag);
+                    }
 
                     convertView.setTag(R.id.TAG_POSITION, position);
 
                     //if this view is selected, change the background color
-                    if (selectedItem == position) {
+                    if (selectedVplanItem == position || selectedAppmodeItem == position) {
                         convertView.setBackgroundColor(getResources().getColor(R.color.yellow));
                         view.titleView.setTypeface(Typeface.DEFAULT_BOLD);
                     } else {
@@ -464,6 +481,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //refresh the pager adapter
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
+        appMode = VPLAN;
+        selectedAppmodeItem = 1 + appMode;
     }
 
     /**
@@ -486,6 +505,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
+        appMode = VPLAN;
+
+        ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
+        DrawerListAdapter adapter = (DrawerListAdapter) vplanModesLV.getAdapter();
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -909,8 +933,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             pb.setVisibility(View.GONE);
         }
     }
-
-    public enum ProgressCode {STARTED, PARSING_FINISHED, FINISHED_ALL, ERR_NO_INTERNET, ERR_NO_CREDS, ERR_NO_INTERNET_OR_NO_CREDS}
 
     private class BgDownloader extends AsyncDownloader {
 

@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
-            android:id="@+id/klasse"
+            android:id="@+id/grade"
             android:layout_gravity="left|center_vertical"
             android:textStyle="bold"
             android:paddingLeft="5dp"
