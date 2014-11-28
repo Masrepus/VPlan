@@ -2376,6 +2376,7 @@ containing a value of this type.
         public static final int ThemeOverlay_AppCompat_Dark_ActionBar=0x7f0d00ad;
         public static final int ThemeOverlay_AppCompat_Light=0x7f0d00ae;
         public static final int ThemeYellow=0x7f0d00af;
+        public static final int ThemeYellow_AlertDialog=0x7f0d00f0;
         public static final int Widget_AppCompat_ActionBar=0x7f0d00b0;
         public static final int Widget_AppCompat_ActionBar_Solid=0x7f0d00b1;
         public static final int Widget_AppCompat_ActionBar_TabBar=0x7f0d00b2;

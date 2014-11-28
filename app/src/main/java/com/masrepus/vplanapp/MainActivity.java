@@ -353,7 +353,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
             //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            pager.setPageMargin(Math.round(5 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
             pager.setCurrentItem(getTodayVplanId(), false);
         }
     }
