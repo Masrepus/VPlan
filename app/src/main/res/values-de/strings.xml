@@ -74,5 +74,6 @@
     <string name="nothing_to_download_msg">In deinem Filter befinden sich noch keine Klassen, weshalb keine Prüfungs-Daten heruntergeladen werden können.\nJetzt Klassen zum Filter hinzufügen?</string>
     <string name="exams_activity_subtitle">(Klassen im Filter)</string>
     <string name="hide_past_exams">Alte Prüfungen ausblenden</string>
+    <string name="hidden_exams_info">Alte Einträge ausgeblendet</string>
 
 </resources>

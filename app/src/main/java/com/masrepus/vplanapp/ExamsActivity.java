@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -34,6 +36,8 @@ import java.util.List;
 
 public class ExamsActivity extends ActionBarActivity {
 
+    public static final String PREF_HIDE_OLD_EXAMS = "hideOldExams";
+
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
     private boolean noOldItems;
@@ -49,6 +53,14 @@ public class ExamsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setSubtitle(getString(R.string.exams_activity_subtitle));
+
+        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        noOldItems = pref.getBoolean(PREF_HIDE_OLD_EXAMS, false);
+
+        //hide or show hidden items info
+        FrameLayout hiddenItemsFL = (FrameLayout) findViewById(R.id.frameLayout2);
+        if (noOldItems) hiddenItemsFL.setVisibility(View.VISIBLE);
+        else hiddenItemsFL.setVisibility(View.GONE);
 
         refreshAdapter();
     }
@@ -73,7 +85,23 @@ public class ExamsActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.exams, menu);
+
+        //init the filter item
+        MenuItem filterItem = (MenuItem) menu.findItem(R.id.action_activate_filter);
+        filterItem.setChecked(noOldItems);
+
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        //save the filter state
+        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean(PREF_HIDE_OLD_EXAMS, noOldItems);
+        editor.apply();
+
+        super.onPause();
     }
 
     @Override
@@ -113,7 +141,14 @@ public class ExamsActivity extends ActionBarActivity {
                 return true;
             case R.id.action_activate_filter:
                 item.setChecked(!item.isChecked());
+
                 noOldItems = item.isChecked();
+
+                //hide or show hidden items info
+                FrameLayout hiddenItemsFL = (FrameLayout) findViewById(R.id.frameLayout2);
+                if (noOldItems) hiddenItemsFL.setVisibility(View.VISIBLE);
+                else hiddenItemsFL.setVisibility(View.GONE);
+
                 refreshAdapter();
                 return true;
         }

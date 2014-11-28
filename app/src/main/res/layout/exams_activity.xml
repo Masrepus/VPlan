@@ -3,7 +3,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:animateLayoutChanges="true">
 
     <include
         android:layout_width="match_parent"
@@ -11,6 +12,27 @@
         layout="@layout/toolbar"
         android:layout_alignParentTop="true"
         android:id="@+id/toolbar" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/frameLayout2"
+        android:visibility="gone"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@color/blue"
+        android:layout_below="@+id/progressBar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/textView6"
+            android:layout_gravity="center"
+            android:textStyle="italic"
+            android:text="@string/hidden_exams_info"
+            android:textColor="@android:color/primary_text_dark" />
+    </FrameLayout>
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
@@ -26,7 +48,7 @@
         android:layout_height="match_parent"
         app:cardElevation="3dp"
         app:cardCornerRadius="6dp"
-        android:layout_below="@+id/progressBar"
+        android:layout_below="@+id/frameLayout2"
         android:layout_margin="5dp">
 
         <LinearLayout
