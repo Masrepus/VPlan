@@ -22,8 +22,8 @@
         android:checkable="true"
         app:showAsAction="never" />
 
-    <item
+    <!--<item
         android:id="@+id/tester"
-        android:title="test" />
+        android:title="test" />-->
 
 </menu>

@@ -604,9 +604,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             case R.id.action_refresh:
                 refresh(item);
                 return true;
-            case R.id.tester:
+            /*case R.id.tester:
                 new AsyncDownloader().execute(this);
-                return true;
+                return true;*/
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));
