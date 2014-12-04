@@ -1805,12 +1805,13 @@ containing a value of this type.
         public static final int drawer_shadow=0x7f020035;
         public static final int ic_cancel=0x7f020036;
         public static final int ic_drawer=0x7f020037;
-        public static final int ic_refresh=0x7f020038;
-        public static final int ic_settings=0x7f020039;
-        public static final int ic_website=0x7f02003a;
-        public static final int section_header=0x7f02003b;
-        public static final int sgplogob=0x7f02003c;
-        public static final int yellow_selector=0x7f02003d;
+        public static final int ic_launcher=0x7f020038;
+        public static final int ic_refresh=0x7f020039;
+        public static final int ic_settings=0x7f02003a;
+        public static final int ic_website=0x7f02003b;
+        public static final int section_header=0x7f02003c;
+        public static final int sgplogob=0x7f02003d;
+        public static final int yellow_selector=0x7f02003e;
     }
     public static final class id {
         public static final int TAG_APPMODE=0x7f090017;
