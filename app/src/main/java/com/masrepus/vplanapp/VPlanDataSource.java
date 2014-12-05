@@ -7,6 +7,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
+
 /**
  * Used as a user interface for MySQLiteHelper
  */
@@ -74,15 +77,15 @@ public class VPlanDataSource {
         values.put(MySQLiteHelper.COLUMN_STATUS, status);
 
         //find out which db is currently in use
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-            case MainActivity.UINFO:
+        SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
+            case VplanModes.UINFO:
                 databaseUinfo.insert(tableName, null, values);
                 break;
-            case MainActivity.MINFO:
+            case VplanModes.MINFO:
                 databaseMinfo.insert(tableName, null, values);
                 break;
-            case MainActivity.OINFO:
+            case VplanModes.OINFO:
                 databaseOinfo.insert(tableName, null, values);
                 break;
         }
@@ -101,15 +104,15 @@ public class VPlanDataSource {
         values.put(MySQLiteHelper.COLUMN_URL, url);
 
         //find out which db is currently in use
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-            case MainActivity.UINFO:
+        SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
+            case VplanModes.UINFO:
                 databaseUinfo.insert(MySQLiteHelper.TABLE_LINKS, null, values);
                 break;
-            case MainActivity.MINFO:
+            case VplanModes.MINFO:
                 databaseMinfo.insert(MySQLiteHelper.TABLE_LINKS, null, values);
                 break;
-            case MainActivity.OINFO:
+            case VplanModes.OINFO:
                 databaseOinfo.insert(MySQLiteHelper.TABLE_LINKS, null, values);
                 break;
         }
@@ -148,9 +151,9 @@ public class VPlanDataSource {
         } else {
 
             //find out which db is currently in use
-            SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-            switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-                case MainActivity.UINFO:
+            SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+            switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
+                case VplanModes.UINFO:
                     return databaseUinfo.query(
                             tableName,
                             projection,
@@ -159,7 +162,7 @@ public class VPlanDataSource {
                             null,
                             null,
                             null);
-                case MainActivity.MINFO:
+                case VplanModes.MINFO:
                     return databaseMinfo.query(
                             tableName,
                             projection,
@@ -168,7 +171,7 @@ public class VPlanDataSource {
                             null,
                             null,
                             null);
-                case MainActivity.OINFO:
+                case VplanModes.OINFO:
                     return databaseOinfo.query(
                             tableName,
                             projection,
@@ -205,9 +208,9 @@ public class VPlanDataSource {
         } else {
 
             //find out which db is currently in use
-            SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-            switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-                case MainActivity.UINFO:
+            SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+            switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
+                case VplanModes.UINFO:
                     return databaseUinfo.query(
                             tableName,
                             projection,
@@ -216,7 +219,7 @@ public class VPlanDataSource {
                             null,
                             null,
                             null);
-                case MainActivity.MINFO:
+                case VplanModes.MINFO:
                     return databaseMinfo.query(
                             tableName,
                             projection,
@@ -225,7 +228,7 @@ public class VPlanDataSource {
                             null,
                             null,
                             null);
-                case MainActivity.OINFO:
+                case VplanModes.OINFO:
                     return databaseOinfo.query(
                             tableName,
                             projection,
@@ -257,15 +260,15 @@ public class VPlanDataSource {
             dbHelperTests.newTable(databaseTests, tableName);
         } else {
             //find out which db is currently in use
-            SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-            switch (pref.getInt(MainActivity.PREF_VPLAN_MODE, 0)) {
-                case MainActivity.UINFO:
+            SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+            switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
+                case VplanModes.UINFO:
                     dbHelperUinfo.newTable(databaseUinfo, tableName);
                     break;
-                case MainActivity.MINFO:
+                case VplanModes.MINFO:
                     dbHelperMinfo.newTable(databaseMinfo, tableName);
                     break;
-                case MainActivity.OINFO:
+                case VplanModes.OINFO:
                     dbHelperOinfo.newTable(databaseOinfo, tableName);
                     break;
             }

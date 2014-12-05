@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -24,6 +25,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.masrepus.vplanapp.constants.AppModes;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.ProgressCode;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,8 +42,6 @@ import java.util.List;
 
 
 public class ExamsActivity extends ActionBarActivity {
-
-    public static final String PREF_HIDE_OLD_EXAMS = "hideOldExams";
 
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
@@ -54,8 +59,8 @@ public class ExamsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setSubtitle(getString(R.string.exams_activity_subtitle));
 
-        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        noOldItems = pref.getBoolean(PREF_HIDE_OLD_EXAMS, false);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        noOldItems = pref.getBoolean(SharedPrefs.HIDE_OLD_EXAMS, false);
 
         //hide or show hidden items info
         FrameLayout hiddenItemsFL = (FrameLayout) findViewById(R.id.frameLayout2);
@@ -63,6 +68,9 @@ public class ExamsActivity extends ActionBarActivity {
         else hiddenItemsFL.setVisibility(View.GONE);
 
         refreshAdapter();
+
+        //check if this activity has to take care of shared prefs changes
+        if (getIntent().getBooleanExtra(Args.ACTIVATE_PREF_LISTENER, true)) PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(new SettingsPrefListener(this));
     }
 
     public void refreshAdapter() {
@@ -96,12 +104,16 @@ public class ExamsActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         //save the filter state
-        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(PREF_HIDE_OLD_EXAMS, noOldItems);
+        editor.putBoolean(SharedPrefs.HIDE_OLD_EXAMS, noOldItems);
         editor.apply();
 
         super.onPause();
+    }
+
+    public void onSettingsClick(View v) {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     @Override
@@ -126,12 +138,12 @@ public class ExamsActivity extends ActionBarActivity {
                                 switch (i) {
                                     case 0:
                                         //u/minfo
-                                        Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), MainActivity.MINFO));
+                                        Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.MINFO));
                                         startActivity(new Intent(Intent.ACTION_VIEW, uri));
                                         break;
                                     case 1:
                                         //oinfo
-                                        uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), MainActivity.OINFO));
+                                        uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.OINFO));
                                         startActivity(new Intent(Intent.ACTION_VIEW, uri));
                                         break;
                                 }
@@ -354,7 +366,7 @@ public class ExamsActivity extends ActionBarActivity {
 
         @Override
         protected int getAppMode() {
-            return MainActivity.TESTS;
+            return AppModes.TESTS;
         }
 
         @Override

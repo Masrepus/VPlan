@@ -41,6 +41,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.masrepus.vplanapp.constants.AppModes;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.ProgressCode;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,28 +56,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, View.OnFocusChangeListener {
-    public static final String PREFS_NAME = "mPrefs";
-    public static final String PREF_LAST_UPDATE = "lastUpdate";
-    public static final String PREF_VPLAN_MODE = "mode";
-    public static final String PREF_PREFIX_VPLAN_CURR_DATE = "currDate";
-    public static final String PREF_PREFIX_VPLAN_TIME_PUBLISHED = "timePublished";
-    public static final String PREF_IS_FILTER_ACTIVE = "isFilterActive";
-    public static final String PREF_APPMODE = "appmode";
-    public static final String PREF_TODAY_VPLAN = "todayVplan";
-    public static final String PREF_IS_BG_UPD_ACTIVE = "isBgUpdActive";
-    public static final String PREF_CURR_BG_INT = "currInt";
-    public static final String PREF_REQUESTED_VPLAN_ID = "requestedVplanId";
-    public static final String PREF_CURR_VPLAN_LINK = "currVplanLink";
 
-    public static final int BASIC = 0;
-    public static final int UINFO = 1;
-    public static final int MINFO = 2;
-    public static final int OINFO = 3;
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
-    public static final int VPLAN = 0;
-    private int appMode = VPLAN; //at the moment tests is not available
-    public static final int TESTS = 1;
-    public static int inflateStatus = 0;
+    private int appMode;
     public ArrayList<String> filterCurrent = new ArrayList<String>();
     public ArrayList<String> filterUnterstufe = new ArrayList<String>();
     public ArrayList<String> filterMittelstufe = new ArrayList<String>();
@@ -99,17 +86,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         setContentView(R.layout.main);
 
         //get the state of the filter from shared prefs
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         pref.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                requestedVplanId = sharedPreferences.getInt(PREF_REQUESTED_VPLAN_ID, 0);
-                currentVPlanLink = sharedPreferences.getString(PREF_CURR_VPLAN_LINK, "");
+                requestedVplanId = sharedPreferences.getInt(SharedPrefs.REQUESTED_VPLAN_ID, 0);
+                currentVPlanLink = sharedPreferences.getString(SharedPrefs.CURR_VPLAN_LINK, "");
             }
         });
-        requestedVplanMode = pref.getInt(PREF_VPLAN_MODE, UINFO);
-        appMode = pref.getInt(PREF_APPMODE, VPLAN);
-        if (pref.getBoolean(PREF_IS_FILTER_ACTIVE, false)) {
+        requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
+        appMode = pref.getInt(SharedPrefs.APPMODE, AppModes.VPLAN);
+        if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
             fl.setVisibility(View.VISIBLE);
             TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
@@ -155,7 +142,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
             drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
 
-                private int currMode;
 
                 @Override
                 public void onDrawerClosed(View drawerView) {
@@ -164,13 +150,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     //set title corresponding to requested vplan mode
                     switch (requestedVplanMode) {
 
-                        case UINFO:
+                        case VplanModes.UINFO:
                             actionBar.setTitle(R.string.unterstufe);
                             break;
-                        case MINFO:
+                        case VplanModes.MINFO:
                             actionBar.setTitle(R.string.mittelstufe);
                             break;
-                        case OINFO:
+                        case VplanModes.OINFO:
                             actionBar.setTitle(R.string.oberstufe);
                             break;
                     }
@@ -192,20 +178,20 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             //set the actionbar title matching to requestedVplanMode
             switch (requestedVplanMode) {
 
-                case UINFO:
+                case VplanModes.UINFO:
                     actionBar.setTitle(R.string.unterstufe);
                     break;
-                case MINFO:
+                case VplanModes.MINFO:
                     actionBar.setTitle(R.string.mittelstufe);
                     break;
-                case OINFO:
+                case VplanModes.OINFO:
                     actionBar.setTitle(R.string.oberstufe);
                     break;
             }
         }
 
         //display last update timestamp
-        String lastUpdate = pref.getString(PREF_LAST_UPDATE, "");
+        String lastUpdate = pref.getString(SharedPrefs.LAST_UPDATE, "");
         TextView tv = (TextView) findViewById(R.id.lastUpdate);
         tv.setVisibility(View.VISIBLE);
         tv.setText(lastUpdate);
@@ -248,9 +234,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             //update the current appmode
             appMode = appModeTag;
 
-            if (appMode == TESTS) {
-                appMode = TESTS;
-                startActivity(new Intent(this, ExamsActivity.class));
+            if (appMode == AppModes.TESTS) {
+                appMode = AppModes.TESTS;
+                //start exams activity and notify it that main activity takes care of shared prefs changes
+                startActivity(new Intent(this, ExamsActivity.class).putExtra(Args.ACTIVATE_PREF_LISTENER, false));
             }
         } else {
             //check whether this is a vplan mode item or not
@@ -268,18 +255,18 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                     //change requested vplan mode and save it in shared prefs
                     requestedVplanMode = vplanMode;
-                    getSharedPreferences(PREFS_NAME, 0).edit().putInt(PREF_VPLAN_MODE, requestedVplanMode).apply();
+                    getSharedPreferences(SharedPrefs.PREFS_NAME, 0).edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
 
                     //select the right filter
                     switch (requestedVplanMode) {
 
-                        case UINFO:
+                        case VplanModes.UINFO:
                             filterCurrent = filterUnterstufe;
                             break;
-                        case MINFO:
+                        case VplanModes.MINFO:
                             filterCurrent = filterMittelstufe;
                             break;
-                        case OINFO:
+                        case VplanModes.OINFO:
                             filterCurrent = filterOberstufe;
                             break;
                     }
@@ -312,7 +299,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         @Override
         public Fragment getItem(int i) {
             Bundle args = new Bundle();
-            args.putBoolean(VplanFragment.FLAG_VPLAN_LOADING_DUMMY, true);
+            args.putBoolean(Args.VPLAN_LOADING_DUMMY, true);
             Fragment loadingFragment = new VplanFragment();
             loadingFragment.setArguments(args);
 
@@ -427,8 +414,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                         //set the appmode tag according to title
                         int appmodeTag;
-                        if (entry.getTitle().contentEquals(getString(R.string.substitutions))) appmodeTag = VPLAN;
-                        else appmodeTag = TESTS;
+                        if (entry.getTitle().contentEquals(getString(R.string.substitutions))) appmodeTag = AppModes.VPLAN;
+                        else appmodeTag = AppModes.TESTS;
 
                         convertView.setTag(R.id.TAG_APPMODE, appmodeTag);
                     }
@@ -469,8 +456,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int getTodayVplanId() {
 
         //today's vplan id has been saved in sharedprefs
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
-        return prefs.getInt(PREF_TODAY_VPLAN, 0);
+        SharedPreferences prefs = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        return prefs.getInt(SharedPrefs.TODAY_VPLAN, 0);
 
     }
 
@@ -481,7 +468,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //refresh the pager adapter
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
-        appMode = VPLAN;
+        appMode = AppModes.VPLAN;
         selectedAppmodeItem = 1 + appMode;
     }
 
@@ -505,7 +492,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
-        appMode = VPLAN;
+        appMode = AppModes.VPLAN;
 
         ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
         DrawerListAdapter adapter = (DrawerListAdapter) vplanModesLV.getAdapter();
@@ -549,15 +536,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         String url = "";
         switch (version) {
-            case BASIC:
+            case VplanModes.BASIC:
                 return vplanBase;
-            case UINFO:
+            case VplanModes.UINFO:
                 url = vplanBase + "pw/" + "urekursiv.php";
                 break;
-            case MINFO:
+            case VplanModes.MINFO:
                 url = vplanBase + "pw/" + "mrekursiv.php";
                 break;
-            case OINFO:
+            case VplanModes.OINFO:
                 url = vplanBase + "oinfo/" + "srekursiv.php";
                 break;
         }
@@ -581,8 +568,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //check whether the filterItem should be checked or not
         MenuItem filterItem = menu.findItem(R.id.action_activate_filter);
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
-        if (pref.getBoolean(PREF_IS_FILTER_ACTIVE, false)) {
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             filterItem.setChecked(true);
         } else filterItem.setChecked(false);
         return super.onCreateOptionsMenu(menu);
@@ -622,17 +609,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
                 if (item.isChecked()) {
                     item.setChecked(false);
-                    SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                     SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean(PREF_IS_FILTER_ACTIVE, false);
+                    editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
                     editor.apply();
                     fl.setVisibility(View.GONE);
                 } else {
                     item.setChecked(true);
-                    SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                     SharedPreferences.Editor editor = pref.edit();
 
-                    editor.putBoolean(PREF_IS_FILTER_ACTIVE, true);
+                    editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, true);
                     editor.apply();
                     fl.setVisibility(View.VISIBLE);
                     filterWarning.setText(R.string.filter_enabled);
@@ -679,10 +666,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     protected void onPause() {
 
         //save the requested vplan mode and appmode for next startup
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(PREF_VPLAN_MODE, requestedVplanMode);
-        editor.putInt(PREF_APPMODE, appMode);
+        editor.putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode);
+        editor.putInt(SharedPrefs.APPMODE, appMode);
         editor.apply();
 
         super.onPause();
@@ -694,8 +681,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
-        if (sharedPreferences == getSharedPreferences(PREFS_NAME, 0)) {
-            if (key.contentEquals(PREF_LAST_UPDATE)) activatePagerAdapter();
+        if (sharedPreferences == getSharedPreferences(SharedPrefs.PREFS_NAME, 0)) {
+            if (key.contentEquals(SharedPrefs.LAST_UPDATE)) activatePagerAdapter();
         }
         //settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
@@ -737,10 +724,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             }
 
             if (Arrays.asList(uinfoKeys).contains(entry.getKey())) {
-                mode = UINFO;
+                mode = VplanModes.UINFO;
             } else if (Arrays.asList(minfoKeys).contains(entry.getKey())) {
-                mode = MINFO;
-            } else mode = OINFO;
+                mode = VplanModes.MINFO;
+            } else mode = VplanModes.OINFO;
 
             Set<String> set = pref.getStringSet(entry.getKey(), null);
 
@@ -748,13 +735,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
             switch (mode) {
 
-                case UINFO:
+                case VplanModes.UINFO:
                     filterUinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
                     break;
-                case MINFO:
+                case VplanModes.MINFO:
                     filterMinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
                     break;
-                case OINFO:
+                case VplanModes.OINFO:
                     filterOinfoTemp.addAll(Arrays.asList(set.toArray(new String[set.size()])));
                     break;
             }
@@ -768,19 +755,19 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //now determine which filter is currently needed
         switch (requestedVplanMode) {
-            case UINFO:
+            case VplanModes.UINFO:
                 filterCurrent = filterUnterstufe;
                 break;
-            case MINFO:
+            case VplanModes.MINFO:
                 filterCurrent = filterMittelstufe;
                 break;
-            case OINFO:
+            case VplanModes.OINFO:
                 filterCurrent = filterOberstufe;
                 break;
         }
 
         //save the filters in shared prefs
-        pref = getSharedPreferences(PREFS_NAME, 0);
+        pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         Set<String> unterstufeSet = new HashSet<String>(filterUnterstufe);
         Set<String> mittelstufeSet = new HashSet<String>(filterMittelstufe);
@@ -794,16 +781,16 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private void refreshBgUpdates(Boolean activated, int interval) {
 
         //find out whether we have to update the pending intent
-        SharedPreferences pref = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
-        Boolean wasActiveBefore = pref.getBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+        Boolean wasActiveBefore = pref.getBoolean(SharedPrefs.IS_BG_UPD_ACTIVE, false);
         int flag;
         if (wasActiveBefore) {
             flag = PendingIntent.FLAG_UPDATE_CURRENT;
 
             //only update the alarm if the interval really changed, else just skip this unless it has to be deactivated
-            if (pref.getLong(PREF_CURR_BG_INT, 0) != interval || !activated)
+            if (pref.getLong(SharedPrefs.CURR_BG_INT, 0) != interval || !activated)
                 saveAlarm(activated, interval, flag, editor);
         } else saveAlarm(activated, interval, 0, editor);
 
@@ -821,13 +808,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval * AlarmManager.INTERVAL_HOUR, interval * AlarmManager.INTERVAL_HOUR, pendingDownloadIntent);
 
             //save that it is active now and also save the current interval
-            editor.putBoolean(PREF_IS_BG_UPD_ACTIVE, true);
-            editor.putLong(PREF_CURR_BG_INT, interval);
+            editor.putBoolean(SharedPrefs.IS_BG_UPD_ACTIVE, true);
+            editor.putLong(SharedPrefs.CURR_BG_INT, interval);
         } else {
             alarmManager.cancel(pendingDownloadIntent);
 
             //save that it isn't active anymore
-            editor.putBoolean(PREF_IS_BG_UPD_ACTIVE, false);
+            editor.putBoolean(SharedPrefs.IS_BG_UPD_ACTIVE, false);
         }
     }
 
