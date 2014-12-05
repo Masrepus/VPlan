@@ -46,6 +46,7 @@ public class ExamsActivity extends ActionBarActivity {
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
     private boolean noOldItems;
+    private SettingsPrefListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +69,16 @@ public class ExamsActivity extends ActionBarActivity {
         else hiddenItemsFL.setVisibility(View.GONE);
 
         refreshAdapter();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         //check if this activity has to take care of shared prefs changes
-        if (getIntent().getBooleanExtra(Args.ACTIVATE_PREF_LISTENER, true)) PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(new SettingsPrefListener(this));
+        if (getIntent().getBooleanExtra(Args.ACTIVATE_PREF_LISTENER, true)) {
+            listener = new SettingsPrefListener(this);
+            PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
+        }
     }
 
     public void refreshAdapter() {
@@ -103,6 +111,7 @@ public class ExamsActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
+
         //save the filter state
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
@@ -113,7 +122,7 @@ public class ExamsActivity extends ActionBarActivity {
     }
 
     public void onSettingsClick(View v) {
-        startActivity(new Intent(this, SettingsActivity.class));
+        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
     @Override
