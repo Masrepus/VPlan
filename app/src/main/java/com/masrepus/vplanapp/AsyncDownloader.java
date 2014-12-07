@@ -519,7 +519,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
                     //perform filtering
                     boolean isNeeded = false;
                     for (String currGrade : filters.get(2)) {
-                        if (currGrade.toLowerCase().contentEquals(course)) {
+                        if (currGrade.toLowerCase().contentEquals(course) || currGrade.toLowerCase().replace('-', '_').contentEquals(course.replace('-', '_')) /*sport theorie verwendet teilweise - und teilweise _*/) {
                             isNeeded = true;
                             break;
                         }
