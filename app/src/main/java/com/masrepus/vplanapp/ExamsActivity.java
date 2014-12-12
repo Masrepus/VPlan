@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,12 +42,13 @@ import java.util.Date;
 import java.util.List;
 
 
-public class ExamsActivity extends ActionBarActivity {
+public class ExamsActivity extends ActionBarActivity implements View.OnClickListener {
 
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
     private boolean noOldItems;
     private SettingsPrefListener listener;
+    private String callingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +77,52 @@ public class ExamsActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         //check if this activity has to take care of shared prefs changes
-        if (getIntent().getBooleanExtra(Args.ACTIVATE_PREF_LISTENER, true)) {
-            listener = new SettingsPrefListener(this);
-            PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
+        callingActivity = getIntent().getStringExtra(Args.CALLING_ACTIVITY);
+        if (callingActivity == null) callingActivity = "";
+
+            if (!callingActivity.contentEquals("")) {
+                listener = new SettingsPrefListener(this);
+                PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
+            }
+
+        prepareDrawer();
+    }
+
+    private void prepareDrawer() {
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        //initialise the drawer list
+        DrawerListBuilder builder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), getResources().getStringArray(R.array.appmodes), 0);
+        DrawerListAdapter adapter = new DrawerListAdapter(this, this, builder.getItems());
+        ListView drawerLV = (ListView) findViewById(R.id.vplanModeList);
+        drawerLV.setAdapter(adapter);
+
+        //save the current appmode item that is selected (tests)
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(SharedPrefs.SELECTED_APPMODE_ITEM, 1 + AppModes.TESTS);
+        editor.apply();
+
+        adapter.notifyDataSetChanged();
+
+        //display last update timestamp
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.TESTS, "");
+        TextView tv = (TextView) findViewById(R.id.lastUpdate);
+        tv.setVisibility(View.VISIBLE);
+        tv.setText(lastUpdate);
+
+        //display current app info in appinfo textview
+        TextView appInfo = (TextView) findViewById(R.id.textViewAppInfo);
+        try {
+            appInfo.setText("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            appInfo.setText("Fehler");
         }
+
+        //init the settings item
+        TextView settings = (TextView) findViewById(R.id.textViewSettings);
+        settings.setText(getString(R.string.settings).toUpperCase());
     }
 
     public void refreshAdapter() {
@@ -307,6 +351,26 @@ public class ExamsActivity extends ActionBarActivity {
         builder.show();
     }
 
+    @Override
+    public void onClick(View view) {
+
+        //check the tag
+        Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
+
+        if (appModeTag != null) {
+
+            switch (appModeTag) {
+
+                case AppModes.VPLAN:
+                    //update appmode
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+
+                    startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        }
+    }
+
     private class ExamsListAdapter extends ArrayAdapter<ExamsRow> {
 
         private ArrayList<ExamsRow> examsList;
@@ -371,6 +435,12 @@ public class ExamsActivity extends ActionBarActivity {
         }
     }
 
+    public void displayLastUpdate(String lastUpdate) {
+
+        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
+        lastUpdateTv.setText(lastUpdate);
+    }
+
     private class BgDownloader extends AsyncDownloader {
 
         @Override
@@ -387,6 +457,8 @@ public class ExamsActivity extends ActionBarActivity {
             resetRefreshAnimation();
 
             refreshAdapter();
+
+            displayLastUpdate(refreshLastUpdate());
         }
 
         @Override

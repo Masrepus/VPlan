@@ -835,7 +835,8 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
         SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(SharedPrefs.LAST_UPDATE, lastUpdate);
+        if (appMode == AppModes.VPLAN) editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, lastUpdate);
+        else editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode, lastUpdate);
         editor.apply();
 
         return lastUpdate;

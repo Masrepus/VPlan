@@ -5,7 +5,7 @@ package com.masrepus.vplanapp.constants;
  */
 public class SharedPrefs {
     public static final String PREFS_NAME = "mPrefs";
-    public static final String LAST_UPDATE = "lastUpdate";
+    public static final String PREFIX_LAST_UPDATE = "lastUpdate";
     public static final String VPLAN_MODE = "mode";
     public static final String PREFIX_VPLAN_CURR_DATE = "currDate";
     public static final String PREFIX_VPLAN_TIME_PUBLISHED = "timePublished";
@@ -17,4 +17,6 @@ public class SharedPrefs {
     public static final String REQUESTED_VPLAN_ID = "requestedVplanId";
     public static final String CURR_VPLAN_LINK = "currVplanLink";
     public static final String HIDE_OLD_EXAMS = "hideOldExams";
+    public static final String SELECTED_APPMODE_ITEM = "selectedAppmodeItem";
+    public static final String SELECTED_VPLAN_ITEM = "selectedVplanItem";
 }

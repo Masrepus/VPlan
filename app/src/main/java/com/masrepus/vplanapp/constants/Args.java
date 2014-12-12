@@ -12,5 +12,5 @@ public class Args {
     public static final String LIST_SIZE_ORIGINAL = "listSizeBeforeFilter";
     public static final String ADAPTER = "adapter";
     public static final String HIDDEN_ITEMS = "hiddenItems";
-    public static final String ACTIVATE_PREF_LISTENER = "activate_pref_listener";
+    public static final String CALLING_ACTIVITY = "caller";
 }
