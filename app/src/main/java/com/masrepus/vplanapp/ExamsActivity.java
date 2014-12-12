@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -24,6 +26,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.masrepus.vplanapp.constants.AppModes;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.ProgressCode;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,13 +42,13 @@ import java.util.Date;
 import java.util.List;
 
 
-public class ExamsActivity extends ActionBarActivity {
-
-    public static final String PREF_HIDE_OLD_EXAMS = "hideOldExams";
+public class ExamsActivity extends ActionBarActivity implements View.OnClickListener {
 
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
     private boolean noOldItems;
+    private SettingsPrefListener listener;
+    private String callingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +62,8 @@ public class ExamsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setSubtitle(getString(R.string.exams_activity_subtitle));
 
-        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        noOldItems = pref.getBoolean(PREF_HIDE_OLD_EXAMS, false);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        noOldItems = pref.getBoolean(SharedPrefs.HIDE_OLD_EXAMS, false);
 
         //hide or show hidden items info
         FrameLayout hiddenItemsFL = (FrameLayout) findViewById(R.id.frameLayout2);
@@ -63,6 +71,58 @@ public class ExamsActivity extends ActionBarActivity {
         else hiddenItemsFL.setVisibility(View.GONE);
 
         refreshAdapter();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //check if this activity has to take care of shared prefs changes
+        callingActivity = getIntent().getStringExtra(Args.CALLING_ACTIVITY);
+        if (callingActivity == null) callingActivity = "";
+
+            if (!callingActivity.contentEquals("")) {
+                listener = new SettingsPrefListener(this);
+                PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
+            }
+
+        prepareDrawer();
+    }
+
+    private void prepareDrawer() {
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        //initialise the drawer list
+        DrawerListBuilder builder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), getResources().getStringArray(R.array.appmodes), 0);
+        DrawerListAdapter adapter = new DrawerListAdapter(this, this, builder.getItems());
+        ListView drawerLV = (ListView) findViewById(R.id.vplanModeList);
+        drawerLV.setAdapter(adapter);
+
+        //save the current appmode item that is selected (tests)
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(SharedPrefs.SELECTED_APPMODE_ITEM, 1 + AppModes.TESTS);
+        editor.apply();
+
+        adapter.notifyDataSetChanged();
+
+        //display last update timestamp
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.TESTS, "");
+        TextView tv = (TextView) findViewById(R.id.lastUpdate);
+        tv.setVisibility(View.VISIBLE);
+        tv.setText(lastUpdate);
+
+        //display current app info in appinfo textview
+        TextView appInfo = (TextView) findViewById(R.id.textViewAppInfo);
+        try {
+            appInfo.setText("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            appInfo.setText("Fehler");
+        }
+
+        //init the settings item
+        TextView settings = (TextView) findViewById(R.id.textViewSettings);
+        settings.setText(getString(R.string.settings).toUpperCase());
     }
 
     public void refreshAdapter() {
@@ -95,13 +155,18 @@ public class ExamsActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
+
         //save the filter state
-        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(PREF_HIDE_OLD_EXAMS, noOldItems);
+        editor.putBoolean(SharedPrefs.HIDE_OLD_EXAMS, noOldItems);
         editor.apply();
 
         super.onPause();
+    }
+
+    public void onSettingsClick(View v) {
+        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
     @Override
@@ -126,12 +191,12 @@ public class ExamsActivity extends ActionBarActivity {
                                 switch (i) {
                                     case 0:
                                         //u/minfo
-                                        Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), MainActivity.MINFO));
+                                        Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.MINFO));
                                         startActivity(new Intent(Intent.ACTION_VIEW, uri));
                                         break;
                                     case 1:
                                         //oinfo
-                                        uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), MainActivity.OINFO));
+                                        uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.OINFO));
                                         startActivity(new Intent(Intent.ACTION_VIEW, uri));
                                         break;
                                 }
@@ -286,6 +351,26 @@ public class ExamsActivity extends ActionBarActivity {
         builder.show();
     }
 
+    @Override
+    public void onClick(View view) {
+
+        //check the tag
+        Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
+
+        if (appModeTag != null) {
+
+            switch (appModeTag) {
+
+                case AppModes.VPLAN:
+                    //update appmode
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+
+                    startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        }
+    }
+
     private class ExamsListAdapter extends ArrayAdapter<ExamsRow> {
 
         private ArrayList<ExamsRow> examsList;
@@ -350,11 +435,17 @@ public class ExamsActivity extends ActionBarActivity {
         }
     }
 
+    public void displayLastUpdate(String lastUpdate) {
+
+        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
+        lastUpdateTv.setText(lastUpdate);
+    }
+
     private class BgDownloader extends AsyncDownloader {
 
         @Override
         protected int getAppMode() {
-            return MainActivity.TESTS;
+            return AppModes.TESTS;
         }
 
         @Override
@@ -366,6 +457,8 @@ public class ExamsActivity extends ActionBarActivity {
             resetRefreshAnimation();
 
             refreshAdapter();
+
+            displayLastUpdate(refreshLastUpdate());
         }
 
         @Override

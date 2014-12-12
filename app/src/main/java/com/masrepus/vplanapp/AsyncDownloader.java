@@ -15,6 +15,11 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import com.masrepus.vplanapp.constants.AppModes;
+import com.masrepus.vplanapp.constants.ProgressCode;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
+
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,10 +39,10 @@ import java.util.List;
  */
 public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
-    private static final int BASIC = MainActivity.BASIC;
-    private static final int UINFO = MainActivity.UINFO;
-    private static final int MINFO = MainActivity.MINFO;
-    private static final int OINFO = MainActivity.OINFO;
+    private static final int BASIC = VplanModes.BASIC;
+    private static final int UINFO = VplanModes.UINFO;
+    private static final int MINFO = VplanModes.MINFO;
+    private static final int OINFO = VplanModes.OINFO;
     ProgressCode progress;
     int downloaded;
     int total_downloads;
@@ -57,15 +62,15 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     protected int getRequestedVplanMode() {
         //externalised so that the service can override this
-        SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        return pref.getInt(MainActivity.PREF_VPLAN_MODE, UINFO);
+        SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        return pref.getInt(SharedPrefs.VPLAN_MODE, UINFO);
     }
 
     protected int getAppMode() {
         //possibility of overriding
         /*SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        return pref.getInt(MainActivity.PREF_APPMODE, MainActivity.VPLAN);*/
-        return MainActivity.VPLAN;
+        return pref.getInt(MainActivity.APPMODE, MainActivity.VPLAN);*/
+        return AppModes.VPLAN;
     }
 
     /**
@@ -80,7 +85,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         this.context = context[0];
         datasource = new VPlanDataSource(this.context);
 
-        SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
         //get the requested vplan mode
@@ -91,9 +96,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         switch (appMode) {
 
-            case MainActivity.VPLAN:
+            case AppModes.VPLAN:
                 return downloadVplan(editor);
-            case MainActivity.TESTS:
+            case AppModes.TESTS:
                 return downloadTests();
             default:
                 return downloadVplan(editor);
@@ -105,8 +110,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         publishProgress(ProgressCode.STARTED);
         downloaded = 0;
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        int vplanModeBefore = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
+        SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        int vplanModeBefore = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
         SharedPreferences.Editor editor = pref.edit();
 
         //get the filter sets
@@ -228,8 +233,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 requestedVplanId = c.getPosition();
                 currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
 
-                editor.putInt(MainActivity.PREF_REQUESTED_VPLAN_ID, requestedVplanId)
-                        .putString(MainActivity.PREF_CURR_VPLAN_LINK, currentVPlanLink);
+                editor.putInt(SharedPrefs.REQUESTED_VPLAN_ID, requestedVplanId)
+                        .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
                 editor.apply();
 
                 parseDataToSql();
@@ -360,7 +365,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         String encoding = encodeCredentials();
 
-        if (encoding == null && requestedVplanMode != MainActivity.OINFO)
+        if (encoding == null && requestedVplanMode != VplanModes.OINFO)
             throw new Exception("no creds available");
 
         Document doc;
@@ -370,7 +375,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
         } catch (Exception e) {
             if (encoding == null) {
-                if (requestedVplanMode != MainActivity.OINFO)
+                if (requestedVplanMode != VplanModes.OINFO)
                     throw new Exception("failed to connect without creds");
                 else throw new Exception("failed to connect oinfo");
             } else throw new Exception("failed to connect");
@@ -467,10 +472,10 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         }
 
         //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
-        SharedPreferences pref = this.context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), currentDate);
-        editor.putString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), timePublished);
+        editor.putString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), currentDate);
+        editor.putString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), timePublished);
         editor.apply();
     }
 
@@ -623,19 +628,19 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
         switch (requestedVplanMode) {
 
-            case MainActivity.UINFO:
-                url = getVPlanUrl(MainActivity.UINFO, false);
+            case UINFO:
+                url = getVPlanUrl(VplanModes.UINFO, false);
                 break;
-            case MainActivity.MINFO:
-                url = getVPlanUrl(MainActivity.MINFO, false);
+            case MINFO:
+                url = getVPlanUrl(VplanModes.MINFO, false);
                 break;
-            case MainActivity.OINFO:
-                url = getVPlanUrl(MainActivity.OINFO, false);
+            case OINFO:
+                url = getVPlanUrl(VplanModes.OINFO, false);
                 break;
         }
 
         if (!url.contentEquals("")) return url;
-        else return getVPlanUrl(MainActivity.UINFO, false);
+        else return getVPlanUrl(VplanModes.UINFO, false);
     }
 
     private String findRequestedTestsPage() {
@@ -828,9 +833,10 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
         Calendar calendar = Calendar.getInstance();
         String lastUpdate = MainActivity.standardFormat.format(calendar.getTime());
 
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(MainActivity.PREF_LAST_UPDATE, lastUpdate);
+        if (appMode == AppModes.VPLAN) editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, lastUpdate);
+        else editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode, lastUpdate);
         editor.apply();
 
         return lastUpdate;

@@ -2,6 +2,8 @@ package com.masrepus.vplanapp;
 
 import android.content.Context;
 
+import com.masrepus.vplanapp.constants.VplanModes;
+
 import java.util.ArrayList;
 
 /**
@@ -71,13 +73,13 @@ public class DrawerListBuilder {
             boolean isVplanMode = false;
             if (title.contentEquals(context.getString(R.string.unterstufe))) {
                 isVplanMode = true;
-                vplanMode = MainActivity.UINFO;
+                vplanMode = VplanModes.UINFO;
             } else if (title.contentEquals(context.getString(R.string.mittelstufe))) {
                 isVplanMode = true;
-                vplanMode = MainActivity.MINFO;
+                vplanMode = VplanModes.MINFO;
             } else if (title.contentEquals(context.getString(R.string.oberstufe))) {
                 isVplanMode = true;
-                vplanMode = MainActivity.OINFO;
+                vplanMode = VplanModes.OINFO;
             }
 
             if (isVplanMode) {
