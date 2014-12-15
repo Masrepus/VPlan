@@ -1,4 +1,4 @@
-package com.masrepus.vplanapp;
+package com.masrepus.vplanapp.constants;
 
 /**
 * Created by samuel on 25.11.14.

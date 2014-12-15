@@ -11,6 +11,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+
 import java.util.ArrayList;
 
 /**
@@ -18,14 +21,6 @@ import java.util.ArrayList;
  */
 public class VplanFragment extends Fragment implements View.OnClickListener {
 
-    public static final String ARG_REQUESTED_VPLAN_ID = "requestedVplan";
-    public static final String ARG_VPLAN_MODE = "vplanmode";
-    public static final String FLAG_VPLAN_LOADING_DUMMY = "loadingDummy";
-    public static final String ARG_LIST_SIZE = "size";
-    public static final String ARG_HIDDEN_ITEMS_COUNT = "hiddenCount";
-    public static final String ARG_LIST_SIZE_ORIGINAL = "listSizeBeforeFilter";
-    public static final String ARG_ADAPTER = "adapter";
-    public static final String ARG_HIDDEN_ITEMS = "hiddenItems";
     private SharedPreferences pref;
     private ArrayList<Row> hiddenItems;
     private int requestedVplanMode;
@@ -34,22 +29,21 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Bundle args = getArguments();
-        requestedVplanMode = args.getInt(ARG_VPLAN_MODE);
-        int listSize = args.getInt(ARG_LIST_SIZE);
-        int hiddenItemsCount = args.getInt(ARG_HIDDEN_ITEMS_COUNT);
-        int listSizeBeforeFilter = args.getInt(ARG_LIST_SIZE_ORIGINAL);
+        requestedVplanMode = args.getInt(Args.VPLAN_MODE);
+        int listSize = args.getInt(Args.LIST_SIZE);
+        int hiddenItemsCount = args.getInt(Args.HIDDEN_ITEMS_COUNT);
+        int listSizeBeforeFilter = args.getInt(Args.LIST_SIZE_ORIGINAL);
 
         if (pref == null) {
-            pref = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            pref = getActivity().getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         }
 
         //if requested, only display a dummy fragment
 
-        if (args.getBoolean(FLAG_VPLAN_LOADING_DUMMY)) {
+        if (args.getBoolean(Args.VPLAN_LOADING_DUMMY)) {
 
             View rootView = inflater.inflate(
                     R.layout.vplan_loading_dummy, container, false);
-            MainActivity.inflateStatus = 1;
             return rootView;
         } else {
 
@@ -63,19 +57,18 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     rootView = inflater.inflate(
                             R.layout.no_data_vplan_list, container, false);
                     TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-                    String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(args.getInt(ARG_REQUESTED_VPLAN_ID)), "");
+                    String currTimePublished = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(args.getInt(Args.REQUESTED_VPLAN_ID)), "");
                     timePublishedTV.setText(currTimePublished);
 
                     //get the hidden items
-                    hiddenItems = ((ArrayList<Row>)args.getSerializable(ARG_HIDDEN_ITEMS));
+                    hiddenItems = ((ArrayList<Row>)args.getSerializable(Args.HIDDEN_ITEMS));
                     displayHiddenItemsCount(rootView, hiddenItemsCount);
 
-                    MainActivity.inflateStatus = 1;
                     return rootView;
                 } else {
 
                     //MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
-                    MySimpleArrayAdapter adapter = (MySimpleArrayAdapter) args.getSerializable(ARG_ADAPTER);
+                    MySimpleArrayAdapter adapter = (MySimpleArrayAdapter) args.getSerializable(Args.ADAPTER);
 
 
                     //display everything
@@ -83,13 +76,13 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
                     //get hidden items and activate the onclick listener for the footer
                     //hiddenItems = pagerAdapter.getHiddenItems(id);
-                    hiddenItems = ((ArrayList<Row>)args.getSerializable(ARG_HIDDEN_ITEMS));
+                    hiddenItems = ((ArrayList<Row>)args.getSerializable(Args.HIDDEN_ITEMS));
                     addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
 
                     listView.setAdapter(adapter);
 
                     //update textview for current timePublished
-                    displayTimePublished(rootView, args.getInt(ARG_REQUESTED_VPLAN_ID));
+                    displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
 
                     return rootView;
                 }
@@ -98,7 +91,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                 rootView = inflater.inflate(
                         R.layout.no_data_vplan_list, container, false);
 
-                displayTimePublished(rootView, args.getInt(ARG_REQUESTED_VPLAN_ID));
+                displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
 
                 TextView hiddenDataTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
                 hiddenDataTV.setText("");
@@ -159,7 +152,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     private void displayTimePublished(View rootView, int vplanId) {
 
         TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-        String currTimePublished = pref.getString(MainActivity.PREF_PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(vplanId), "");
+        String currTimePublished = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(vplanId), "");
         timePublishedTV.setText(currTimePublished);
     }
 }

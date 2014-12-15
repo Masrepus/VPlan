@@ -9,6 +9,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,8 +47,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         this.filter = filter;
         this.activity = activity;
 
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        vplanMode = pref.getInt(MainActivity.PREF_VPLAN_MODE, MainActivity.UINFO);
+        SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        vplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
 
         //get the amount of available days from database
         datasource.open();
@@ -140,7 +144,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             ArrayList<Row> tempList = new ArrayList<Row>();
 
             //check whether filter is active
-            Boolean isFilterActive = context.getSharedPreferences(MainActivity.PREFS_NAME, 0).getBoolean(MainActivity.PREF_IS_FILTER_ACTIVE, false);
+            Boolean isFilterActive = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
 
             //if filter is active, then use it after filling the Arraylist
             int listSizeBeforeFilter = 0;
@@ -174,9 +178,9 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                             char[] klasseFilter = filter.get(i).toCharArray();
 
                             //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
-                            if (vplanMode == MainActivity.OINFO) {
+                            if (vplanMode == VplanModes.OINFO) {
                                 String filterItem = filter.get(i);
-                                if (vplanMode != MainActivity.OINFO)isNeeded = klasse.contains(filterItem);
+                                if (vplanMode != VplanModes.OINFO)isNeeded = klasse.contains(filterItem);
                                 else isNeeded = klasse.contentEquals("Q" + filterItem);
 
                                 if (isNeeded) break;
@@ -253,29 +257,29 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         Bundle args = new Bundle();
 
         //the id of the requested vplan for this fragment is the fragment's id; also pass hidden items count, data list size, original list size before filtering
-        args.putInt(VplanFragment.ARG_REQUESTED_VPLAN_ID, i);
-        args.putInt(VplanFragment.ARG_VPLAN_MODE, vplanMode);
+        args.putInt(Args.REQUESTED_VPLAN_ID, i);
+        args.putInt(Args.VPLAN_MODE, vplanMode);
         if (adapters.size() > i) {
             if (adapters.get(i) != null) {
-                args.putSerializable(VplanFragment.ARG_ADAPTER, adapters.get(i));
+                args.putSerializable(Args.ADAPTER, adapters.get(i));
             }
         }
         if (hiddenItems.size() > i) {
             if (hiddenItems.get(i) != null) {
-                args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
-                args.putSerializable(VplanFragment.ARG_HIDDEN_ITEMS, hiddenItems.get(i));
+                args.putInt(Args.HIDDEN_ITEMS_COUNT, hiddenItems.get(i).size());
+                args.putSerializable(Args.HIDDEN_ITEMS, hiddenItems.get(i));
             }
-        } else args.putInt(VplanFragment.ARG_HIDDEN_ITEMS_COUNT, 0);
+        } else args.putInt(Args.HIDDEN_ITEMS_COUNT, 0);
 
         if (dataLists.size() > i) {
             if (dataLists.get(i) != null) {
-                args.putInt(VplanFragment.ARG_LIST_SIZE, dataLists.get(i).size());
+                args.putInt(Args.LIST_SIZE, dataLists.get(i).size());
             }
-        } else args.putInt(VplanFragment.ARG_LIST_SIZE, 0);
+        } else args.putInt(Args.LIST_SIZE, 0);
 
-        if (listSizesBeforeFilter.length > i) args.putInt(VplanFragment.ARG_LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);
-        else args.putInt(VplanFragment.ARG_LIST_SIZE_ORIGINAL, 0);
-        args.putBoolean(VplanFragment.FLAG_VPLAN_LOADING_DUMMY, false);
+        if (listSizesBeforeFilter.length > i) args.putInt(Args.LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);
+        else args.putInt(Args.LIST_SIZE_ORIGINAL, 0);
+        args.putBoolean(Args.VPLAN_LOADING_DUMMY, false);
         fragment.setArguments(args);
 
         return fragment;
@@ -295,8 +299,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         CharSequence title;
 
         //this vplan's current date is used as title
-        SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        title = prefs.getString(MainActivity.PREF_PREFIX_VPLAN_CURR_DATE + String.valueOf(vplanMode) + String.valueOf(position), "");
+        SharedPreferences prefs = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        title = prefs.getString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(vplanMode) + String.valueOf(position), "");
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
@@ -305,7 +309,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         //save the position of today's vplan in shared prefs
         if ((String.valueOf(title)).contains(format.format(calendar.getTime())) && Integer.valueOf(hour.format(calendar.getTime())) < 17) {
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
+            editor.putInt(SharedPrefs.TODAY_VPLAN, position);
             editor.apply();
         } else if (Integer.valueOf(hour.format(calendar.getTime())) >= 17) {
             calendar = Calendar.getInstance();
@@ -314,7 +318,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             } else calendar.add(Calendar.DAY_OF_MONTH, 1);
             if ((String.valueOf(title)).contains(format.format(calendar.getTime()))) {
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt(MainActivity.PREF_TODAY_VPLAN, position);
+                editor.putInt(SharedPrefs.TODAY_VPLAN, position);
                 editor.apply();
             }
         }

@@ -13,6 +13,9 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import com.masrepus.vplanapp.constants.ProgressCode;
+import com.masrepus.vplanapp.constants.SharedPrefs;
+
 import java.util.Set;
 
 public class DownloaderService extends Service {
@@ -35,7 +38,7 @@ public class DownloaderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences pref = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         editor = pref.edit();
 
         Set<String> levelsSet = settings.getStringSet(getString(R.string.pref_key_bg_upd_levels), null);
@@ -51,7 +54,7 @@ public class DownloaderService extends Service {
         vplanMode = parseVplanMode(levels[0]);
 
         //now save the current vplan mode in shared prefs
-        editor.putInt(MainActivity.PREF_VPLAN_MODE, vplanMode);
+        editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
         editor.apply();
 
         new BgDownloader().execute(this);
@@ -185,7 +188,7 @@ public class DownloaderService extends Service {
                 vplanMode = parseVplanMode(levels[downloaded_levels]);
 
                 //update shared prefs as well
-                editor.putInt(MainActivity.PREF_VPLAN_MODE, vplanMode);
+                editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
                 editor.apply();
 
                 new BgDownloader().execute(context);
