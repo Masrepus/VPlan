@@ -45,6 +45,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
             android:id="@+id/status"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:gravity="center" />
     </FrameLayout>
 </LinearLayout>
