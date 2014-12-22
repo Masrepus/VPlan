@@ -816,6 +816,8 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
             case OINFO:
                 url = "http://www.schyren-gymnasium.de/export/";
                 break;
+            case VplanModes.FILES_ONLY:
+                return "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
         }
 
         if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {
@@ -882,7 +884,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
             Document doc = null;
             try {
-                doc = Jsoup.connect(getVPlanUrl(VplanModes.MINFO, true)).header("Authorization", "Basic " + encoding).post();
+                doc = Jsoup.connect(getVPlanUrl(VplanModes.FILES_ONLY, true)).header("Authorization", "Basic " + encoding).post();
             } catch (IOException e) {
                 e.printStackTrace();
                 if (encoding == null) throw new Exception("failed to connect oinfo");
