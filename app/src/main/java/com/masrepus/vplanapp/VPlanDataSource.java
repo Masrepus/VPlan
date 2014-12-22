@@ -64,16 +64,15 @@ public class VPlanDataSource {
     /**
      * Takes care of inserting all columns of a vplan item into its table
      *
-     * @param tableName               the table where the columns will be inserted
-     * @param id,stunde,klasse,status the columns to insert
+     * @param tableName the table where the columns will be inserted
+     * @param stunde,klasse,status the columns to insert
      */
-    public void createRowVplan(String tableName, Integer id, String stunde, String klasse, String status) {
+    public void createRowVplan(String tableName, String stunde, String klasse, String status) {
 
         //create new ContentValues with the column name as key and the cell data as value
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_STUNDE, stunde);
         values.put(MySQLiteHelper.COLUMN_GRADE, klasse);
-        values.put(MySQLiteHelper.COLUMN_ID, id);
         values.put(MySQLiteHelper.COLUMN_STATUS, status);
 
         //find out which db is currently in use
