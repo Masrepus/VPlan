@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     package="com.masrepus.vplanapp"
     android:versionCode="9"
-    android:versionName="2.1.3" >
+    android:versionName="2.2.1" >
 
     <application
         android:allowBackup="true"
