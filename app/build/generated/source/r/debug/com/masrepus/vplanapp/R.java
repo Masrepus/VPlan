@@ -1654,15 +1654,17 @@ containing a value of this type.
         public static final int section_item=0x7f03001d;
         public static final int settings=0x7f03001e;
         public static final int support_simple_spinner_dropdown_item=0x7f03001f;
-        public static final int toolbar=0x7f030020;
-        public static final int vplan_list=0x7f030021;
-        public static final int vplan_list_footer=0x7f030022;
-        public static final int vplan_loading_dummy=0x7f030023;
-        public static final int vplanlist_element=0x7f030024;
+        public static final int timetable_activity=0x7f030020;
+        public static final int toolbar=0x7f030021;
+        public static final int vplan_list=0x7f030022;
+        public static final int vplan_list_footer=0x7f030023;
+        public static final int vplan_loading_dummy=0x7f030024;
+        public static final int vplanlist_element=0x7f030025;
     }
     public static final class menu {
         public static final int exams=0x7f0e0000;
         public static final int main_actions=0x7f0e0001;
+        public static final int menu_timetable=0x7f0e0002;
     }
     public static final class string {
         public static final int abc_action_bar_home_description=0x7f0c0000;
@@ -1859,17 +1861,19 @@ containing a value of this type.
         public static final int tests=0x7f0c00bf;
         public static final int tests_base_oinfo=0x7f0c00c0;
         public static final int tests_base_url=0x7f0c00c1;
-        public static final int title_activity_exams=0x7f0c00c2;
-        public static final int type=0x7f0c00c3;
-        public static final int uname=0x7f0c00c4;
-        public static final int unterstufe=0x7f0c00c5;
-        public static final int update_int=0x7f0c00c6;
-        public static final int updating=0x7f0c00c7;
-        public static final int vplan=0x7f0c00c8;
-        public static final int vplan_base_cred=0x7f0c00c9;
-        public static final int vplan_base_url=0x7f0c00ca;
-        public static final int wr=0x7f0c00cb;
-        public static final int wsem=0x7f0c00cc;
+        public static final int timetable=0x7f0c00c2;
+        public static final int title_activity_exams=0x7f0c00c3;
+        public static final int title_activity_timetable=0x7f0c00c4;
+        public static final int type=0x7f0c00c5;
+        public static final int uname=0x7f0c00c6;
+        public static final int unterstufe=0x7f0c00c7;
+        public static final int update_int=0x7f0c00c8;
+        public static final int updating=0x7f0c00c9;
+        public static final int vplan=0x7f0c00ca;
+        public static final int vplan_base_cred=0x7f0c00cb;
+        public static final int vplan_base_url=0x7f0c00cc;
+        public static final int wr=0x7f0c00cd;
+        public static final int wsem=0x7f0c00ce;
     }
     public static final class style {
         public static final int Base_TextAppearance_AppCompat=0x7f0d0000;

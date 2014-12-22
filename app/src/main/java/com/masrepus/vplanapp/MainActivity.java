@@ -203,7 +203,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
 
         //build the item list
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, 2);
+        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, appModes.length);
 
         DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
 
@@ -241,6 +241,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                 case AppModes.TESTS:
                     startActivity(new Intent(this, ExamsActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
+                    break;
+                case AppModes.TIMETABLE:
+                    startActivity(new Intent(this, TimetableActivity.class));
                     break;
             }
 

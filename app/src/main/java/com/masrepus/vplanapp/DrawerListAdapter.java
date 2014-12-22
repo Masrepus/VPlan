@@ -87,6 +87,8 @@ class DrawerListAdapter extends ArrayAdapter<Item> {
                     convertView.setOnClickListener(((MainActivity) activity));
                 } else if (activity instanceof ExamsActivity) {
                     convertView.setOnClickListener(((ExamsActivity) activity));
+                } else if (activity instanceof TimetableActivity) {
+                    convertView.setOnClickListener((TimetableActivity) activity);
                 }
 
                 //if this item has a vplan mode attached to it, add it as a tag
@@ -97,6 +99,7 @@ class DrawerListAdapter extends ArrayAdapter<Item> {
                     //set the appmode tag according to title
                     int appmodeTag;
                     if (entry.getTitle().contentEquals(context.getString(R.string.substitutions))) appmodeTag = AppModes.VPLAN;
+                    else if (entry.getTitle().contentEquals(context.getString(R.string.timetable))) appmodeTag = AppModes.TIMETABLE;
                     else appmodeTag = AppModes.TESTS;
 
                     convertView.setTag(R.id.TAG_APPMODE, appmodeTag);

@@ -175,6 +175,11 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         int id = item.getItemId();
         switch (id) {
 
+            case android.R.id.home:
+                //update appmode
+                SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+                return super.onOptionsItemSelected(item);
             case R.id.action_refresh:
                 refresh(item);
                 return true;
@@ -357,16 +362,23 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         //check the tag
         Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
 
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
         if (appModeTag != null) {
 
             switch (appModeTag) {
 
                 case AppModes.VPLAN:
                     //update appmode
-                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                     pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
 
                     startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    break;
+                case AppModes.TIMETABLE:
+                    //update appmode
+                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE).apply();
+
+                    startActivity(new Intent(this, TimetableActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         }
     }
