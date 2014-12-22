@@ -19,7 +19,9 @@ import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
+import com.masrepus.vplanapp.constants.XmlTags;
 
+import org.apache.http.HttpStatus;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -237,7 +239,17 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
                 editor.apply();
 
-                parseDataToSql();
+                switch (requestedVplanMode) {
+
+                    //treat oinfo differently
+
+                    case VplanModes.OINFO:
+                        parseOinfoVplan();
+                        break;
+                    default:
+                        parseUinfoMinfoVplan();
+                        break;
+                }
 
                 downloaded = c.getPosition() + 1;
                 publishProgress(ProgressCode.PARSING_FINISHED);
@@ -359,9 +371,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     /**
      * Takes care of all the downloading and db-inserting
      *
-     * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null or if therer has been an error while downloading
+     * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null or if there has been an error while downloading
      */
-    public void parseDataToSql() throws Exception {
+    public void parseUinfoMinfoVplan() throws Exception {
 
         String encoding = encodeCredentials();
 
@@ -380,6 +392,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 else throw new Exception("failed to connect oinfo");
             } else throw new Exception("failed to connect");
         }
+
+        if (doc == null) return;
 
         //tempContent contains all found tables
         Elements tempContent = doc.select("table[class=hyphenate]");
@@ -424,14 +438,75 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         parseAvailableFiles(availableFiles);
     }
 
-    public void insertVplanRow(String stunde, String klasse, String status, int position) {
+    public void parseOinfoVplan() {
+
+        Document doc;
+
+        try {
+            doc = Jsoup.connect(findRequestedVPlan()).get();
+        } catch (IOException e) {
+            if (e instanceof HttpStatusException) {
+                HttpStatusException exception = (HttpStatusException) e;
+
+                switch (exception.getStatusCode()) {
+
+                    case HttpStatus.SC_UNAUTHORIZED:
+                        publishProgress(ProgressCode.ERR_NO_CREDS);
+                        break;
+                    default:
+                        publishProgress(ProgressCode.ERR_NO_INTERNET);
+                }
+            }
+            return;
+        }
+
+        if (doc == null) return;
+
+        //save timePublished
+        String headerCurrentDate = doc.child(0).select(XmlTags.HEADER).first().text();
+
+        Elements items = doc.select(XmlTags.ITEMS);
+
+        datasource.open();
+
+        clearExistingTable();
+
+        //iterate through the items
+        for (Element item : items) {
+
+            Element temp;
+
+            String[] contents = new String[5];
+            String[] xmlTags = {XmlTags.LESSON, XmlTags.COURSE, XmlTags.STATUS, XmlTags.MISC, XmlTags.ROOM};
+
+            for (int i = 0; i < 5; i++) {
+                temp = item.select(xmlTags[i]).first();
+                if (temp != null) contents[i] = temp.text();
+                else contents[i] = "";
+            }
+
+            String status = contents[2];
+            if (!contents[3].contentEquals("")) status += " " + contents[3];
+            if (!contents[4].contentEquals("")) status += " " + contents[4];
+
+            insertVplanRow(contents[0], contents[1], status);
+        }
+
+        datasource.close();
+
+        //save the current timestamp
+        timePublished = doc.select(XmlTags.TIME_PUBLISHED).first().text();
+        saveCurrentTimestamp(headerCurrentDate);
+    }
+
+    public void insertVplanRow(String stunde, String klasse, String status) {
 
         //sql insert of all three columns, but only if they aren't all empty or header items
 
         if (stunde != null && !klasse.contentEquals("Klasse")) {
 
             if (requestedVplanId <= 4) {
-                datasource.createRowVplan(MySQLiteHelper.tablesVplan[requestedVplanId], position, stunde, klasse, status);
+                datasource.createRowVplan(MySQLiteHelper.tablesVplan[requestedVplanId], stunde, klasse, status);
             }
         }
     }
@@ -464,6 +539,27 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         String[] separated = null;
         if (headerCurrentDate != null) {
             separated = headerCurrentDate.text().split("für");
+        }
+        String currentDate = null;
+        if (separated != null) {
+            if (separated.length <= 2) currentDate = separated[1].trim();
+            else currentDate = separated[2].trim();
+        }
+
+        //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
+        SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), currentDate);
+        editor.putString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(requestedVplanId), timePublished);
+        editor.apply();
+    }
+
+    public void saveCurrentTimestamp(String headerCurrentDate) {
+
+        //only take the current day of the week and the date out of the header text; delete the space before the split string
+        String[] separated = null;
+        if (headerCurrentDate != null) {
+            separated = headerCurrentDate.split("für");
         }
         String currentDate = null;
         if (separated != null) {
@@ -582,7 +678,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
                     status += columns[i];
                 }
 
-                insertVplanRow(stunde, klasse, status, position);
+                insertVplanRow(stunde, klasse, status);
 
                 position++;
             }
@@ -718,14 +814,22 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
                 url = vplanBase + "pw/" + "mrekursiv.php";
                 break;
             case OINFO:
-                url = vplanBase + "oinfo/" + "srekursiv.php";
+                url = "http://www.schyren-gymnasium.de/export/";
                 break;
+            case VplanModes.FILES_ONLY:
+                return "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
         }
 
         if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {
             String date = currentVPlanLink.split("_")[2];
 
-            return url + "?datei=schuelerplan_vom_" + date;
+            switch (version) {
+
+                case OINFO:
+                    return url + "schuelerplan_vom_" + date;
+                default:
+                    return url + "?datei=schuelerplan_vom_" + date;
+            }
         } else return url;
     }
 
@@ -780,7 +884,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
             Document doc = null;
             try {
-                doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
+                doc = Jsoup.connect(getVPlanUrl(VplanModes.FILES_ONLY, true)).header("Authorization", "Basic " + encoding).post();
             } catch (IOException e) {
                 e.printStackTrace();
                 if (encoding == null) throw new Exception("failed to connect oinfo");
