@@ -8,4 +8,5 @@ public class VplanModes {
     public static final int UINFO = 1;
     public static final int MINFO = 2;
     public static final int OINFO = 3;
+    public static final int FILES_ONLY = 4;
 }
