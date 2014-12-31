@@ -115,7 +115,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //activate adapter for viewPager
         datasource.open();
-        if (!datasource.hasData(MySQLiteHelper.TABLE_LINKS)) {
+        if (!datasource.hasData(SQLiteHelperVplan.TABLE_LINKS)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
             welcome.setVisibility(View.VISIBLE);
         }

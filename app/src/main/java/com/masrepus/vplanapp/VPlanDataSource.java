@@ -21,9 +21,9 @@ public class VPlanDataSource {
     private SQLiteDatabase databaseOinfo;
     private SQLiteDatabase databaseTests;
 
-    private MySQLiteHelper dbHelperUinfo;
-    private MySQLiteHelper dbHelperMinfo;
-    private MySQLiteHelper dbHelperOinfo;
+    private SQLiteHelperVplan dbHelperUinfo;
+    private SQLiteHelperVplan dbHelperMinfo;
+    private SQLiteHelperVplan dbHelperOinfo;
     private SQLiteHelperTests dbHelperTests;
 
     private Context context;
@@ -35,9 +35,9 @@ public class VPlanDataSource {
      */
     public VPlanDataSource(Context context) {
         this.context = context;
-        dbHelperUinfo = new MySQLiteHelper(context, MySQLiteHelper.DATABASE_UINFO);
-        dbHelperMinfo = new MySQLiteHelper(context, MySQLiteHelper.DATABASE_MINFO);
-        dbHelperOinfo = new MySQLiteHelper(context, MySQLiteHelper.DATABASE_OINFO);
+        dbHelperUinfo = new SQLiteHelperVplan(context, SQLiteHelperVplan.DATABASE_UINFO);
+        dbHelperMinfo = new SQLiteHelperVplan(context, SQLiteHelperVplan.DATABASE_MINFO);
+        dbHelperOinfo = new SQLiteHelperVplan(context, SQLiteHelperVplan.DATABASE_OINFO);
         dbHelperTests = new SQLiteHelperTests(context, SQLiteHelperTests.DATABASE_TESTS);
     }
 
@@ -71,9 +71,9 @@ public class VPlanDataSource {
 
         //create new ContentValues with the column name as key and the cell data as value
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_STUNDE, stunde);
-        values.put(MySQLiteHelper.COLUMN_GRADE, klasse);
-        values.put(MySQLiteHelper.COLUMN_STATUS, status);
+        values.put(SQLiteHelperVplan.COLUMN_STUNDE, stunde);
+        values.put(SQLiteHelperVplan.COLUMN_GRADE, klasse);
+        values.put(SQLiteHelperVplan.COLUMN_STATUS, status);
 
         //find out which db is currently in use
         SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -98,21 +98,21 @@ public class VPlanDataSource {
     public void createRowLinks(Integer id, String tag, String url) {
 
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_ID, id);
-        values.put(MySQLiteHelper.COLUMN_TAG, tag);
-        values.put(MySQLiteHelper.COLUMN_URL, url);
+        values.put(SQLiteHelperVplan.COLUMN_ID, id);
+        values.put(SQLiteHelperVplan.COLUMN_TAG, tag);
+        values.put(SQLiteHelperVplan.COLUMN_URL, url);
 
         //find out which db is currently in use
         SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
             case VplanModes.UINFO:
-                databaseUinfo.insert(MySQLiteHelper.TABLE_LINKS, null, values);
+                databaseUinfo.insert(SQLiteHelperVplan.TABLE_LINKS, null, values);
                 break;
             case VplanModes.MINFO:
-                databaseMinfo.insert(MySQLiteHelper.TABLE_LINKS, null, values);
+                databaseMinfo.insert(SQLiteHelperVplan.TABLE_LINKS, null, values);
                 break;
             case VplanModes.OINFO:
-                databaseOinfo.insert(MySQLiteHelper.TABLE_LINKS, null, values);
+                databaseOinfo.insert(SQLiteHelperVplan.TABLE_LINKS, null, values);
                 break;
         }
     }
@@ -284,7 +284,7 @@ public class VPlanDataSource {
         //query for available _id columns; if that cursor is empty, then there is no data in the table
 
         String[] test = new String[1];
-        test[0] = MySQLiteHelper.COLUMN_ID;
+        test[0] = SQLiteHelperVplan.COLUMN_ID;
         Cursor c = query(tablename, test);
         if (c.getCount() > 0) {
             return true;

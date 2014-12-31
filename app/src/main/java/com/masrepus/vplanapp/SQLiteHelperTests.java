@@ -14,18 +14,18 @@ public class SQLiteHelperTests extends SQLiteOpenHelper {
     public static final String TABLE_TESTS_UINFO_MINFO = "tests_uinfo_minfo";
     public static final String TABLE_TESTS_OINFO = "tests_oinfo";
 
-    public static final String COLUMN_ID = MySQLiteHelper.COLUMN_ID;
-    public static final String COLUMN_GRADE = MySQLiteHelper.COLUMN_GRADE;
+    public static final String COLUMN_ID = SQLiteHelperVplan.COLUMN_ID;
+    public static final String COLUMN_GRADE = SQLiteHelperVplan.COLUMN_GRADE;
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_SUBJECT = "subject";
     private static final String CREATE_UINFO_MINFO = "create table "
-            + TABLE_TESTS_UINFO_MINFO + "(" + MySQLiteHelper.COLUMN_ID
-            + " integer primary key autoincrement, " + MySQLiteHelper.COLUMN_GRADE
+            + TABLE_TESTS_UINFO_MINFO + "(" + SQLiteHelperVplan.COLUMN_ID
+            + " integer primary key autoincrement, " + SQLiteHelperVplan.COLUMN_GRADE
             + " text, " + COLUMN_TYPE + " text, " + COLUMN_SUBJECT + " text, " + COLUMN_DATE + " text);";
     private static final String CREATE_OINFO = "create table "
-            + TABLE_TESTS_OINFO + "(" + MySQLiteHelper.COLUMN_ID
-            + " integer primary key autoincrement, " + MySQLiteHelper.COLUMN_GRADE
+            + TABLE_TESTS_OINFO + "(" + SQLiteHelperVplan.COLUMN_ID
+            + " integer primary key autoincrement, " + SQLiteHelperVplan.COLUMN_GRADE
             + " text, " + COLUMN_TYPE + " text, " + COLUMN_SUBJECT + " text, " + COLUMN_DATE + " text);";
 
     private static final int DATABASE_VERSION = 1;

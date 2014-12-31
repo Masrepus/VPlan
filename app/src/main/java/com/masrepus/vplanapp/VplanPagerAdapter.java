@@ -30,7 +30,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     private Activity activity;
     private VPlanDataSource datasource;
     private ArrayList<String> filter;
-    private ArrayList<MySimpleArrayAdapter> adapters;
+    private ArrayList<VplanListAdapter> adapters;
     private ArrayList<ArrayList<Row>> hiddenItems;
     private ArrayList<ArrayList<Row>> dataLists;
     private int[] listSizesBeforeFilter;
@@ -52,7 +52,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         //get the amount of available days from database
         datasource.open();
-        Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_ID});
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
         count = c.getCount();
         datasource.close();
 
@@ -65,7 +65,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
     public void initData() {
 
-        adapters = new ArrayList<MySimpleArrayAdapter>(count);
+        adapters = new ArrayList<VplanListAdapter>(count);
         hiddenItems = new ArrayList<ArrayList<Row>>(count);
         dataLists = new ArrayList<ArrayList<Row>>(count);
 
@@ -88,12 +88,12 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             //create the right adapter for each fragment's listview, if the specific data list is empty, just leave the adapter on null
             try {
                 if (dataLists.size() > 0 && dataLists.get(i) != null && dataLists.get(i).size() > 0)
-                    adapters.add(i, new MySimpleArrayAdapter(activity, dataLists.get(i)));
+                    adapters.add(i, new VplanListAdapter(activity, dataLists.get(i)));
             } catch(Exception e) {}
         }
     }
 
-    public MySimpleArrayAdapter getArrayAdapter(int id) {
+    public VplanListAdapter getArrayAdapter(int id) {
         return adapters.get(id);
     }
 
@@ -113,22 +113,22 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         switch (id) {
 
             case 0:
-                tableName = MySQLiteHelper.TABLE_VPLAN_0;
+                tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
                 break;
             case 1:
-                tableName = MySQLiteHelper.TABLE_VPLAN_1;
+                tableName = SQLiteHelperVplan.TABLE_VPLAN_1;
                 break;
             case 2:
-                tableName = MySQLiteHelper.TABLE_VPLAN_2;
+                tableName = SQLiteHelperVplan.TABLE_VPLAN_2;
                 break;
             case 3:
-                tableName = MySQLiteHelper.TABLE_VPLAN_3;
+                tableName = SQLiteHelperVplan.TABLE_VPLAN_3;
                 break;
             case 4:
-                tableName = MySQLiteHelper.TABLE_VPLAN_4;
+                tableName = SQLiteHelperVplan.TABLE_VPLAN_4;
                 break;
             default:
-                tableName = MySQLiteHelper.TABLE_VPLAN_0;
+                tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
                 break;
         }
 
@@ -137,8 +137,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
             hasData = true;
 
-            Cursor c = datasource.query(tableName, new String[]{MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_GRADE, MySQLiteHelper.COLUMN_STUNDE,
-                    MySQLiteHelper.COLUMN_STATUS});
+            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
+                    SQLiteHelperVplan.COLUMN_STATUS});
 
             ArrayList<Row> list = new ArrayList<Row>();
             ArrayList<Row> tempList = new ArrayList<Row>();
@@ -154,13 +154,13 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE));
+                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
                     if (help.contentEquals("Klasse")) continue;
                     if (help.contentEquals("")) continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STATUS)));
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
 
                     tempList.add(row);
                 }
@@ -221,13 +221,13 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE));
+                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
                     if (help == "Klasse") continue;
                     if (help == "") continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_STATUS)));
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
 
                     list.add(row);
 

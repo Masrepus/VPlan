@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Created by samuel on 27.07.14.
  */
-public class MySimpleArrayAdapter extends ArrayAdapter implements Serializable {
+public class VplanListAdapter extends ArrayAdapter implements Serializable {
 
     private final ArrayList<Row> list;
 
@@ -22,7 +22,7 @@ public class MySimpleArrayAdapter extends ArrayAdapter implements Serializable {
      * @param activity used for method-calls that require a context parameter
      * @param list     a Row ArrayList that has to be parsed into a listview
      */
-    public MySimpleArrayAdapter(Activity activity, ArrayList<Row> list) {
+    public VplanListAdapter(Activity activity, ArrayList<Row> list) {
         super(activity, R.layout.vplan_list, list);
         this.list = list;
     }
