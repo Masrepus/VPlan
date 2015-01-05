@@ -2,6 +2,13 @@
 <items version="2" >
 
     <item
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="95482e7c792a7c0d5a9d5461e97726bd54fe9549">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-3091be259642cbf6333f6ffbf0629e3df2d2ab9d.jar" />
+    </item>
+    <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/21.0.0/classes.jar"
         jumboMode="false"
         revision="20.0.0"
@@ -42,6 +49,13 @@
         revision="20.0.0"
         sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-6c3a5a14415383d152c62d59af52d17131a35dd9.jar" />
+    </item>
+    <item
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wearable/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="6384c6cd674a22610b932d9464aa6938d067f285">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-895c53b0bfad6fbdc42e2d66198ac1f72de93663.jar" />
     </item>
     <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"

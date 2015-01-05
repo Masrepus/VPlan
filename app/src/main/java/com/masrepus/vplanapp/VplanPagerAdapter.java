@@ -180,8 +180,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                             //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
                             if (vplanMode == VplanModes.OINFO) {
                                 String filterItem = filter.get(i);
-                                if (vplanMode != VplanModes.OINFO)isNeeded = klasse.contains(filterItem);
-                                else isNeeded = klasse.contentEquals("Q" + filterItem);
+                                isNeeded = klasse.contentEquals("Q" + filterItem);
 
                                 if (isNeeded) break;
                                 if (klasse.contentEquals("")) isNeeded = true;

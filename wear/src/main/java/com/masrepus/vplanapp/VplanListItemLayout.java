@@ -2,6 +2,7 @@ package com.masrepus.vplanapp;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.support.wearable.view.CircledImageView;
 import android.support.wearable.view.WearableListView;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -18,7 +19,7 @@ public class VplanListItemLayout extends RelativeLayout implements WearableListV
     private final int fadedCircleColor;
     private final int chosenCircleColor;
 
-    private ImageView circle;
+    private CircledImageView circle;
     private TextView hour;
     private TextView grade;
     private TextView status;
@@ -44,7 +45,7 @@ public class VplanListItemLayout extends RelativeLayout implements WearableListV
         super.onFinishInflate();
 
         //get the view references from the layout
-        circle = (ImageView) findViewById(R.id.circle);
+        circle = (CircledImageView) findViewById(R.id.circle);
         hour = (TextView) findViewById(R.id.hour);
         grade = (TextView) findViewById(R.id.grade);
         status = (TextView) findViewById(R.id.status);
@@ -55,12 +56,12 @@ public class VplanListItemLayout extends RelativeLayout implements WearableListV
         hour.setAlpha(1f);
         grade.setAlpha(1f);
         status.setAlpha(1f);
-        ((GradientDrawable) circle.getDrawable()).setColor(chosenCircleColor);
+        circle.setCircleColor(chosenCircleColor);
     }
 
     @Override
     public void onNonCenterPosition(boolean b) {
-        ((GradientDrawable) circle.getDrawable()).setColor(fadedCircleColor);
+        circle.setCircleColor(fadedCircleColor);
         hour.setAlpha(fadedTextAlpha);
         grade.setAlpha(fadedTextAlpha);
         status.setAlpha(fadedTextAlpha);
