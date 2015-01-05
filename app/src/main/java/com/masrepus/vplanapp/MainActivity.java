@@ -322,15 +322,22 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public void onConnected(Bundle bundle) {
 
         //Now the Wear Data Layer API can be used
-
+        sendDataToWatch();
 
     }
 
     private void sendDataToWatch() {
 
+        int currVplanMode = requestedVplanMode;
+
         DataMap dataMap = new DataMap();
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
 
         for (int m = VplanModes.UINFO; m <= VplanModes.OINFO; m++) {
+
+            //set the vplanmode in sharedprefs
+            editor.putInt(SharedPrefs.VPLAN_MODE, m).apply();
 
             //get the number of available days
             datasource.open();
@@ -342,6 +349,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 dataMap.putDataMap(String.valueOf(m) + String.valueOf(i), fillDataMap(m, i));
             }
         }
+
+        new SendToDataLayerThread("/vplan", dataMap).start();
+
+        editor.putInt(SharedPrefs.VPLAN_MODE, currVplanMode);
     }
 
     private DataMap fillDataMap(int mode, int id) {
