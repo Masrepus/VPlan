@@ -42,7 +42,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Node;
@@ -68,11 +67,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final String ACTIVITY_NAME = "MainActivity";
-    private int appMode;
     public ArrayList<String> filterCurrent = new ArrayList<String>();
     public ArrayList<String> filterUnterstufe = new ArrayList<String>();
     public ArrayList<String> filterMittelstufe = new ArrayList<String>();
     public ArrayList<String> filterOberstufe = new ArrayList<String>();
+    private int appMode;
     private int requestedVplanMode;
     private int requestedVplanId;
     private boolean isOnlineRequested;
@@ -323,39 +322,26 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //Now the Wear Data Layer API can be used
         sendDataToWatch();
-
     }
 
     private void sendDataToWatch() {
 
-        int currVplanMode = requestedVplanMode;
-
         DataMap dataMap = new DataMap();
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
 
-        for (int m = VplanModes.UINFO; m <= VplanModes.OINFO; m++) {
+        //get the number of available days
+        datasource.open();
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
+        int count = c.getCount();
+        datasource.close();
 
-            //set the vplanmode in sharedprefs
-            editor.putInt(SharedPrefs.VPLAN_MODE, m).apply();
-
-            //get the number of available days
-            datasource.open();
-            Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
-            int count = c.getCount();
-            datasource.close();
-
-            for (int i = 0; i < count; i++) {
-                dataMap.putDataMap(String.valueOf(m) + String.valueOf(i), fillDataMap(m, i));
-            }
+        for (int i = 0; i < count; i++) {
+            dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
         }
 
         new SendToDataLayerThread("/vplan", dataMap).start();
-
-        editor.putInt(SharedPrefs.VPLAN_MODE, currVplanMode);
     }
 
-    private DataMap fillDataMap(int mode, int id) {
+    private DataMap fillDataMap(int id) {
 
         datasource.open();
 
@@ -383,21 +369,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 break;
             default:
                 tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
-                break;
-        }
-
-        //set the filter list for the current vplan mode
-        ArrayList<String> filter = new ArrayList<>();
-        switch (mode) {
-
-            case VplanModes.UINFO:
-                filter = filterUnterstufe;
-                break;
-            case VplanModes.MINFO:
-                filter = filterMittelstufe;
-                break;
-            case VplanModes.OINFO:
-                filter = filterOberstufe;
                 break;
         }
 
@@ -439,13 +410,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     boolean isNeeded = false;
 
                     //look whether this row's klasse attribute contains any of the classes to filter for
-                    if (filter.size() > 0) {
-                        for (int i = 0; i <= filter.size() - 1; i++) {
-                            char[] klasseFilter = filter.get(i).toCharArray();
+                    if (filterCurrent.size() > 0) {
+                        for (int i = 0; i <= filterCurrent.size() - 1; i++) {
+                            char[] klasseFilter = filterCurrent.get(i).toCharArray();
 
                             //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
-                            if (mode == VplanModes.OINFO) {
-                                String filterItem = filter.get(i);
+                            if (requestedVplanMode == VplanModes.OINFO) {
+                                String filterItem = filterCurrent.get(i);
                                 isNeeded = klasse.contentEquals("Q" + filterItem);
 
                                 if (isNeeded) break;
@@ -486,8 +457,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                     //only add to list if row isn't null
                     String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
-                    if (help == "Klasse") continue;
-                    if (help == "") continue;
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
 
                     row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
                     row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
@@ -508,65 +479,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public void onConnectionSuspended(int cause) {
         Log.d(getPackageName(), "onConnectionSuspended: " + cause);
     }
-
-    /**
-     * PagerAdapter that only displays one dummy fragment containing a progressbar
-     */
-    private class LoadingAdapter extends FragmentStatePagerAdapter {
-
-        public LoadingAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-            Bundle args = new Bundle();
-            args.putBoolean(Args.VPLAN_LOADING_DUMMY, true);
-            Fragment loadingFragment = new VplanFragment();
-            loadingFragment.setArguments(args);
-
-            return loadingFragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-    }
-
-    /**
-     * Loads a VplanPagerAdapter in a background task
-     */
-    private class PagerAdapterLoader extends AsyncTask<Activity, Void, VplanPagerAdapter> {
-
-        @Override
-        protected VplanPagerAdapter doInBackground(Activity... activities) {
-            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
-        }
-
-        @Override
-        protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
-
-            //check whether disabling of welcome tv and activation of tabstrip must be done
-            if (vplanPagerAdapter.hasData()) {
-
-                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-                welcome.setVisibility(View.GONE);
-
-                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-                tabStrip.setVisibility(View.VISIBLE);
-            }
-
-            ViewPager pager = (ViewPager) findViewById(R.id.pager);
-            pager.setAdapter(vplanPagerAdapter);
-
-            //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-            pager.setCurrentItem(getTodayVplanId(), false);
-        }
-    }
-
 
     private int getTodayVplanId() {
 
@@ -1028,7 +940,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         new PagerAdapterLoader().execute(this);
     }
 
-
     public void displayLastUpdate(String lastUpdate) {
 
         TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
@@ -1055,6 +966,64 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             //if pb is null, then data is already displayed, so no dummy layout available
             pb.setIndeterminate(false);
             pb.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * PagerAdapter that only displays one dummy fragment containing a progressbar
+     */
+    private class LoadingAdapter extends FragmentStatePagerAdapter {
+
+        public LoadingAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            Bundle args = new Bundle();
+            args.putBoolean(Args.VPLAN_LOADING_DUMMY, true);
+            Fragment loadingFragment = new VplanFragment();
+            loadingFragment.setArguments(args);
+
+            return loadingFragment;
+        }
+
+        @Override
+        public int getCount() {
+            return 1;
+        }
+    }
+
+    /**
+     * Loads a VplanPagerAdapter in a background task
+     */
+    private class PagerAdapterLoader extends AsyncTask<Activity, Void, VplanPagerAdapter> {
+
+        @Override
+        protected VplanPagerAdapter doInBackground(Activity... activities) {
+            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
+        }
+
+        @Override
+        protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
+
+            //check whether disabling of welcome tv and activation of tabstrip must be done
+            if (vplanPagerAdapter.hasData()) {
+
+                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+                welcome.setVisibility(View.GONE);
+
+                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+                tabStrip.setVisibility(View.VISIBLE);
+            }
+
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(vplanPagerAdapter);
+
+            //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+            pager.setCurrentItem(getTodayVplanId(), false);
         }
     }
 
@@ -1126,7 +1095,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
     }
 
-    private class SendToDataLayerThread extends Thread{
+    private class SendToDataLayerThread extends Thread {
 
         private String path;
         private DataMap dataMap;
@@ -1150,7 +1119,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 PutDataRequest request = putDMR.asPutDataRequest();
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
 
-                if (result.getStatus().isSuccess()) Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
+                if (result.getStatus().isSuccess())
+                    Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
                 else Log.e(getPackageName(), "ERROR: failed to send DataMap!");
             }
         }
