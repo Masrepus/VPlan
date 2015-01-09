@@ -1,5 +1,7 @@
 package com.masrepus.vplanapp;
 
+import com.google.android.gms.wearable.DataMap;
+
 import java.io.Serializable;
 
 /**
@@ -11,11 +13,8 @@ public class Row implements Serializable {
     private String stunde;
     private String status;
 
-    public Row(String stunde, String klasse, String status) {
-        this.klasse = klasse;
-        this.stunde = stunde;
-        this.status = status;
-    }
+
+    public Row() {}
 
     public long getId() {
         return id;
@@ -47,5 +46,18 @@ public class Row implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Row(DataMap map) {
+        stunde = map.getString("stunde");
+        status = map.getString("status");
+        klasse = map.getString("klasse");
+    }
+
+    public DataMap putToDataMap(DataMap map) {
+        map.putString("stunde", stunde);
+        map.putString("klasse", klasse);
+        map.putString("status", status);
+        return map;
     }
 } 

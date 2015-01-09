@@ -348,29 +348,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         DataMap dataMap = new DataMap();
 
         //query the data for the right vplan -> get requested table name by passed arg
-        String tableName;
-
-        switch (id) {
-
-            case 0:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
-                break;
-            case 1:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_1;
-                break;
-            case 2:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_2;
-                break;
-            case 3:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_3;
-                break;
-            case 4:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_4;
-                break;
-            default:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
-                break;
-        }
+        String tableName = SQLiteHelperVplan.tablesVplan[id];
 
         if (datasource.hasData(tableName)) {
 
@@ -1101,6 +1079,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         private String path;
         private DataMap dataMap;
+        private int failCount = 0;
 
         //Constructor for sending data objects to the data layer
         public SendToDataLayerThread(String path, DataMap dataMap) {
@@ -1123,7 +1102,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                 if (result.getStatus().isSuccess())
                     Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
-                else Log.e(getPackageName(), "ERROR: failed to send DataMap!");
+                else {
+                    failCount++;
+                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+
+                    //retry later
+                    try {
+                        if (failCount <= 3) {
+                            Thread.sleep(2000);
+                        } //else stop it after 3 times trying
+                    } catch (InterruptedException e) {}
+                }
             }
         }
     }
