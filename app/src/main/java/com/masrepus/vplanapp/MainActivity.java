@@ -1091,6 +1091,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 displayLastUpdate(refreshLastUpdate());
 
                 activatePagerAdapter();
+
+                sendDataToWatch();
             }
         }
     }
