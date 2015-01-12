@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by samuel on 27.07.14.
@@ -26,6 +28,14 @@ public class VplanListAdapter extends WearableListView.Adapter {
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.rows = rows;
+
+        //sort the rows depending on their lesson
+        Collections.sort(this.rows, new Comparator<Row>() {
+            @Override
+            public int compare(Row row, Row row2) {
+                return row.getStunde().compareTo(row2.getStunde());
+            }
+        });
     }
 
     @Override

@@ -1,13 +1,20 @@
 package com.masrepus.vplanapp;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.WatchViewStub;
 import android.support.wearable.view.WearableListView;
+import android.util.AttributeSet;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.masrepus.vplanapp.constants.SharedPrefs;
 
 import java.util.ArrayList;
 
@@ -21,10 +28,15 @@ public class MainActivity extends Activity {
         setContentView(R.layout.vplan_fragment);
 
         //display vplan data in recylerview
-        WearableListView recycler = (WearableListView) findViewById(R.id.vplanlist);
-        VplanListAdapter adapter = new VplanListAdapter(this, getVplanList(0));
+        WearableListView listView = (WearableListView) findViewById(R.id.vplanlist);
+        VplanListAdapter adapter = new VplanListAdapter(this, getVplanList(1));
 
-        recycler.setAdapter(adapter);
+        listView.setAdapter(adapter);
+
+        final TextView header = (TextView) findViewById(R.id.header);
+        header.requestApplyInsets();
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        header.setText(pref.getString(SharedPrefs.PREF_HEADER_PREFIX + 1, "Fehler"));
     }
 
     private ArrayList<Row> getVplanList(int day) {

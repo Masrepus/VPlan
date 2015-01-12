@@ -332,18 +332,32 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         datasource.open();
         Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
         int count = c.getCount();
-        datasource.close();
 
         for (int i = 0; i < count; i++) {
             dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
         }
 
         new SendToDataLayerThread("/vplan", dataMap).start();
+
+        //now the headers
+        dataMap = new DataMap();
+
+        //add the header for each day to the map
+        c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_TAG});
+        count = c.getCount();
+        datasource.close();
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        //get the header strings from shared prefs
+        for (int i = 0; i < count; i++) {
+            dataMap.putString(String.valueOf(i), pref.getString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(i), ""));
+        }
+
+        new SendToDataLayerThread("/headers", dataMap).start();
     }
 
     private DataMap fillDataMap(int id) {
-
-        datasource.open();
 
         DataMap dataMap = new DataMap();
 
@@ -447,8 +461,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 }
             }
         }
-
-        datasource.close();
 
         return dataMap;
     }
