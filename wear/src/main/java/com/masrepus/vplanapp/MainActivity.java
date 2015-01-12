@@ -4,14 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.wearable.view.BoxInsetLayout;
-import android.support.wearable.view.WatchViewStub;
 import android.support.wearable.view.WearableListView;
-import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -22,26 +15,29 @@ import java.util.Calendar;
 
 public class MainActivity extends Activity {
 
-    private TextView mTextView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vplan_fragment);
 
+        initTodayVplan();
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        int todayVplan = pref.getInt(SharedPrefs.TODAY_VPLAN, 0);
+
         //display vplan data in recylerview
         WearableListView listView = (WearableListView) findViewById(R.id.vplanlist);
-        VplanListAdapter adapter = new VplanListAdapter(this, getVplanList(1));
+        VplanListAdapter adapter = new VplanListAdapter(this, getVplanList(todayVplan));
 
         listView.setAdapter(adapter);
 
         final TextView header = (TextView) findViewById(R.id.header);
         header.requestApplyInsets();
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-        header.setText(pref.getString(SharedPrefs.PREF_HEADER_PREFIX + 1, "Fehler"));
+
+        header.setText(pref.getString(SharedPrefs.PREF_HEADER_PREFIX + todayVplan, ""));
     }
 
-    private void getTodayVplan() {
+    private void initTodayVplan() {
 
         SharedPreferences prefs = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
 
@@ -49,7 +45,7 @@ public class MainActivity extends Activity {
         Calendar calendar = Calendar.getInstance();
 
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        SimpleDateFormat hour = new SimpleDateFormat("hh");
+        SimpleDateFormat hour = new SimpleDateFormat("HH");
 
         for (int i = 0; i < 5; i++) {
 
