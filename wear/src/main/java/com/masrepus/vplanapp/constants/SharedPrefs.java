@@ -7,4 +7,5 @@ public class SharedPrefs {
 
     public static final String PREFS_NAME = "prefs";
     public static final String PREF_HEADER_PREFIX = "header";
+    public static final String TODAY_VPLAN = "todayVplan";
 }
