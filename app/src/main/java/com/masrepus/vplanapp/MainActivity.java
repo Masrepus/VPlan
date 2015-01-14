@@ -653,6 +653,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
                     editor.apply();
                     fl.setVisibility(View.GONE);
+
+                    //sync this new dataset to wear
+                    sendDataToWatch();
                 } else {
                     item.setChecked(true);
                     SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -662,6 +665,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     editor.apply();
                     fl.setVisibility(View.VISIBLE);
                     filterWarning.setText(R.string.filter_enabled);
+
+                    //sync to wear
+                    sendDataToWatch();
                 }
                 //refresh adapter for viewPager
                 new PagerAdapterLoader().execute(this);

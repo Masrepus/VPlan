@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.wearable.view.WearableListView;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -35,6 +37,16 @@ public class MainActivity extends Activity {
         header.requestApplyInsets();
 
         header.setText(pref.getString(SharedPrefs.PREF_HEADER_PREFIX + todayVplan, ""));
+
+        //if the list is empty notify the user that there are no items for today
+        if (adapter.getItemCount() == 0) {
+
+            TextView noItemsTV = (TextView) findViewById(R.id.noItemsTV);
+            noItemsTV.setText(getString(R.string.no_data_today));
+
+            FrameLayout noItemsBg = (FrameLayout) findViewById(R.id.noItemsBg);
+            noItemsBg.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initTodayVplan() {
