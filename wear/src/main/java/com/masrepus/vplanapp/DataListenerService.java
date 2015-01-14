@@ -18,28 +18,55 @@ public class DataListenerService extends WearableListenerService {
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
 
-        DataMap dataMap;
-
         for (DataEvent event : dataEvents) {
 
             //check the data type
             if (event.getType() == DataEvent.TYPE_CHANGED) {
 
-                //check the data path
+                DataMap dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+
+                //check the data path and react accordingly
                 String path = event.getDataItem().getUri().getPath();
                 if (path.contentEquals("/vplan")) {
-                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.v(getPackageName(), "Vplan data received on watch: " + dataMap);
 
                     saveVplanFiles(dataMap);
                 } else if (path.contentEquals("/headers")) {
-                    dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                     Log.v(getPackageName(), "Headers received on watch: " + dataMap);
 
                     saveHeaders(dataMap);
+                } else if (path.contentEquals("/timestamps")) {
+                    Log.v(getPackageName(), "Timestamps received on watch: " + dataMap);
+
+                    saveLastUpdate(dataMap.getString("lastUpdate"));
+                    saveTimePublishedTimestamps(dataMap.getStringArray("timePublishedTimestamps"));
                 }
             } else Log.v(getPackageName(), "Skipped incoming data item (type: " + event.getType() + ")");
         }
+    }
+
+    private void saveTimePublishedTimestamps(String[] timePublishedTimestamps) {
+
+        //save the timestamps to shared prefs according to their order in the array
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+
+        int position = 0;
+        for (String timePublished : timePublishedTimestamps) {
+
+            editor.putString(SharedPrefs.TIME_PUBLISHED_PREFIX + String.valueOf(position), timePublished);
+            position++;
+        }
+    }
+
+    private void saveLastUpdate(String lastUpdate) {
+
+        //save the last update timestamp to shared prefs
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.putString(SharedPrefs.LAST_UPDATE, lastUpdate);
+        editor.apply();
     }
 
     private void saveHeaders(DataMap dataMap) {

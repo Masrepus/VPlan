@@ -136,6 +136,23 @@ public class DownloaderService extends Service {
         }
 
         new SendToDataLayerThread("/headers", dataMap).start();
+
+        //send last updated timestamp and time published timestamps
+        dataMap = new DataMap();
+
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + String.valueOf(lastRequestedVplanMode), "");
+        String[] timePublishedTimestamps = new String[count];
+
+        for (int i = 0; i < count; i++) {
+
+            //get each time published timestamp
+            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(lastRequestedVplanMode) + String.valueOf(i), "");
+        }
+
+        dataMap.putString("lastUpdate", lastUpdate);
+        dataMap.putStringArray("timePublishedTimestamps", timePublishedTimestamps);
+
+        new SendToDataLayerThread("/timestamps", dataMap);
     }
 
     private DataMap fillDataMap(int id) {
@@ -294,7 +311,7 @@ public class DownloaderService extends Service {
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
 
                 if (result.getStatus().isSuccess())
-                    Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
+                    Log.v(getPackageName(), path + " " + dataMap + "sent to: " + node.getDisplayName());
                 else {
                     failCount++;
                     Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
