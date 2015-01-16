@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.wearable.view.WearableListView;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -17,6 +18,8 @@ import java.util.Calendar;
 
 public class MainActivity extends Activity {
 
+    private int todayVplan;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,7 +28,13 @@ public class MainActivity extends Activity {
         initTodayVplan();
 
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-        int todayVplan = pref.getInt(SharedPrefs.TODAY_VPLAN, 0);
+        todayVplan = pref.getInt(SharedPrefs.TODAY_VPLAN, 0);
+
+        //request box layout
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+        layout.requestApplyInsets();
+        RelativeLayout timestamps = (RelativeLayout) findViewById(R.id.timestamps);
+        timestamps.requestApplyInsets();
 
         //display vplan data in recylerview
         WearableListView listView = (WearableListView) findViewById(R.id.vplanlist);
@@ -47,6 +56,21 @@ public class MainActivity extends Activity {
             FrameLayout noItemsBg = (FrameLayout) findViewById(R.id.noItemsBg);
             noItemsBg.setVisibility(View.VISIBLE);
         }
+
+        displayTimestamps(pref);
+    }
+
+    private void displayTimestamps(SharedPreferences pref) {
+
+        String lastUpdate = pref.getString(SharedPrefs.LAST_UPDATE, "-");
+        String timePublished = pref.getString(SharedPrefs.TIME_PUBLISHED_PREFIX + String.valueOf(todayVplan), "");
+
+        //display the timestamps in the textviews
+        TextView lastUpdateTV = (TextView) findViewById(R.id.lastUpdateTV);
+        lastUpdateTV.setText(getString(R.string.last_update) + " " + lastUpdate);
+
+        TextView timePublishedTV = (TextView) findViewById(R.id.timePublishedTV);
+        timePublishedTV.setText(timePublished);
     }
 
     private void initTodayVplan() {

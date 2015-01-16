@@ -79,5 +79,6 @@
     <string name="tests">Tests</string>
     <string name="vplan">Substitution Plan</string>
     <string name="title_activity_timetable">Timetable</string>
+    <string name="room">Room</string>
 
 </resources>

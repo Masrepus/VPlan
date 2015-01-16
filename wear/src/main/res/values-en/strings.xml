@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">SGP</string>
     <string name="no_data_today">no data for today</string>
+    <string name="last_update">Last update:</string>
 </resources>

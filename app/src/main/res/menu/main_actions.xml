@@ -21,8 +21,8 @@
         android:id="@+id/action_activate_filter"
         android:title="@string/activate_filter"
         android:checkable="true" />
-    <!--<item
+    <item
         android:id="@+id/tester"
-        android:title="test" />-->
+        android:title="test" />
 
 </menu>

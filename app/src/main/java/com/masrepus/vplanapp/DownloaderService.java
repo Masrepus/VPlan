@@ -24,6 +24,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -140,19 +141,19 @@ public class DownloaderService extends Service {
         //send last updated timestamp and time published timestamps
         dataMap = new DataMap();
 
-        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + String.valueOf(lastRequestedVplanMode), "");
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.VPLAN + lastRequestedVplanMode, "");
         String[] timePublishedTimestamps = new String[count];
 
         for (int i = 0; i < count; i++) {
 
             //get each time published timestamp
-            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(lastRequestedVplanMode) + String.valueOf(i), "");
+            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + lastRequestedVplanMode + i, "");
         }
 
         dataMap.putString("lastUpdate", lastUpdate);
         dataMap.putStringArray("timePublishedTimestamps", timePublishedTimestamps);
 
-        new SendToDataLayerThread("/timestamps", dataMap);
+        new SendToDataLayerThread("/timestamps", dataMap).start();
     }
 
     private DataMap fillDataMap(int id) {
@@ -276,6 +277,7 @@ public class DownloaderService extends Service {
                         //request access to the Wearable API
                 .addApi(Wearable.API)
                 .build();
+        apiClient.connect();
     }
 
     private class SendToDataLayerThread extends Thread {

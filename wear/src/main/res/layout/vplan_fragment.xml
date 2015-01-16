@@ -9,16 +9,17 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/layout">
+        android:id="@+id/layout"
+        app:layout_box="top|bottom">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Medium Text"
             android:id="@+id/header"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp" />
+            android:layout_marginTop="5dp"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -40,11 +41,45 @@
                 android:textColor="@color/blue" />
         </FrameLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            app:layout_box="left|right"
+            android:id="@+id/timestamps">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/lastUpdateTV"
+                android:textColor="@android:color/darker_gray"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/timePublishedTV" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/timePublishedTV"
+                android:textColor="@android:color/darker_gray"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <android.support.wearable.view.WearableListView
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:id="@+id/vplanlist" />
-
-    </RelativeLayout>
+        </FrameLayout>
 
 </android.support.wearable.view.BoxInsetLayout>

@@ -359,19 +359,19 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //send last updated timestamp and time published timestamps
         dataMap = new DataMap();
 
-        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + String.valueOf(requestedVplanMode), "");
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.VPLAN + requestedVplanMode, "");
         String[] timePublishedTimestamps = new String[count];
 
         for (int i = 0; i < count; i++) {
 
             //get each time published timestamp
-            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(i), "");
+            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + requestedVplanMode + i, "");
         }
 
         dataMap.putString("lastUpdate", lastUpdate);
         dataMap.putStringArray("timePublishedTimestamps", timePublishedTimestamps);
 
-        new SendToDataLayerThread("/timestamps", dataMap);
+        new SendToDataLayerThread("/timestamps", dataMap).start();
     }
 
     private DataMap fillDataMap(int id) {
@@ -647,9 +647,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             case R.id.action_refresh:
                 refresh(item);
                 return true;
-            /*case R.id.tester:
-                new AsyncDownloader().execute(this);
-                return true;*/
+            case R.id.tester:
+                startService(new Intent(this, DownloaderService.class));
+                return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));

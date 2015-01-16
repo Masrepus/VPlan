@@ -3,5 +3,6 @@
 
     <string name="app_name">SGP</string>
     <string name="no_data_today">Keine Vertretungen</string>
+    <string name="last_update">Letztes Update:</string>
 
 </resources>

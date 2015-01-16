@@ -55,6 +55,7 @@ public class DataListenerService extends WearableListenerService {
         for (String timePublished : timePublishedTimestamps) {
 
             editor.putString(SharedPrefs.TIME_PUBLISHED_PREFIX + String.valueOf(position), timePublished);
+            editor.apply();
             position++;
         }
     }
