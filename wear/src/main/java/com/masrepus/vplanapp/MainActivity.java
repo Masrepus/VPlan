@@ -1,76 +1,66 @@
 package com.masrepus.vplanapp;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.wearable.view.FragmentGridPagerAdapter;
+import android.support.wearable.view.GridViewPager;
 import android.support.wearable.view.WearableListView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private int todayVplan;
+    private GoogleApiClient apiClient;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.vplan_fragment);
+        setContentView(R.layout.activity_main);
+
+        connectApiClient();
 
         initTodayVplan();
 
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-        todayVplan = pref.getInt(SharedPrefs.TODAY_VPLAN, 0);
+        //create a new pager adapter and assign it to the pager
+        VplanPagerAdapter adapter = new VplanPagerAdapter(getFragmentManager(), this);
+        GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapter);
 
-        //request box layout
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-        layout.requestApplyInsets();
-        RelativeLayout timestamps = (RelativeLayout) findViewById(R.id.timestamps);
-        timestamps.requestApplyInsets();
+        //set a 1 dp margin between the fragments
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        pager.setPageMargins(0, Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
 
-        //display vplan data in recylerview
-        WearableListView listView = (WearableListView) findViewById(R.id.vplanlist);
-        VplanListAdapter adapter = new VplanListAdapter(this, getVplanList(todayVplan));
-
-        listView.setAdapter(adapter);
-
-        final TextView header = (TextView) findViewById(R.id.header);
-        header.requestApplyInsets();
-
-        header.setText(pref.getString(SharedPrefs.PREF_HEADER_PREFIX + todayVplan, ""));
-
-        //if the list is empty notify the user that there are no items for today
-        if (adapter.getItemCount() == 0) {
-
-            TextView noItemsTV = (TextView) findViewById(R.id.noItemsTV);
-            noItemsTV.setText(getString(R.string.no_data_today));
-
-            FrameLayout noItemsBg = (FrameLayout) findViewById(R.id.noItemsBg);
-            noItemsBg.setVisibility(View.VISIBLE);
-        }
-
-        displayTimestamps(pref);
-    }
-
-    private void displayTimestamps(SharedPreferences pref) {
-
-        String lastUpdate = pref.getString(SharedPrefs.LAST_UPDATE, "-");
-        String timePublished = pref.getString(SharedPrefs.TIME_PUBLISHED_PREFIX + String.valueOf(todayVplan), "");
-
-        //display the timestamps in the textviews
-        TextView lastUpdateTV = (TextView) findViewById(R.id.lastUpdateTV);
-        lastUpdateTV.setText(getString(R.string.last_update) + " " + lastUpdate);
-
-        TextView timePublishedTV = (TextView) findViewById(R.id.timePublishedTV);
-        timePublishedTV.setText(timePublished);
+        //scroll to today's vplan
+        pager.setCurrentItem(1, todayVplan);
     }
 
     private void initTodayVplan() {
@@ -93,6 +83,7 @@ public class MainActivity extends Activity {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt(SharedPrefs.TODAY_VPLAN, i);
                 editor.apply();
+                todayVplan = i;
             } else if (Integer.valueOf(hour.format(calendar.getTime())) >= 17) {
                 calendar = Calendar.getInstance();
                 if (calendar.get(Calendar.DAY_OF_WEEK) >= Calendar.FRIDAY) {
@@ -103,32 +94,102 @@ public class MainActivity extends Activity {
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putInt(SharedPrefs.TODAY_VPLAN, i);
                     editor.apply();
+                    todayVplan = i;
                 }
             }
         }
     }
 
-    private ArrayList<Row> getVplanList(int day) {
+    @Override
+    public void onClick(View v) {
 
-        VPlanDataSource datasource = new VPlanDataSource(this);
-        datasource.open();
+        TextView noItemsTV = (TextView) findViewById(R.id.noItemsTV);
+        ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
 
-        Cursor c = datasource.query(SQLiteHelperVplan.tablesVplan[day], new String[]{SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STATUS, SQLiteHelperVplan.COLUMN_STUNDE});
+        //update the ui
+        noItemsTV.setText(getString(R.string.refreshing));
+        progress.setVisibility(View.VISIBLE);
 
-        //build the arraylist
-        ArrayList<Row> rows = new ArrayList<>();
+        //fire the refresh request
+        DataMap dataMap = new DataMap();
+        dataMap.putString(DataKeys.ACTION, Args.ACTION_REFRESH);
 
-        while (c.moveToNext()) {
+        new SendToDataLayerThread(DataKeys.REQUEST, dataMap).start();
+    }
 
-            Row row = new Row();
-            row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-            row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
-            row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-            rows.add(row);
+        //now register a broadcastreceiver that waits for the phone's answer that update is done
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                //notify the pager adapter
+                GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
+                pager.getAdapter().notifyDataSetChanged();
+            }
+        };
+
+        registerReceiver(receiver, new IntentFilter(Args.ACTION_UPDATE_UI));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        unregisterReceiver(receiver);
+    }
+
+    private void connectApiClient() {
+
+        apiClient = new GoogleApiClient.Builder(this)
+                //request access to the Wearable API
+                .addApi(Wearable.API)
+                .build();
+        apiClient.connect();
+    }
+
+    private class SendToDataLayerThread extends Thread {
+
+        private String path;
+        private DataMap dataMap;
+        private int failCount = 0;
+
+        //Constructor for sending data objects to the data layer
+        public SendToDataLayerThread(String path, DataMap dataMap) {
+            this.path = path;
+            this.dataMap = dataMap;
         }
 
-        datasource.close();
-        return rows;
+        @Override
+        public void run() {
+
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+            for (Node node : nodes.getNodes()) {
+
+                //Construct a DataRequest and send over the data layer
+                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                putDMR.getDataMap().putAll(dataMap);
+
+                PutDataRequest request = putDMR.asPutDataRequest();
+                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
+
+                if (result.getStatus().isSuccess())
+                    Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
+                else {
+                    failCount++;
+                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+
+                    //retry later
+                    try {
+                        if (failCount <= 3) {
+                            Thread.sleep(2000);
+                        } //else stop it after 3 times trying
+                    } catch (InterruptedException e) {}
+                }
+            }
+        }
     }
 }

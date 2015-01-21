@@ -1,5 +1,6 @@
 package com.masrepus.vplanapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -8,6 +9,8 @@ import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 
 /**
@@ -27,22 +30,35 @@ public class DataListenerService extends WearableListenerService {
 
                 //check the data path and react accordingly
                 String path = event.getDataItem().getUri().getPath();
-                if (path.contentEquals("/vplan")) {
+                if (path.contentEquals(DataKeys.VPLAN)) {
                     Log.v(getPackageName(), "Vplan data received on watch: " + dataMap);
 
                     saveVplanFiles(dataMap);
-                } else if (path.contentEquals("/headers")) {
+                } else if (path.contentEquals(DataKeys.HEADERS)) {
                     Log.v(getPackageName(), "Headers received on watch: " + dataMap);
 
                     saveHeaders(dataMap);
-                } else if (path.contentEquals("/timestamps")) {
-                    Log.v(getPackageName(), "Timestamps received on watch: " + dataMap);
+                } else if (path.contentEquals(DataKeys.META_DATA)) {
+                    Log.v(getPackageName(), "Meta-data received on watch: " + dataMap);
 
-                    saveLastUpdate(dataMap.getString("lastUpdate"));
-                    saveTimePublishedTimestamps(dataMap.getStringArray("timePublishedTimestamps"));
+                    saveLastUpdate(dataMap.getString(SharedPrefs.LAST_UPDATE));
+                    saveTimePublishedTimestamps(dataMap.getStringArray(DataKeys.TIME_PUBLISHED_TIMESTAMPS));
+                    saveCount(dataMap.getInt(DataKeys.DAYS));
+                } else if (path.contentEquals(DataKeys.REQUEST)) {
+
+                    if (dataMap.getString(DataKeys.ACTION).contentEquals(Args.ACTION_UPDATE_UI)) sendBroadcast(new Intent(this, MainActivity.class).setAction(Args.ACTION_UPDATE_UI));
                 }
             } else Log.v(getPackageName(), "Skipped incoming data item (type: " + event.getType() + ")");
         }
+    }
+
+    private void saveCount(int count) {
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.putInt(SharedPrefs.DAYS_COUNT, count);
+        editor.apply();
     }
 
     private void saveTimePublishedTimestamps(String[] timePublishedTimestamps) {

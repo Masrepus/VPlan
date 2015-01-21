@@ -51,6 +51,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -337,14 +338,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
         }
 
-        new SendToDataLayerThread("/vplan", dataMap).start();
+        new SendToDataLayerThread(DataKeys.VPLAN, dataMap).start();
 
         //now the headers
         dataMap = new DataMap();
 
-        //add the header for each day to the map
-        c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_TAG});
-        count = c.getCount();
         datasource.close();
 
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -354,7 +352,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             dataMap.putString(String.valueOf(i), pref.getString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(i), ""));
         }
 
-        new SendToDataLayerThread("/headers", dataMap).start();
+        new SendToDataLayerThread(DataKeys.HEADERS, dataMap).start();
 
         //send last updated timestamp and time published timestamps
         dataMap = new DataMap();
@@ -368,10 +366,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + requestedVplanMode + i, "");
         }
 
-        dataMap.putString("lastUpdate", lastUpdate);
-        dataMap.putStringArray("timePublishedTimestamps", timePublishedTimestamps);
+        dataMap.putString(SharedPrefs.PREFIX_LAST_UPDATE, lastUpdate);
+        dataMap.putStringArray(DataKeys.TIME_PUBLISHED_TIMESTAMPS, timePublishedTimestamps);
+        dataMap.putInt(DataKeys.DAYS, count);
 
-        new SendToDataLayerThread("/timestamps", dataMap).start();
+        new SendToDataLayerThread(DataKeys.META_DATA, dataMap).start();
     }
 
     private DataMap fillDataMap(int id) {
@@ -648,7 +647,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 refresh(item);
                 return true;
             case R.id.tester:
-                startService(new Intent(this, DownloaderService.class));
+                startService(new Intent(this, DownloaderService.class).putExtra(DataKeys.ACTION, Args.NOTIFY_WEAR_UPDATE_UI));
                 return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
@@ -1033,10 +1032,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
             pager.setAdapter(vplanPagerAdapter);
 
-            //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
+            //set a 1 dp margin between the fragments
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
             pager.setCurrentItem(getTodayVplanId(), false);
+
+            //sync wear
+            sendDataToWatch();
         }
     }
 

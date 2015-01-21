@@ -10,4 +10,5 @@ public class SharedPrefs {
     public static final String TODAY_VPLAN = "todayVplan";
     public static final String LAST_UPDATE = "lastUpdate";
     public static final String TIME_PUBLISHED_PREFIX = "timePublished";
+    public static final String DAYS_COUNT = "count";
 }

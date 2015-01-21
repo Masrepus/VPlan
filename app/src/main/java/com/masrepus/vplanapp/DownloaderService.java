@@ -25,6 +25,8 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.constants.AppModes;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -43,6 +45,7 @@ public class DownloaderService extends Service {
     private int lastRequestedVplanMode;
     private ArrayList<String> filterCurrent = new ArrayList<>();
     private GoogleApiClient apiClient;
+    private boolean notifyWear;
 
     public DownloaderService() {
     }
@@ -58,6 +61,9 @@ public class DownloaderService extends Service {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         editor = pref.edit();
+
+        //check whether we must notify wear after completion
+        notifyWear = intent.getStringExtra(DataKeys.ACTION).contentEquals(Args.NOTIFY_WEAR_UPDATE_UI);
 
         lastRequestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
 
@@ -124,9 +130,6 @@ public class DownloaderService extends Service {
         //now the headers
         dataMap = new DataMap();
 
-        //add the header for each day to the map
-        c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_TAG});
-        count = c.getCount();
         datasource.close();
 
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -152,8 +155,18 @@ public class DownloaderService extends Service {
 
         dataMap.putString("lastUpdate", lastUpdate);
         dataMap.putStringArray("timePublishedTimestamps", timePublishedTimestamps);
+        dataMap.putInt("days", count);
 
-        new SendToDataLayerThread("/timestamps", dataMap).start();
+        new SendToDataLayerThread("/meta-data", dataMap).start();
+
+        //check if we must notify wear that update is finished
+        if (notifyWear) {
+
+            dataMap = new DataMap();
+            dataMap.putString(DataKeys.ACTION, Args.ACTION_UPDATE_UI);
+
+            new SendToDataLayerThread(DataKeys.REQUEST, dataMap);
+        }
     }
 
     private DataMap fillDataMap(int id) {

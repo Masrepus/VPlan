@@ -4,5 +4,8 @@
     <string name="app_name">SGP</string>
     <string name="no_data_today">Keine Vertretungen</string>
     <string name="last_update">Letztes Update:</string>
+    <string name="no_data">Keine Daten verfügbar</string>
+    <string name="refreshing">Aktualisiere...</string>
+    <string name="data_update">"Data update: "</string>
 
 </resources>
