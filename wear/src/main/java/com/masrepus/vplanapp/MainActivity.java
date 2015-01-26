@@ -6,40 +6,34 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.GridViewPager;
-import android.support.wearable.view.WearableListView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.constants.Args;
-import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private int todayVplan;
     private GoogleApiClient apiClient;
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver updateFinishedReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,10 +105,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         progress.setVisibility(View.VISIBLE);
 
         //fire the refresh request
-        DataMap dataMap = new DataMap();
-        dataMap.putString(DataKeys.ACTION, Args.ACTION_REFRESH);
-
-        new SendToDataLayerThread(DataKeys.REQUEST, dataMap).start();
+        new SendToDataLayerThread(Args.ACTION_REFRESH).start();
     }
 
     @Override
@@ -122,24 +113,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onResume();
 
         //now register a broadcastreceiver that waits for the phone's answer that update is done
-        receiver = new BroadcastReceiver() {
+        updateFinishedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                //notify the pager adapter
+                //get a new pager adapter
                 GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
-                pager.getAdapter().notifyDataSetChanged();
+                VplanPagerAdapter adapter = new VplanPagerAdapter(getFragmentManager(), getApplicationContext());
+                pager.setAdapter(adapter);
+
+                Log.d(getPackageName(), "Re-created pager adapter");
             }
         };
 
-        registerReceiver(receiver, new IntentFilter(Args.ACTION_UPDATE_UI));
+        registerReceiver(updateFinishedReceiver, new IntentFilter(Args.ACTION_UPDATE_UI));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        unregisterReceiver(receiver);
+        unregisterReceiver(updateFinishedReceiver);
     }
 
     private void connectApiClient() {
@@ -153,6 +147,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private class SendToDataLayerThread extends Thread {
 
+        private final boolean message;
         private String path;
         private DataMap dataMap;
         private int failCount = 0;
@@ -161,10 +156,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
         public SendToDataLayerThread(String path, DataMap dataMap) {
             this.path = path;
             this.dataMap = dataMap;
+            message = false;
         }
 
-        @Override
-        public void run() {
+        //Constructor for messages
+        public SendToDataLayerThread(String path) {
+            this.path = path;
+            message = true;
+        }
+
+        private void sendMessage() {
+
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+
+            for (Node node : nodes.getNodes()) {
+
+                MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(apiClient, node.getId(), path, null).await();
+
+                //check for success
+                if (!result.getStatus().isSuccess()) Log.e(getPackageName(), "ERROR: failed to send Message: " + path + " (" + result.getStatus() + ")");
+                else Log.v(getPackageName(), "Successfully sent message: " + path + " to " + node);
+            }
+        }
+
+        private void sendData() {
 
             NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
             for (Node node : nodes.getNodes()) {
@@ -177,7 +192,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
 
                 if (result.getStatus().isSuccess())
-                    Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
+                    Log.v(getPackageName(), path + " " + dataMap + "sent to: " + node.getDisplayName());
                 else {
                     failCount++;
                     Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
@@ -185,11 +200,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     //retry later
                     try {
                         if (failCount <= 3) {
-                            Thread.sleep(2000);
+                            sleep(2000);
                         } //else stop it after 3 times trying
                     } catch (InterruptedException e) {}
                 }
             }
+        }
+
+        @Override
+        public void run() {
+
+            //wait for connection
+            if (!apiClient.isConnected()) try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (message) sendMessage();
+            else sendData();
         }
     }
 }

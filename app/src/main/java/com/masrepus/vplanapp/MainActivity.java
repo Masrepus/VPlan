@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -85,6 +86,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int selectedAppmodeItem;
     private GoogleApiClient apiClient;
     private ArrayList<DataMap> dataMaps;
+    private BroadcastReceiver updateRequestReceiver;
 
     /**
      * Called when the activity is first created.

@@ -8,6 +8,7 @@ import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.DataKeys;
@@ -17,6 +18,16 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
  * Created by samuel on 05.01.15.
  */
 public class DataListenerService extends WearableListenerService {
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+
+        if (messageEvent.getPath().equals(Args.ACTION_UPDATE_UI)) {
+            //start an update in the background
+            sendBroadcast(new Intent(Args.ACTION_UPDATE_UI));
+            Log.v(getPackageName(), "Received message: " + messageEvent.getPath());
+        }
+    }
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {

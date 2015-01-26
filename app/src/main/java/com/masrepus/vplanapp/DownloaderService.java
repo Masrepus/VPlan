@@ -10,7 +10,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -19,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -46,6 +49,7 @@ public class DownloaderService extends Service {
     private ArrayList<String> filterCurrent = new ArrayList<>();
     private GoogleApiClient apiClient;
     private boolean notifyWear;
+    private boolean finishedSyncing = false;
 
     public DownloaderService() {
     }
@@ -58,12 +62,18 @@ public class DownloaderService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Log.d(getPackageName(), "Starting bg download service");
+
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         editor = pref.edit();
 
         //check whether we must notify wear after completion
-        notifyWear = intent.getStringExtra(DataKeys.ACTION).contentEquals(Args.NOTIFY_WEAR_UPDATE_UI);
+        String action = intent.getStringExtra(DataKeys.ACTION);
+        if (action != null) {
+            notifyWear = action.contentEquals(Args.NOTIFY_WEAR_UPDATE_UI);
+            Log.d(getPackageName(), "notifyWear = " + notifyWear);
+        } else notifyWear = false;
 
         lastRequestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
 
@@ -83,6 +93,7 @@ public class DownloaderService extends Service {
         Set<String> levelsSet = settings.getStringSet(getString(R.string.pref_key_bg_upd_levels), null);
 
         if (levelsSet == null || levelsSet.size() == 0) {
+            sendDataToWatch();
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -125,7 +136,7 @@ public class DownloaderService extends Service {
             dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
         }
 
-        new SendToDataLayerThread("/vplan", dataMap).start();
+        new SendToDataLayerThread(DataKeys.VPLAN, dataMap).execute();
 
         //now the headers
         dataMap = new DataMap();
@@ -139,7 +150,7 @@ public class DownloaderService extends Service {
             dataMap.putString(String.valueOf(i), pref.getString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(lastRequestedVplanMode) + String.valueOf(i), ""));
         }
 
-        new SendToDataLayerThread("/headers", dataMap).start();
+        new SendToDataLayerThread(DataKeys.HEADERS, dataMap).execute();
 
         //send last updated timestamp and time published timestamps
         dataMap = new DataMap();
@@ -153,20 +164,13 @@ public class DownloaderService extends Service {
             timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + lastRequestedVplanMode + i, "");
         }
 
-        dataMap.putString("lastUpdate", lastUpdate);
-        dataMap.putStringArray("timePublishedTimestamps", timePublishedTimestamps);
-        dataMap.putInt("days", count);
+        dataMap.putString(SharedPrefs.PREFIX_LAST_UPDATE, lastUpdate);
+        dataMap.putStringArray(DataKeys.TIME_PUBLISHED_TIMESTAMPS, timePublishedTimestamps);
+        dataMap.putInt(DataKeys.DAYS, count);
 
-        new SendToDataLayerThread("/meta-data", dataMap).start();
-
-        //check if we must notify wear that update is finished
-        if (notifyWear) {
-
-            dataMap = new DataMap();
-            dataMap.putString(DataKeys.ACTION, Args.ACTION_UPDATE_UI);
-
-            new SendToDataLayerThread(DataKeys.REQUEST, dataMap);
-        }
+        //check if we must notify wear that the update is finished
+        if (notifyWear) new SendToDataLayerThread(DataKeys.META_DATA, dataMap, true).execute();
+        else new SendToDataLayerThread(DataKeys.META_DATA, dataMap).execute();
     }
 
     private DataMap fillDataMap(int id) {
@@ -181,14 +185,12 @@ public class DownloaderService extends Service {
             Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
                     SQLiteHelperVplan.COLUMN_STATUS});
 
-            ArrayList<Row> list = new ArrayList<Row>();
             ArrayList<Row> tempList = new ArrayList<Row>();
 
             //check whether filter is active
             Boolean isFilterActive = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
 
             //if filter is active, then use it after filling the Arraylist
-            int listSizeBeforeFilter = 0;
             if (isFilterActive) {
 
                 while (c.moveToNext()) {
@@ -293,27 +295,36 @@ public class DownloaderService extends Service {
         apiClient.connect();
     }
 
-    private class SendToDataLayerThread extends Thread {
+    private class SendToDataLayerThread extends AsyncTask<Void, Void, Void> {
 
+        private boolean notifyOnFinish;
         private String path;
         private DataMap dataMap;
         private int failCount = 0;
+        private boolean message;
 
         //Constructor for sending data objects to the data layer
         public SendToDataLayerThread(String path, DataMap dataMap) {
             this.path = path;
             this.dataMap = dataMap;
+            message = false;
         }
 
-        @Override
-        public void run() {
+        //Constructor used when calling the last data upload
+        public SendToDataLayerThread(String path, DataMap dataMap, boolean notifyOnFinish) {
+            this.path = path;
+            this.dataMap = dataMap;
+            message = false;
+            this.notifyOnFinish = notifyOnFinish;
+        }
 
-            //wait for connection
-            if (!apiClient.isConnected()) try {
-                sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        //Constructor for messages
+        public SendToDataLayerThread(String path) {
+            this.path = path;
+            message = true;
+        }
+
+        private void sendData() {
 
             NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
             for (Node node : nodes.getNodes()) {
@@ -334,11 +345,49 @@ public class DownloaderService extends Service {
                     //retry later
                     try {
                         if (failCount <= 3) {
-                            sleep(2000);
+                            Thread.sleep(2000);
                         } //else stop it after 3 times trying
                     } catch (InterruptedException e) {}
                 }
             }
+        }
+
+        private void sendMessage() {
+
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+
+            for (Node node : nodes.getNodes()) {
+
+                MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(apiClient, node.getId(), path, null).await();
+
+                //check for success
+                if (!result.getStatus().isSuccess()) Log.e(getPackageName(), "ERROR: failed to send Message: " + result.getStatus());
+                else Log.v(getPackageName(), "Successfully sent message: " + path + " to " + node);
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            //wait for connection
+            if (!apiClient.isConnected()) try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (message) sendMessage();
+            else sendData();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            //notify wear if this wass the last syncing operation
+            if (notifyOnFinish) new SendToDataLayerThread(Args.ACTION_UPDATE_UI).execute();
         }
     }
 
