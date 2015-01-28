@@ -80,6 +80,6 @@ public class VplanFragment extends Fragment {
 
         //display the timestamps in the textviews
         TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timePublishedTV);
-        timePublishedTV.setText(getString(R.string.data_update) + timePublished);
+        timePublishedTV.setText(timePublished);
     }
 }

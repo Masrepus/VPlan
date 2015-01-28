@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@color/yellow"
-    android:id="@+id/box_inset">
+    android:id="@+id/box_inset"
+    android:background="@android:color/transparent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,16 +19,17 @@
             android:text="Medium Text"
             android:id="@+id/header"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:textStyle="bold" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_centerInParent="true"
             android:background="@color/card_default_background"
-            android:translationZ="5dp"
             android:visibility="invisible"
-            android:id="@+id/noItemsBg">
+            android:id="@+id/noItemsBg"
+            android:translationZ="5dp">
 
             <TextView
                 android:layout_width="wrap_content"

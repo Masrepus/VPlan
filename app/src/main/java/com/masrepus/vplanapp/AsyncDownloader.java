@@ -494,8 +494,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         datasource.close();
 
-        //save the current timestamp
-        timePublished = doc.select(XmlTags.TIME_PUBLISHED).first().text();
+        //save the current timestamp; add "Stand: " because it is missing in oinfo vplan
+        timePublished = "Stand: " + doc.select(XmlTags.TIME_PUBLISHED).first().text();
         saveCurrentTimestamp(headerCurrentDate);
     }
 

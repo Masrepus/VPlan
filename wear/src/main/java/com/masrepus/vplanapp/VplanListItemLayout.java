@@ -5,6 +5,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.wearable.view.CircledImageView;
 import android.support.wearable.view.WearableListView;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,6 +25,7 @@ public class VplanListItemLayout extends RelativeLayout implements WearableListV
     private TextView hour;
     private TextView grade;
     private TextView status;
+    private RelativeLayout circleLayout;
 
     public VplanListItemLayout(Context context) {
         this(context, null);
@@ -49,6 +52,7 @@ public class VplanListItemLayout extends RelativeLayout implements WearableListV
         hour = (TextView) findViewById(R.id.hour);
         grade = (TextView) findViewById(R.id.grade);
         status = (TextView) findViewById(R.id.status);
+        circleLayout = (RelativeLayout) findViewById(R.id.circleLayout);
     }
 
     @Override
