@@ -68,7 +68,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                 } else {
 
                     //MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
-                    MySimpleArrayAdapter adapter = (MySimpleArrayAdapter) args.getSerializable(Args.ADAPTER);
+                    VplanListAdapter adapter = (VplanListAdapter) args.getSerializable(Args.ADAPTER);
 
 
                     //display everything
@@ -110,7 +110,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             if (hiddenItems.size() > 0) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle(R.string.hidden_items);
-                builder.setAdapter(new MySimpleArrayAdapter(getActivity(), hiddenItems), null);
+                builder.setAdapter(new VplanListAdapter(getActivity(), hiddenItems), null);
                 builder.show();
             } //else there is no data to be shown and would cause an error
         }

@@ -13,4 +13,7 @@ public class Args {
     public static final String ADAPTER = "adapter";
     public static final String HIDDEN_ITEMS = "hiddenItems";
     public static final String CALLING_ACTIVITY = "caller";
+    public static final String ACTION_REFRESH = "com.masrepus.vplanapp.action.refresh";
+    public static final String ACTION_UPDATE_UI = "com.masrepus.vplanapp.action.updateUI";
+    public static final String NOTIFY_WEAR_UPDATE_UI = "notifyWear";
 }

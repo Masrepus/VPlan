@@ -6,4 +6,5 @@ package com.masrepus.vplanapp.constants;
 public class AppModes {
     public static final int VPLAN = 0;
     public static final int TESTS = 1;
+    public static final int TIMETABLE = 2;
 }

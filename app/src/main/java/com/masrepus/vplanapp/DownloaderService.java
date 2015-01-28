@@ -8,14 +8,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+import com.masrepus.vplanapp.constants.AppModes;
+import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
+import com.masrepus.vplanapp.constants.VplanModes;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class DownloaderService extends Service {
@@ -25,6 +44,12 @@ public class DownloaderService extends Service {
     String[] levels;
     int downloaded_levels = 0;
     private SharedPreferences.Editor editor;
+    VPlanDataSource datasource;
+    private int lastRequestedVplanMode;
+    private ArrayList<String> filterCurrent = new ArrayList<>();
+    private GoogleApiClient apiClient;
+    private boolean notifyWear;
+    private boolean finishedSyncing = false;
 
     public DownloaderService() {
     }
@@ -37,13 +62,38 @@ public class DownloaderService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Log.d(getPackageName(), "Starting bg download service");
+
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         editor = pref.edit();
 
+        //check whether we must notify wear after completion
+        String action = intent.getStringExtra(DataKeys.ACTION);
+        if (action != null) {
+            notifyWear = action.contentEquals(Args.NOTIFY_WEAR_UPDATE_UI);
+            Log.d(getPackageName(), "notifyWear = " + notifyWear);
+        } else notifyWear = false;
+
+        lastRequestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
+
+        //get the current filter
+        switch (lastRequestedVplanMode) {
+            case VplanModes.UINFO:
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), null));
+                break;
+            case VplanModes.MINFO:
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), null));
+                break;
+            case VplanModes.OINFO:
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), null));
+                break;
+        }
+
         Set<String> levelsSet = settings.getStringSet(getString(R.string.pref_key_bg_upd_levels), null);
 
         if (levelsSet == null || levelsSet.size() == 0) {
+            sendDataToWatch();
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -67,6 +117,278 @@ public class DownloaderService extends Service {
         if (humanReadable.contentEquals(getString(R.string.unterstufe))) return 1;
         else if (humanReadable.contentEquals(getString(R.string.mittelstufe))) return 2;
         else return 3;
+    }
+
+    private void sendDataToWatch() {
+
+        DataMap dataMap = new DataMap();
+        datasource = new VPlanDataSource(this);
+
+        //init the api client
+        buildApiClient();
+
+        //get the number of available days
+        datasource.open();
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
+        int count = c.getCount();
+
+        for (int i = 0; i < count; i++) {
+            dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
+        }
+
+        new SendToDataLayerThread(DataKeys.VPLAN, dataMap).execute();
+
+        //now the headers
+        dataMap = new DataMap();
+
+        datasource.close();
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        //get the header strings from shared prefs
+        for (int i = 0; i < count; i++) {
+            dataMap.putString(String.valueOf(i), pref.getString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(lastRequestedVplanMode) + String.valueOf(i), ""));
+        }
+
+        new SendToDataLayerThread(DataKeys.HEADERS, dataMap).execute();
+
+        //send last updated timestamp and time published timestamps
+        dataMap = new DataMap();
+
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.VPLAN + lastRequestedVplanMode, "");
+        String[] timePublishedTimestamps = new String[count];
+
+        for (int i = 0; i < count; i++) {
+
+            //get each time published timestamp
+            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + lastRequestedVplanMode + i, "");
+        }
+
+        dataMap.putString(SharedPrefs.PREFIX_LAST_UPDATE, lastUpdate);
+        dataMap.putStringArray(DataKeys.TIME_PUBLISHED_TIMESTAMPS, timePublishedTimestamps);
+        dataMap.putInt(DataKeys.DAYS, count);
+
+        //check if we must notify wear that the update is finished
+        if (notifyWear) new SendToDataLayerThread(DataKeys.META_DATA, dataMap, true).execute();
+        else new SendToDataLayerThread(DataKeys.META_DATA, dataMap).execute();
+    }
+
+    private DataMap fillDataMap(int id) {
+
+        DataMap dataMap = new DataMap();
+
+        //query the data for the right vplan -> get requested table name by passed arg
+        String tableName = SQLiteHelperVplan.tablesVplan[id];
+
+        if (datasource.hasData(tableName)) {
+
+            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
+                    SQLiteHelperVplan.COLUMN_STATUS});
+
+            ArrayList<Row> tempList = new ArrayList<Row>();
+
+            //check whether filter is active
+            Boolean isFilterActive = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
+
+            //if filter is active, then use it after filling the Arraylist
+            if (isFilterActive) {
+
+                while (c.moveToNext()) {
+                    Row row = new Row();
+
+                    //only add to list if row isn't null
+                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
+
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+
+                    tempList.add(row);
+                }
+
+                //now perform the filtering
+                int position = 0;
+
+                for (Row currRow : tempList) {
+                    String klasse = currRow.getKlasse();
+                    boolean isNeeded = false;
+
+                    //look whether this row's klasse attribute contains any of the classes to filter for
+                    if (filterCurrent.size() > 0) {
+                        for (int i = 0; i <= filterCurrent.size() - 1; i++) {
+                            char[] klasseFilter = filterCurrent.get(i).toCharArray();
+
+                            //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
+                            if (lastRequestedVplanMode == VplanModes.OINFO) {
+                                String filterItem = filterCurrent.get(i);
+                                isNeeded = klasse.contentEquals("Q" + filterItem);
+
+                                if (isNeeded) break;
+                                if (klasse.contentEquals("")) isNeeded = true;
+                            } else { //in u/minfo the order doesn't play a role
+
+                                //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
+                                for (int y = 0; y <= klasseFilter.length - 1; y++) {
+                                    if (klasse.contains(String.valueOf(klasseFilter[y]))) {
+                                        isNeeded = true;
+                                    } else {
+                                        isNeeded = false;
+                                        break;
+                                    }
+                                }
+                                if (isNeeded) break;
+
+                                //also set isneeded to true if klasse=""
+                                if (klasse.contentEquals("")) isNeeded = true;
+                            }
+                        }
+                    } else {
+                        //if there is no item in the filter list, then still take the rows without a value for class
+                        isNeeded = klasse.contentEquals("");
+                    }
+                    //if the test was positive, then add the current Row to the map
+                    if (isNeeded) {
+                        dataMap.putDataMap(String.valueOf(position), currRow.putToDataMap(new DataMap()));
+                        position++;
+                    }
+                }
+
+            } else {
+                // just fill the list normally
+                int position = 0;
+                while (c.moveToNext()) {
+                    Row row = new Row();
+
+                    //only add to list if row isn't null
+                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
+
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+
+                    dataMap.putDataMap(String.valueOf(position), row.putToDataMap(new DataMap()));
+                    position++;
+                }
+            }
+        }
+
+        return dataMap;
+    }
+
+    private void buildApiClient() {
+
+        apiClient = new GoogleApiClient.Builder(this)
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        Log.d(getPackageName(), "onConnectionFailed: " + connectionResult);
+                    }
+                })
+
+                        //request access to the Wearable API
+                .addApi(Wearable.API)
+                .build();
+        apiClient.connect();
+    }
+
+    private class SendToDataLayerThread extends AsyncTask<Void, Void, Void> {
+
+        private boolean notifyOnFinish;
+        private String path;
+        private DataMap dataMap;
+        private int failCount = 0;
+        private boolean message;
+
+        //Constructor for sending data objects to the data layer
+        public SendToDataLayerThread(String path, DataMap dataMap) {
+            this.path = path;
+            this.dataMap = dataMap;
+            message = false;
+        }
+
+        //Constructor used when calling the last data upload
+        public SendToDataLayerThread(String path, DataMap dataMap, boolean notifyOnFinish) {
+            this.path = path;
+            this.dataMap = dataMap;
+            message = false;
+            this.notifyOnFinish = notifyOnFinish;
+        }
+
+        //Constructor for messages
+        public SendToDataLayerThread(String path) {
+            this.path = path;
+            message = true;
+        }
+
+        private void sendData() {
+
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+            for (Node node : nodes.getNodes()) {
+
+                //Construct a DataRequest and send over the data layer
+                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                putDMR.getDataMap().putAll(dataMap);
+
+                PutDataRequest request = putDMR.asPutDataRequest();
+                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
+
+                if (result.getStatus().isSuccess())
+                    Log.v(getPackageName(), path + " " + dataMap + "sent to: " + node.getDisplayName());
+                else {
+                    failCount++;
+                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+
+                    //retry later
+                    try {
+                        if (failCount <= 3) {
+                            Thread.sleep(2000);
+                        } //else stop it after 3 times trying
+                    } catch (InterruptedException e) {}
+                }
+            }
+        }
+
+        private void sendMessage() {
+
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+
+            for (Node node : nodes.getNodes()) {
+
+                MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(apiClient, node.getId(), path, null).await();
+
+                //check for success
+                if (!result.getStatus().isSuccess()) Log.e(getPackageName(), "ERROR: failed to send Message: " + result.getStatus());
+                else Log.v(getPackageName(), "Successfully sent message: " + path + " to " + node);
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            //wait for connection
+            if (!apiClient.isConnected()) try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (message) sendMessage();
+            else sendData();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            //notify wear if this wass the last syncing operation
+            if (notifyOnFinish) new SendToDataLayerThread(Args.ACTION_UPDATE_UI).execute();
+        }
     }
 
     private class BgDownloader extends AsyncDownloader {
@@ -182,7 +504,13 @@ public class DownloaderService extends Service {
             context.unregisterReceiver(cancelReceiver);
 
             //only stop the service when all the levels are finished downloading
-            if (downloaded_levels == levels.length) stopSelf();
+            if (downloaded_levels == levels.length) {
+
+                //sync to wear
+                sendDataToWatch();
+
+                stopSelf();
+            }
             else {
                 //parse the next vplan level
                 vplanMode = parseVplanMode(levels[downloaded_levels]);

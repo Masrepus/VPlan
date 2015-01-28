@@ -1,196 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello" translatable="false">Hello World, MainActivity!</string>
-    <string name="app_name" translatable="false">SGP</string>
-    <string name="no_lesson">not available</string>
-    <string name="all_grades" translatable="false">all grades</string>
-    <string name="no_status">no status available</string>
+    <string name="activate_filter">Filtern</string>
+    <string name="cancel">Abbruch</string>
+    <string name="creds">Zugangsdaten</string>
+    <string name="download_finished">Herunterladen beendet</string>
+    <string name="downloading">Herunterladen…</string>
+    <string name="filter_enabled">Filter aktiv - Klicken für Details</string>
+    <string name="filter_title">Klassen/Kurse im Filter</string>
+    <string name="grade">Klasse</string>
+    <string name="k10">10. Klasse</string>
+    <string name="k5">5. Klasse</string>
+    <string name="k6">6. Klasse</string>
+    <string name="k7">7. Klasse</string>
+    <string name="k8">8. Klasse</string>
+    <string name="k9">9. Klasse</string>
+    <string name="last_update">Letztes Update:</string>
+    <string name="lesson">Stunde</string>
+    <string name="mittelstufe">Mittelstufe</string>
+    <string name="no_creds">Keine Zugangsdaten gespeichert</string>
+    <string name="no_creds_detailed">Es wurden noch keine Zugangsdaten gespeichert, willst du das jetzt tun?</string>
+    <string name="no_data">Keine Daten verfügbar, klicken zum aktualisieren</string>
+    <string name="no_data_today">Keine Vertretungen</string>
+    <string name="no_lesson">nicht verfügbar</string>
+    <string name="no_status">kein Status verfügbar</string>
+    <string name="oberstufe">Oberstufe</string>
     <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="headingListview" translatable="false">Vertretungsplan:</string>
-    <string name="grade">Grade</string>
-    <string name="lesson">Lesson</string>
+    <string name="open_browser">Im Browser öffnen</string>
+    <string name="parsing_finished">Datenverarbeitung beendet</string>
+    <string name="published">Stand:</string>
+    <string name="pwd">Passwort</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="settings">Einstellungen</string>
     <string name="status">Status</string>
-    <string name="last_update">Last update:</string>
-    <string name="download_finished">Finished downloading</string>
-    <string name="parsing_finished">Finished parsing</string>
-    <string name="err_getBytes" translatable="false">Error during getBytes from credentials</string>
+    <string name="still_parsing">Aktion nicht möglich! Daten werden noch verarbeitet!</string>
+    <string name="uname">Benutzername</string>
+    <string name="unterstufe">Unterstufe</string>
+    <string name="updating">Wird aktualisiert</string>
+    <string name="curr_filter">Momentan gefilterte Klassen</string>
+    <string name="no_filter">Klasse hinzufügen…</string>
+    <string name="drawer_closed">Navigationsleiste geschlossen</string>
+    <string name="drawer_open">Navigationsleiste geöffnet</string>
+    <string name="news">News</string>
+    <string name="tests">Tests</string>
+    <string name="vplan">Vertretungsplan</string>
+    <string name="msg_hidden_plural">Einträge wegen Filterung verborgen</string>
+    <string name="msg_hidden_singular">Eintrag wegen Filterung verborgen</string>
+    <string name="download_error">Bitte überprüfe die gespeicherten Zugangsdaten und deine Internetverbindung</string>
+    <string name="download_error_title">Herunterladen gescheitert</string>
+    <string name="download_error_nocreds">Für Unter- und Mittelstufe sind Benutzername und Passwort benötigt. Jetzt eingeben?</string>
+    <string name="download_error_nointernet">Bitte die Internetverbindung überprüfen</string>
+    <string name="hidden_items">Verborgene Einträge</string>
+    <string name="bg_updates">Hintergrundaktualisierung</string>
+    <string name="activate_bg_updates">Automatisch aktualisieren</string>
+    <string name="preparing">Vorbereiten...</string>
+    <string name="update_int">Intervall</string>
+    <string name="msg_bg_update">Aktualisiere Daten</string>
+    <string name="files">Dateien</string>
+    <string name="downloaded_prog">heruntergeladen...</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="file">Datei</string>
+    <string name="levels">Stufen</string>
+    <string name="level">Stufe</string>
+    <string name="date">Datum</string>
+    <string name="subject">Fach</string>
+    <string name="substitutions">Vertretungen</string>
+    <string name="exams">Prüfungen</string>
+    <string name="appmodes_header">Ansichten</string>
+    <string name="title_activity_exams">Prüfungen</string>
+    <string name="exam">Schulaufgabe</string>
+    <string name="type">Art</string>
+    <string name="standard_test_abbrev">SA</string>
+    <string name="nothing_to_download">Herunterladen nicht möglich</string>
+    <string name="nothing_to_download_msg">In deinem Filter befinden sich noch keine Klassen, weshalb keine Prüfungs-Daten heruntergeladen werden können.\nJetzt Klassen zum Filter hinzufügen?</string>
+    <string name="exams_activity_subtitle">(Klassen im Filter)</string>
+    <string name="hide_past_exams">Alte Prüfungen ausblenden</string>
+    <string name="hidden_exams_info">Alte Einträge ausgeblendet</string>
+    <string name="all_grades" translatable="false">all grades</string>
+    <string name="app_name" translatable="false">SGP</string>
+    <string name="bigb" translatable="false">Bigband</string>
+    <string name="bio" translatable="false">Biologie</string>
+    <string name="button_filter_unterstufe_key" translatable="false">button_filter_unterstufe_key</string>
+    <string name="chem" translatable="false">Chemie</string>
+    <string name="cho" translatable="false">Chor</string>
+    <string name="deutsch" translatable="false">Deutsch</string>
+    <string name="ekon" translatable="false">Englisch Konversation</string>
+    <string name="englisch" translatable="false">Englisch</string>
     <string name="err_decryptPW" translatable="false">Exception while decrypting pwd</string>
     <string name="err_decryptUname" translatable="false">Exception while decrypting uname</string>
     <string name="err_encryptCredentials" translatable="false">Exception while encrypting uname/pwd</string>
-    <string name="downloading">Downloading…</string>
-    <string name="no_data">No data available, click to refresh</string>
-    <string name="refresh">refresh</string>
-    <string name="still_parsing">Action not available!
- Parsing of data still in progress!</string>
-    <string name="vplan_base_url" translatable="false">http://app.schyren-gymnasium.de:80/</string>
-    <string name="vplan_base_cred" translatable="false">app.schyren-gymnasium.de:80/</string>
-    <string name="no_data_today">no data for this day</string>
-    <string name="settings">Settings</string>
-    <string name="unterstufe">Unterstufe</string>
-    <string name="mittelstufe">Mittelstufe</string>
-    <string name="oberstufe">Oberstufe</string>
-    <string name="open_browser">Open in web browser</string>
-    <string name="drawer_open">navigation drawer open</string>
-    <string name="drawer_closed">navigation drawer closed</string>
-    <string name="sgp" translatable="false">Schyren-Gymnasium</string>
-    <string name="updating">Updating</string>
-    <string name="published">Published:</string>
-    <string name="creds">Credentials</string>
-    <string name="uname">Username</string>
-    <string name="pwd">Password</string>
-    <string name="k5">Grade 5</string>
-    <string name="k6">Grade 6</string>
-    <string name="k7">Grade 7</string>
-    <string name="k8">Grade 8</string>
-    <string name="k9">Grade 9</string>
-    <string name="k10">Grade 10</string>
+    <string name="err_getBytes" translatable="false">Error during getBytes from credentials</string>
+    <string name="foto" translatable="false">Fotographie</string>
+    <string name="franz" translatable="false">Französisch</string>
+    <string name="geo" translatable="false">Geographie</string>
+    <string name="gesch" translatable="false">Geschichte</string>
+    <string name="headingListview" translatable="false">Vertretungsplan:</string>
+    <string name="hello" translatable="false">Hello World, MainActivity!</string>
+    <string name="inf" translatable="false">Informatik</string>
     <string name="k11" translatable="false">Q 11</string>
     <string name="k12" translatable="false">Q 12</string>
-    <string name="filter_title">Classes/courses to filter</string>
-    <string name="key_uname" translatable="false">pref_uname</string>
-    <string name="key_pwd" translatable="false">pref_pwd</string>
-    <string name="button_filter_unterstufe_key" translatable="false">button_filter_unterstufe_key</string>
+    <string name="key_deutsch_q11" translatable="false">pref_key_d_q11</string>
+    <string name="key_deutsch_q12" translatable="false">pref_key_d_q12</string>
+    <string name="key_grade10" translatable="false">pref_key_grade10</string>
+    <string name="key_grade11" translatable="false">pref_key_grade11</string>
+    <string name="key_grade12" translatable="false">pref_key_grade12</string>
     <string name="key_grade5" translatable="false">pref_key_grade5</string>
     <string name="key_grade6" translatable="false">pref_key_grade6</string>
     <string name="key_grade7" translatable="false">pref_key_grade7</string>
     <string name="key_grade8" translatable="false">pref_key_grade8</string>
     <string name="key_grade9" translatable="false">pref_key_grade9</string>
-    <string name="key_grade10" translatable="false">pref_key_grade10</string>
-    <string name="key_grade11" translatable="false">pref_key_grade11</string>
-    <string name="key_grade12" translatable="false">pref_key_grade12</string>
-    <string name="no_creds">No credentials saved</string>
-    <string name="no_creds_detailed">No credentials were saved yet, do you want to do this now?</string>
-    <string name="activate_filter">Apply filter</string>
-    <string name="filter_enabled">Filter enabled - Click for details</string>
-    <string name="curr_filter">Currently filtered classes</string>
-    <string name="no_filter">Add class…</string>
-    <string name="tests">Tests</string>
-    <string name="vplan">Ver</string>
-    <string name="deutsch" translatable="false">Deutsch</string>
-    <string name="key_deutsch_q11" translatable="false">pref_key_d_q11</string>
-    <string name="key_deutsch_q12" translatable="false">pref_key_d_q12</string>
-    <string name="mathe" translatable="false">Mathematik</string>
-    <string name="pref_key_mathe_q11" translatable="false">pref_key_mathe_q11</string>
-    <string name="pref_key_mathe_q12" translatable="false">pref_key_mathe_q12</string>
-    <string name="englisch" translatable="false">Englisch</string>
-    <string name="pref_key_engl_q11" translatable="false">pref_key_engl_q11</string>
-    <string name="religion" translatable="false">Religion</string>
-    <string name="pref_key_reli_q11" translatable="false">pref_key_reli_q11</string>
-    <string name="pref_key_geo_q11" translatable="false">pref_key_geo_q11</string>
-    <string name="geo" translatable="false">Geographie</string>
-    <string name="musik" translatable="false">Musik</string>
-    <string name="pref_key_musik_q11" translatable="false">pref_key_musik_q11</string>
-    <string name="gesch" translatable="false">Geschichte</string>
-    <string name="pref_key_gesch_q11" translatable="false">pref_key_gesch_q11</string>
-    <string name="phy" translatable="false">Physik</string>
-    <string name="pref_key_phy_q11" translatable="false">pref_key_phy_q11</string>
-    <string name="ph_b" translatable="false">Biophysik</string>
-    <string name="pref_key_phb_q11" translatable="false">pref_key_phb_q11</string>
-    <string name="pref_key_ch_q11" translatable="false">pref_key_ch_q11</string>
-    <string name="pref_key_info_q11" translatable="false">pref_key_info_q11</string>
-    <string name="pref_key_wr_q11" translatable="false">pref_key_wr_q11</string>
+    <string name="key_pwd" translatable="false">pref_pwd</string>
+    <string name="key_uname" translatable="false">pref_uname</string>
     <string name="ku" translatable="false">Kunst</string>
-    <string name="chem" translatable="false">Chemie</string>
-    <string name="inf" translatable="false">Informatik</string>
-    <string name="wr" translatable="false">Wirtschaft</string>
-    <string name="franz" translatable="false">Französisch</string>
-    <string name="pref_key_f_q11" translatable="false">pref_key_f_q11</string>
     <string name="lat" translatable="false">Latein</string>
-    <string name="pref_key_lat_q11" translatable="false">pref_key_lat_q11</string>
-    <string name="bio" translatable="false">Biologie</string>
-    <string name="pref_key_bio_q11" translatable="false">pref_key_bio_q11</string>
-    <string name="sk" translatable="false">Sozialkunde</string>
-    <string name="pref_key_sk_q11" translatable="false">pref_key_sk_q11</string>
-    <string name="spo" translatable="false">Sport</string>
-    <string name="pref_key_spo_q11" translatable="false">pref_key_spo_q11</string>
-    <string name="wsem" translatable="false">W-Seminar</string>
-    <string name="psem" translatable="false">P-Seminar</string>
-    <string name="pref_key_psem_q11" translatable="false">pref_key_psem_q11</string>
-    <string name="pref_key_sp_q11" translatable="false">pref_key_sp_q11</string>
-    <string name="sp" translatable="false">Spanisch</string>
-    <string name="rhet" translatable="false">Rhetorik</string>
-    <string name="pref_key_rhet_q11" translatable="false">pref_key_rhet_q11</string>
-    <string name="foto" translatable="false">Fotographie</string>
-    <string name="pref_key_foto" translatable="false">pref_key_foto</string>
-    <string name="ssp" translatable="false">Schulspiel</string>
-    <string name="pref_key_ssp" translatable="false">pref_key_ssp</string>
-    <string name="cho" translatable="false">Chor</string>
-    <string name="pref_key_cho" translatable="false">pref_key_cho</string>
+    <string name="mathe" translatable="false">Mathematik</string>
+    <string name="musik" translatable="false">Musik</string>
     <string name="orc" translatable="false">Orchester</string>
-    <string name="pref_key_orc" translatable="false">pref_key_orc</string>
-    <string name="psy" translatable="false">Psychologie</string>
-    <string name="pref_key_psy_q11" translatable="false">pref_key_psy_q11</string>
-    <string name="sp_add" translatable="false">Sport Additum</string>
-    <string name="pref_key_sp_add_q11" translatable="false">pref_key_sp_add_q11</string>
-    <string name="pref_key_engl_q12" translatable="false">pref_key_engl_q12</string>
-    <string name="pref_key_reli_q12" translatable="false">pref_key_reli_q12</string>
-    <string name="pref_key_geo_q12" translatable="false">pref_key_geo_q12</string>
-    <string name="pref_key_mu_q12" translatable="false">pref_key_musik_q12</string>
-    <string name="pref_key_gesch_q12" translatable="false">pref_key_gesch_q12</string>
-    <string name="pref_key_phy_q12" translatable="false">pref_key_phy_q12</string>
     <string name="ph_as" translatable="false">Astrophysik</string>
-    <string name="pref_key_phas_q12" translatable="false">pref_key_phas_q12</string>
-    <string name="pref_key_ch_q12" translatable="false">pref_key_ch_q12</string>
-    <string name="pref_key_inf_q12" translatable="false">pref_key_info_q12</string>
-    <string name="pref_key_wr_q12" translatable="false">pref_key_wr_q12</string>
-    <string name="pref_key_ku_q12" translatable="false">key_ku_q12</string>
-    <string name="pref_key_ku_q11" translatable="false">pref_key_ku_q12</string>
-    <string name="pref_key_f_q12" translatable="false">pref_key_f_q12</string>
-    <string name="pref_key_lat_q12" translatable="false">pref_key_lat_q12</string>
-    <string name="pref_key_bio_q12" translatable="false">pref_key_bio_q12</string>
-    <string name="pref_key_sk_q12" translatable="false">pref_key_sk_q12</string>
-    <string name="pref_key_wsem_q11" translatable="false">pref_key_wsem_q11</string>
-    <string name="pref_key_wsem_q12" translatable="false">pref_key_wsem_q12</string>
-    <string name="pref_key_psem_q12" translatable="false">pref_key_psem_q12</string>
-    <string name="pref_key_sp_q12" translatable="false">pref_key_sp_q12</string>
-    <string name="pref_key_rhet_q12" translatable="false">pref_key_rhet_q12</string>
-    <string name="pref_key_sp_add_q12" translatable="false">pref_key_sp_add_q12</string>
-    <string name="ekon" translatable="false">Englisch Konversation</string>
-    <string name="pref_key_ekon_q12" translatable="false">pref_key_ekon_q12</string>
-    <string name="bigb" translatable="false">Bigband</string>
-    <string name="pref_key_bigb_q12" translatable="false">pref_key_bigb_q12</string>
-    <string name="msg_hidden_plural">items hidden because of filtering</string>
-    <string name="msg_hidden_singular">item hidden because of filtering</string>
-    <string name="download_error">Please check the saved credentials and your internet connection...</string>
-    <string name="download_error_title">Error while downloading</string>
-    <string name="download_error_nointernet">Please check your internet connection</string>
-    <string name="download_error_nocreds">You first have to enter username and password for Unterstufe and Mittelstufe. Do this now?</string>
-    <string name="news">news</string>
-    <string name="hidden_items">Hidden items</string>
-    <string name="bg_updates">Background updates</string>
-    <string name="activate_bg_updates">Activate background updates</string>
-    <string name="update_int">Update interval</string>
-    <string name="pref_key_upd_int" translatable="false">pref_key_upd_int</string>
-    <string name="pref_key_bg_updates" translatable="false">pref_key_bg_updates</string>
-    <string name="msg_bg_update">Updating data</string>
-    <string name="preparing">Preparing...</string>
-    <string name="downloaded_prog"> downloaded...</string>
-    <string name="files"> files</string>
-    <string name="retry">Retry</string>
-    <string name="levels">Class levels</string>
+    <string name="ph_b" translatable="false">Biophysik</string>
+    <string name="phy" translatable="false">Physik</string>
     <string name="pref_key_bg_upd_levels" translatable="false">pref_key_bg_upd_levels</string>
-    <string name="file">file</string>
-    <string name="level">level</string>
-    <string name="subject">Subject</string>
-    <string name="date">Date</string>
-    <string name="substitutions">Substitutions</string>
-    <string name="exams">Exams</string>
-    <string name="appmodes_header">Views</string>
-    <string name="tests_base_url" translatable="false">http://app.schyren-gymnasium.de/schulaufgaben.php?kl=</string>
-    <string name="tests_base_oinfo" translatable="false">http://app.schyren-gymnasium.de/oinfo/scha</string>
+    <string name="pref_key_bg_updates" translatable="false">pref_key_bg_updates</string>
+    <string name="pref_key_bigb_q12" translatable="false">pref_key_bigb_q12</string>
+    <string name="pref_key_bio_q11" translatable="false">pref_key_bio_q11</string>
+    <string name="pref_key_bio_q12" translatable="false">pref_key_bio_q12</string>
+    <string name="pref_key_ch_q11" translatable="false">pref_key_ch_q11</string>
+    <string name="pref_key_ch_q12" translatable="false">pref_key_ch_q12</string>
+    <string name="pref_key_cho" translatable="false">pref_key_cho</string>
+    <string name="pref_key_ekon_q12" translatable="false">pref_key_ekon_q12</string>
+    <string name="pref_key_engl_q11" translatable="false">pref_key_engl_q11</string>
+    <string name="pref_key_engl_q12" translatable="false">pref_key_engl_q12</string>
+    <string name="pref_key_f_q11" translatable="false">pref_key_f_q11</string>
+    <string name="pref_key_f_q12" translatable="false">pref_key_f_q12</string>
     <string name="pref_key_filter_minfo" translatable="false">pref_key_filter_minfo</string>
     <string name="pref_key_filter_oinfo" translatable="false">pref_key_filter_oinfo</string>
     <string name="pref_key_filter_uinfo" translatable="false">pref_key_filter_uinfo</string>
-    <string name="title_activity_exams">Exams</string>
-    <string name="exam">Exam</string>
-    <string name="type">Type</string>
-    <string name="standard_test_abbrev">SA</string>
-    <string name="nothing_to_download">Nothing to download</string>
-    <string name="nothing_to_download_msg">There are no classes in your filters yet, so there are no test dates to be downloaded.\nAdd classes to your filter now?</string>
-    <string name="exams_activity_subtitle">(classes in filter)</string>
-    <string name="hide_past_exams">Hide old exams</string>
-    <string name="hidden_exams_info">Hiding old items</string>
+    <string name="pref_key_foto" translatable="false">pref_key_foto</string>
+    <string name="pref_key_geo_q11" translatable="false">pref_key_geo_q11</string>
+    <string name="pref_key_geo_q12" translatable="false">pref_key_geo_q12</string>
+    <string name="pref_key_gesch_q11" translatable="false">pref_key_gesch_q11</string>
+    <string name="pref_key_gesch_q12" translatable="false">pref_key_gesch_q12</string>
+    <string name="pref_key_inf_q12" translatable="false">pref_key_info_q12</string>
+    <string name="pref_key_info_q11" translatable="false">pref_key_info_q11</string>
+    <string name="pref_key_ku_q11" translatable="false">pref_key_ku_q12</string>
+    <string name="pref_key_ku_q12" translatable="false">key_ku_q12</string>
+    <string name="pref_key_lat_q11" translatable="false">pref_key_lat_q11</string>
+    <string name="pref_key_lat_q12" translatable="false">pref_key_lat_q12</string>
+    <string name="pref_key_mathe_q11" translatable="false">pref_key_mathe_q11</string>
+    <string name="pref_key_mathe_q12" translatable="false">pref_key_mathe_q12</string>
+    <string name="pref_key_mu_q12" translatable="false">pref_key_musik_q12</string>
+    <string name="pref_key_musik_q11" translatable="false">pref_key_musik_q11</string>
+    <string name="pref_key_orc" translatable="false">pref_key_orc</string>
+    <string name="pref_key_phas_q12" translatable="false">pref_key_phas_q12</string>
+    <string name="pref_key_phb_q11" translatable="false">pref_key_phb_q11</string>
+    <string name="pref_key_phy_q11" translatable="false">pref_key_phy_q11</string>
+    <string name="pref_key_phy_q12" translatable="false">pref_key_phy_q12</string>
+    <string name="pref_key_psem_q11" translatable="false">pref_key_psem_q11</string>
+    <string name="pref_key_psem_q12" translatable="false">pref_key_psem_q12</string>
+    <string name="pref_key_psy_q11" translatable="false">pref_key_psy_q11</string>
+    <string name="pref_key_reli_q11" translatable="false">pref_key_reli_q11</string>
+    <string name="pref_key_reli_q12" translatable="false">pref_key_reli_q12</string>
+    <string name="pref_key_rhet_q11" translatable="false">pref_key_rhet_q11</string>
+    <string name="pref_key_rhet_q12" translatable="false">pref_key_rhet_q12</string>
+    <string name="pref_key_sk_q11" translatable="false">pref_key_sk_q11</string>
+    <string name="pref_key_sk_q12" translatable="false">pref_key_sk_q12</string>
+    <string name="pref_key_sp_add_q11" translatable="false">pref_key_sp_add_q11</string>
+    <string name="pref_key_sp_add_q12" translatable="false">pref_key_sp_add_q12</string>
+    <string name="pref_key_sp_q11" translatable="false">pref_key_sp_q11</string>
+    <string name="pref_key_sp_q12" translatable="false">pref_key_sp_q12</string>
+    <string name="pref_key_spo_q11" translatable="false">pref_key_spo_q11</string>
+    <string name="pref_key_ssp" translatable="false">pref_key_ssp</string>
+    <string name="pref_key_upd_int" translatable="false">pref_key_upd_int</string>
+    <string name="pref_key_wr_q11" translatable="false">pref_key_wr_q11</string>
+    <string name="pref_key_wr_q12" translatable="false">pref_key_wr_q12</string>
+    <string name="pref_key_wsem_q11" translatable="false">pref_key_wsem_q11</string>
+    <string name="pref_key_wsem_q12" translatable="false">pref_key_wsem_q12</string>
+    <string name="psem" translatable="false">P-Seminar</string>
+    <string name="psy" translatable="false">Psychologie</string>
+    <string name="religion" translatable="false">Religion</string>
+    <string name="rhet" translatable="false">Rhetorik</string>
+    <string name="sgp" translatable="false">Schyren-Gymnasium</string>
+    <string name="sk" translatable="false">Sozialkunde</string>
+    <string name="sp" translatable="false">Spanisch</string>
+    <string name="sp_add" translatable="false">Sport Additum</string>
+    <string name="spo" translatable="false">Sport</string>
+    <string name="ssp" translatable="false">Schulspiel</string>
+    <string name="tests_base_oinfo" translatable="false">http://app.schyren-gymnasium.de/oinfo/scha</string>
+    <string name="tests_base_url" translatable="false">http://app.schyren-gymnasium.de/schulaufgaben.php?kl=</string>
+    <string name="vplan_base_cred" translatable="false">app.schyren-gymnasium.de:80/</string>
+    <string name="vplan_base_url" translatable="false">http://app.schyren-gymnasium.de:80/</string>
+    <string name="wr" translatable="false">Wirtschaft</string>
+    <string name="wsem" translatable="false">W-Seminar</string>
+    <string name="title_activity_timetable">Stundenplan</string>
+    <string name="timetable">Stundenplan</string>
+    <string name="room">Raum</string>
 
 </resources>
