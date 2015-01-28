@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.wearable.view.WearableListView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,7 +67,9 @@ public class VplanFragment extends Fragment {
 
         displayTimestamps(pref, rootView);
 
-        rootView.requestApplyInsets();
+        //request insets
+        RelativeLayout layout = (RelativeLayout) rootView.findViewById(R.id.layout);
+        layout.requestApplyInsets();
 
         return rootView;
     }

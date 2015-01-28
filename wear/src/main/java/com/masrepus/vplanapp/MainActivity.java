@@ -52,6 +52,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //set a 1 dp margin between the fragments
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         pager.setPageMargins(0, Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+        pager.setOffscreenPageCount(adapter.getColumnCount(0));
 
         //scroll to today's vplan
         pager.setCurrentItem(1, todayVplan);
