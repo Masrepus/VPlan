@@ -18,6 +18,8 @@ public final class R {
         public static final int refresh_clockwise=0x7f040006;
     }
     public static final class array {
+        /** <item>@string/timetable</item>
+         */
         public static final int appmodes=0x7f070000;
         public static final int cho=0x7f070001;
         public static final int foto=0x7f070002;
@@ -1667,7 +1669,6 @@ containing a value of this type.
         public static final int subject=0x7f0b004d;
         public static final int submit_area=0x7f0b0047;
         public static final int tabMode=0x7f0b0014;
-        public static final int tester=0x7f0b007a;
         public static final int textView=0x7f0b0057;
         public static final int textView2=0x7f0b0059;
         public static final int textView3=0x7f0b0056;

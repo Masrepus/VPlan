@@ -18,7 +18,7 @@
     <string-array name="appmodes">
         <item>@string/substitutions</item>
         <item>@string/exams</item>
-        <item>@string/timetable</item>
+        <!--<item>@string/timetable</item>-->
     </string-array>
     <string-array name="sectionHeaders">
         <item>@string/appmodes_header</item>
