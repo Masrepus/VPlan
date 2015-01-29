@@ -9,18 +9,18 @@
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-3091be259642cbf6333f6ffbf0629e3df2d2ab9d.jar" />
     </item>
     <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/debug/classes-31c6a50c913f6c66cb7d68289748d187b23b10d3.jar" />
-    </item>
-    <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.google.android.support/wearable/1.1.0/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="27f19641b81b1078e653d2f0e5d1ed44d158a785">
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/debug/classes-39b8439881afb4e16584bfefb0622449887aea9a.jar" />
+    </item>
+    <item
+        jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/debug/classes-31c6a50c913f6c66cb7d68289748d187b23b10d3.jar" />
     </item>
     <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/classes.jar"

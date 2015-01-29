@@ -3,4 +3,6 @@
     <string name="app_name">SGP</string>
     <string name="no_data_today">no data for today</string>
     <string name="last_update">Last update:</string>
+    <string name="refreshing">Refreshing...</string>
+    <string name="no_data">No data available</string>
 </resources>
