@@ -1555,7 +1555,7 @@ containing a value of this type.
         public static final int drawer_shadow=0x7f02004f;
         public static final int ic_cancel=0x7f020050;
         public static final int ic_drawer=0x7f020051;
-        public static final int ic_launcher=0x7f020052;
+        public static final int ic_launcher_v2=0x7f020052;
         public static final int ic_plusone_medium_off_client=0x7f020053;
         public static final int ic_plusone_small_off_client=0x7f020054;
         public static final int ic_plusone_standard_off_client=0x7f020055;

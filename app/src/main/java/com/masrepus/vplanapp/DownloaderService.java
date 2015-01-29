@@ -441,7 +441,7 @@ public class DownloaderService extends Service {
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
-                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_v2))
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(progressText);
             if (progress[0] == ProgressCode.FINISHED_ALL) {
