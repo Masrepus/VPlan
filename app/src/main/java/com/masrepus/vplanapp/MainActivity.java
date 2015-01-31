@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int requestedVplanMode;
     private int requestedVplanId;
     private boolean isOnlineRequested;
-    private VPlanDataSource datasource;
+    private DataSource datasource;
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
     private Map<String, ?> keys;
@@ -94,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
-        datasource = new VPlanDataSource(this);
+        datasource = new DataSource(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);

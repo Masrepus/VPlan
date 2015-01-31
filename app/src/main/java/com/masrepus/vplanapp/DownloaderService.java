@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -44,7 +43,7 @@ public class DownloaderService extends Service {
     String[] levels;
     int downloaded_levels = 0;
     private SharedPreferences.Editor editor;
-    VPlanDataSource datasource;
+    DataSource datasource;
     private int lastRequestedVplanMode;
     private ArrayList<String> filterCurrent = new ArrayList<>();
     private GoogleApiClient apiClient;
@@ -122,7 +121,7 @@ public class DownloaderService extends Service {
     private void sendDataToWatch() {
 
         DataMap dataMap = new DataMap();
-        datasource = new VPlanDataSource(this);
+        datasource = new DataSource(this);
 
         //init the api client
         buildApiClient();

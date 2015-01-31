@@ -28,7 +28,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     private int count;
     private Context context;
     private Activity activity;
-    private VPlanDataSource datasource;
+    private DataSource datasource;
     private ArrayList<String> filter;
     private ArrayList<VplanListAdapter> adapters;
     private ArrayList<ArrayList<Row>> hiddenItems;
@@ -42,7 +42,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
      */
     public VplanPagerAdapter(FragmentManager fm, Context context, Activity activity, ArrayList<String> filter) {
         super(fm);
-        datasource = new VPlanDataSource(context);
+        datasource = new DataSource(context);
         this.context = context;
         this.filter = filter;
         this.activity = activity;

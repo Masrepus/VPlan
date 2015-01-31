@@ -13,42 +13,38 @@ import com.masrepus.vplanapp.constants.VplanModes;
 /**
  * Used as a user interface for MySQLiteHelper
  */
-public class VPlanDataSource {
+public class DataSource {
 
     //Database fields
     private SQLiteDatabase databaseUinfo;
     private SQLiteDatabase databaseMinfo;
     private SQLiteDatabase databaseOinfo;
     private SQLiteDatabase databaseTests;
+    private SQLiteDatabase databaseTimetable;
 
     private SQLiteHelperVplan dbHelperUinfo;
     private SQLiteHelperVplan dbHelperMinfo;
     private SQLiteHelperVplan dbHelperOinfo;
     private SQLiteHelperTests dbHelperTests;
+    private SQLiteHelperTimetable dbHelperTimetable;
 
     private Context context;
 
-    /**
-     * Creates instances of MySQLiteHelper for U/M/Oinfo
-     *
-     * @param context passed to MySQLiteHelper constructor
-     */
-    public VPlanDataSource(Context context) {
+    public DataSource(Context context) {
         this.context = context;
         dbHelperUinfo = new SQLiteHelperVplan(context, SQLiteHelperVplan.DATABASE_UINFO);
         dbHelperMinfo = new SQLiteHelperVplan(context, SQLiteHelperVplan.DATABASE_MINFO);
         dbHelperOinfo = new SQLiteHelperVplan(context, SQLiteHelperVplan.DATABASE_OINFO);
         dbHelperTests = new SQLiteHelperTests(context, SQLiteHelperTests.DATABASE_TESTS);
+        dbHelperTimetable = new SQLiteHelperTimetable(context, SQLiteHelperTimetable.DATABASE_TIMETABLE);
     }
 
-    /**
-     * Creates writable instances of all three dbs
-     */
     public void open() throws SQLException {
         databaseUinfo = dbHelperUinfo.getWritableDatabase();
         databaseMinfo = dbHelperMinfo.getWritableDatabase();
         databaseOinfo = dbHelperOinfo.getWritableDatabase();
         databaseTests = dbHelperTests.getWritableDatabase();
+        databaseTimetable = dbHelperTimetable.getWritableDatabase();
     }
 
     /**
@@ -59,6 +55,18 @@ public class VPlanDataSource {
         dbHelperMinfo.close();
         dbHelperOinfo.close();
         dbHelperTests.close();
+        dbHelperTimetable.close();
+    }
+
+    public void createRowTimetable(String tableName, String lesson, String subject, String room) {
+
+        //create new ContentValues with the column name as key and the cell data as value
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelperTimetable.COLUMN_LESSON, lesson);
+        values.put(SQLiteHelperTimetable.COLUMN_SUBJECT, subject);
+        values.put(SQLiteHelperTimetable.COLUMN_ROOM, room);
+
+        databaseTimetable.insert(tableName, null, values);
     }
 
     /**
@@ -192,6 +200,19 @@ public class VPlanDataSource {
         }
     }
 
+    public Cursor queryTimetable(String tableName, String[] projection, String selection) {
+
+        return databaseTimetable.query(
+                tableName,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
     public Cursor query(String tableName, String[] projection, String selection) {
 
         //check whether we have to query the tests db
@@ -271,6 +292,23 @@ public class VPlanDataSource {
                     dbHelperOinfo.newTable(databaseOinfo, tableName);
                     break;
             }
+        }
+    }
+
+    public void newTimetable(String tableName) {
+        dbHelperTimetable.newTable(databaseTimetable, tableName);
+    }
+
+    public boolean hasTimetableData(String tableName) {
+
+        //return true if this timetable has data
+        String[] test = new String[1];
+        test[0] = SQLiteHelperTimetable.COLUMN_LESSON;
+        Cursor c = query(tableName, test);
+        if (c.getCount() > 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 

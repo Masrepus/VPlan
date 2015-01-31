@@ -50,7 +50,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     int total_downloads;
     Context context;
     ProgressBar progressBar;
-    VPlanDataSource datasource;
+    DataSource datasource;
     private int requestedVplanId;
     private String currentVPlanLink;
     private String timePublished;
@@ -85,7 +85,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     final protected Boolean doInBackground(Context... context) {
 
         this.context = context[0];
-        datasource = new VPlanDataSource(this.context);
+        datasource = new DataSource(this.context);
 
         SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();

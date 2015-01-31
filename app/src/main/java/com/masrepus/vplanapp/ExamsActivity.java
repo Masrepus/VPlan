@@ -227,7 +227,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
 
     private ArrayList<ExamsRow> initData() {
 
-        VPlanDataSource datasource = new VPlanDataSource(this);
+        DataSource datasource = new DataSource(this);
         datasource.open();
 
         ArrayList<ExamsRow> examsList = new ArrayList<ExamsRow>();

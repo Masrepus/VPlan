@@ -35,6 +35,7 @@ public class SQLiteHelperTests extends SQLiteOpenHelper {
     public SQLiteHelperTests(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);
     }
+
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(CREATE_UINFO_MINFO);
