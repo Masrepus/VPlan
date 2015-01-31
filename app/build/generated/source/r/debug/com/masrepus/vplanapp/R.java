@@ -18,8 +18,6 @@ public final class R {
         public static final int refresh_clockwise=0x7f040006;
     }
     public static final class array {
-        /** <item>@string/timetable</item>
-         */
         public static final int appmodes=0x7f070000;
         public static final int cho=0x7f070001;
         public static final int foto=0x7f070002;
@@ -1728,12 +1726,13 @@ containing a value of this type.
         public static final int settings=0x7f03001e;
         public static final int support_simple_spinner_dropdown_item=0x7f03001f;
         public static final int timetable_activity=0x7f030020;
-        public static final int timetable_item=0x7f030021;
-        public static final int toolbar=0x7f030022;
-        public static final int vplan_list=0x7f030023;
-        public static final int vplan_list_footer=0x7f030024;
-        public static final int vplan_loading_dummy=0x7f030025;
-        public static final int vplanlist_element=0x7f030026;
+        public static final int timetable_fragment=0x7f030021;
+        public static final int timetable_item=0x7f030022;
+        public static final int toolbar=0x7f030023;
+        public static final int vplan_list=0x7f030024;
+        public static final int vplan_list_footer=0x7f030025;
+        public static final int vplan_loading_dummy=0x7f030026;
+        public static final int vplanlist_element=0x7f030027;
     }
     public static final class menu {
         public static final int exams=0x7f0f0000;

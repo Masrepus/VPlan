@@ -3,9 +3,13 @@ package com.masrepus.vplanapp;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.support.v4.view.PagerTabStrip;
+import android.support.v4.view.PagerTitleStrip;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +31,20 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        //prepare the pager
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
+        pager.setAdapter(adapter);
+
+        //prepare the title strip
+        PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+        tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
+
+
+        //set a 1 dp margin between the fragments
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
     }
 
     @Override

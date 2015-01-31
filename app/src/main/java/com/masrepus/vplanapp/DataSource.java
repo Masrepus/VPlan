@@ -200,7 +200,7 @@ public class DataSource {
         }
     }
 
-    public Cursor queryTimetable(String tableName, String[] projection, String selection) {
+    public Cursor queryTimetable(String tableName, String[] projection) {
 
         return databaseTimetable.query(
                 tableName,

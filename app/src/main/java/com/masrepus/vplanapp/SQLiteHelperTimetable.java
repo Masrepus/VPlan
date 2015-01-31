@@ -10,11 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SQLiteHelperTimetable extends SQLiteOpenHelper {
 
     //Tables for all weekdays
-    public static final String TABLE_MONDAY = "monday";
-    public static final String TABLE_TUESDAY = "tuesday";
-    public static final String TABLE_WEDNESDAY = "wednesday";
-    public static final String TABLE_THURSDAY = "thursday";
-    public static final String TABLE_FRIDAY = "friday";
+    public static final String[] DAYS = {"monday", "tuesday", "wednesday", "thursday", "friday"};
 
     //column names
     public static final String COLUMN_SUBJECT = "subject";
@@ -37,20 +33,16 @@ public class SQLiteHelperTimetable extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE.replace(TABLENAME_WILDCARD, TABLE_MONDAY));
-        db.execSQL(CREATE.replace(TABLENAME_WILDCARD, TABLE_TUESDAY));
-        db.execSQL(CREATE.replace(TABLENAME_WILDCARD, TABLE_WEDNESDAY));
-        db.execSQL(CREATE.replace(TABLENAME_WILDCARD, TABLE_THURSDAY));
-        db.execSQL(CREATE.replace(TABLENAME_WILDCARD, TABLE_FRIDAY));
+        for (int i = 0; i < 5; i++) {
+            db.execSQL(CREATE.replace(TABLENAME_WILDCARD, DAYS[i]));
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MONDAY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TUESDAY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEDNESDAY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_THURSDAY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIDAY);
+        for (int i = 0; i < 5; i++) {
+            db.execSQL("DROP TABLE IF EXISTS " + DAYS[i]);
+        }
         onCreate(db);
     }
 
