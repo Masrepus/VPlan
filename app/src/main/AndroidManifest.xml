@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.masrepus.vplanapp"
-    android:versionCode="9"
-    android:versionName="2.2.1" >
+    android:versionCode="10"
+    android:versionName="2.3" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,7 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_launcher_v2"
         android:label="@string/app_name"
         android:theme="@style/ThemeYellow" >
         <activity
@@ -65,6 +65,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.masrepus.vplanapp.MainActivity" />
         </activity>
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <service android:name=".DataListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

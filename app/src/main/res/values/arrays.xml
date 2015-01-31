@@ -18,18 +18,18 @@
     <string-array name="appmodes">
         <item>@string/substitutions</item>
         <item>@string/exams</item>
-        <item>@string/timetable</item>
+        <!--<item>@string/timetable</item>-->
     </string-array>
     <string-array name="sectionHeaders">
         <item>@string/appmodes_header</item>
         <item>@string/levels</item>
     </string-array>
     <string-array name="upd_intervals">
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>5 hours</item>
-        <item>12 hours</item>
-        <item>daily</item>
+        <item>1 Stunde</item>
+        <item>3 Stunden</item>
+        <item>5 Stunden</item>
+        <item>12 Stunden</item>
+        <item>Täglich</item>
     </string-array>
     <string-array name="upd_int_values">
         <item>1</item>

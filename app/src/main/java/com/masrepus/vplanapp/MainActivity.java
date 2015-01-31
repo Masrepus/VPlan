@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,8 +41,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -52,15 +65,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks {
 
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final String ACTIVITY_NAME = "MainActivity";
-    private int appMode;
     public ArrayList<String> filterCurrent = new ArrayList<String>();
     public ArrayList<String> filterUnterstufe = new ArrayList<String>();
     public ArrayList<String> filterMittelstufe = new ArrayList<String>();
     public ArrayList<String> filterOberstufe = new ArrayList<String>();
+    private int appMode;
     private int requestedVplanMode;
     private int requestedVplanId;
     private boolean isOnlineRequested;
@@ -71,6 +84,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private String currentVPlanLink;
     private int selectedVplanItem;
     private int selectedAppmodeItem;
+    private GoogleApiClient apiClient;
+    private ArrayList<DataMap> dataMaps;
+    private BroadcastReceiver updateRequestReceiver;
 
     /**
      * Called when the activity is first created.
@@ -115,7 +131,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //activate adapter for viewPager
         datasource.open();
-        if (!datasource.hasData(MySQLiteHelper.TABLE_LINKS)) {
+        if (!datasource.hasData(SQLiteHelperVplan.TABLE_LINKS)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
             welcome.setVisibility(View.VISIBLE);
         }
@@ -224,6 +240,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
+        buildApiClient();
     }
 
     @Override
@@ -303,64 +320,173 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
     }
 
-    /**
-     * PagerAdapter that only displays one dummy fragment containing a progressbar
-     */
-    private class LoadingAdapter extends FragmentStatePagerAdapter {
+    @Override
+    public void onConnected(Bundle bundle) {
 
-        public LoadingAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-            Bundle args = new Bundle();
-            args.putBoolean(Args.VPLAN_LOADING_DUMMY, true);
-            Fragment loadingFragment = new VplanFragment();
-            loadingFragment.setArguments(args);
-
-            return loadingFragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
+        //Now the Wear Data Layer API can be used
+        sendDataToWatch();
     }
 
-    /**
-     * Loads a VplanPagerAdapter in a background task
-     */
-    private class PagerAdapterLoader extends AsyncTask<Activity, Void, VplanPagerAdapter> {
+    private void sendDataToWatch() {
 
-        @Override
-        protected VplanPagerAdapter doInBackground(Activity... activities) {
-            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
+        DataMap dataMap = new DataMap();
+
+        //get the number of available days
+        datasource.open();
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
+        int count = c.getCount();
+
+        for (int i = 0; i < count; i++) {
+            dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
         }
 
-        @Override
-        protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
+        new SendToDataLayerThread(DataKeys.VPLAN, dataMap).start();
 
-            //check whether disabling of welcome tv and activation of tabstrip must be done
-            if (vplanPagerAdapter.hasData()) {
+        //now the headers
+        dataMap = new DataMap();
 
-                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-                welcome.setVisibility(View.GONE);
+        datasource.close();
 
-                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-                tabStrip.setVisibility(View.VISIBLE);
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        //get the header strings from shared prefs
+        for (int i = 0; i < count; i++) {
+            dataMap.putString(String.valueOf(i), pref.getString(SharedPrefs.PREFIX_VPLAN_CURR_DATE + String.valueOf(requestedVplanMode) + String.valueOf(i), ""));
+        }
+
+        new SendToDataLayerThread(DataKeys.HEADERS, dataMap).start();
+
+        //send last updated timestamp and time published timestamps
+        dataMap = new DataMap();
+
+        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.VPLAN + requestedVplanMode, "");
+        String[] timePublishedTimestamps = new String[count];
+
+        for (int i = 0; i < count; i++) {
+
+            //get each time published timestamp
+            timePublishedTimestamps[i] = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + requestedVplanMode + i, "");
+        }
+
+        dataMap.putString(SharedPrefs.PREFIX_LAST_UPDATE, lastUpdate);
+        dataMap.putStringArray(DataKeys.TIME_PUBLISHED_TIMESTAMPS, timePublishedTimestamps);
+        dataMap.putInt(DataKeys.DAYS, count);
+
+        new SendToDataLayerThread(DataKeys.META_DATA, dataMap).start();
+    }
+
+    private DataMap fillDataMap(int id) {
+
+        DataMap dataMap = new DataMap();
+
+        //query the data for the right vplan -> get requested table name by passed arg
+        String tableName = SQLiteHelperVplan.tablesVplan[id];
+
+        if (datasource.hasData(tableName)) {
+
+            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
+                    SQLiteHelperVplan.COLUMN_STATUS});
+
+            ArrayList<Row> list = new ArrayList<Row>();
+            ArrayList<Row> tempList = new ArrayList<Row>();
+
+            //check whether filter is active
+            Boolean isFilterActive = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
+
+            //if filter is active, then use it after filling the Arraylist
+            int listSizeBeforeFilter = 0;
+            if (isFilterActive) {
+
+                while (c.moveToNext()) {
+                    Row row = new Row();
+
+                    //only add to list if row isn't null
+                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
+
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+
+                    tempList.add(row);
+                }
+
+                //now perform the filtering
+                int position = 0;
+
+                for (Row currRow : tempList) {
+                    String klasse = currRow.getKlasse();
+                    boolean isNeeded = false;
+
+                    //look whether this row's klasse attribute contains any of the classes to filter for
+                    if (filterCurrent.size() > 0) {
+                        for (int i = 0; i <= filterCurrent.size() - 1; i++) {
+                            char[] klasseFilter = filterCurrent.get(i).toCharArray();
+
+                            //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
+                            if (requestedVplanMode == VplanModes.OINFO) {
+                                String filterItem = filterCurrent.get(i);
+                                isNeeded = klasse.contentEquals("Q" + filterItem);
+
+                                if (isNeeded) break;
+                                if (klasse.contentEquals("")) isNeeded = true;
+                            } else { //in u/minfo the order doesn't play a role
+
+                                //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
+                                for (int y = 0; y <= klasseFilter.length - 1; y++) {
+                                    if (klasse.contains(String.valueOf(klasseFilter[y]))) {
+                                        isNeeded = true;
+                                    } else {
+                                        isNeeded = false;
+                                        break;
+                                    }
+                                }
+                                if (isNeeded) break;
+
+                                //also set isneeded to true if klasse=""
+                                if (klasse.contentEquals("")) isNeeded = true;
+                            }
+                        }
+                    } else {
+                        //if there is no item in the filter list, then still take the rows without a value for class
+                        isNeeded = klasse.contentEquals("");
+                    }
+                    //if the test was positive, then add the current Row to the map
+                    if (isNeeded) {
+                        dataMap.putDataMap(String.valueOf(position), currRow.putToDataMap(new DataMap()));
+                        position++;
+                    }
+                }
+
+            } else {
+                // just fill the list normally
+                int position = 0;
+                while (c.moveToNext()) {
+                    Row row = new Row();
+
+                    //only add to list if row isn't null
+                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
+
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+
+                    dataMap.putDataMap(String.valueOf(position), row.putToDataMap(new DataMap()));
+                    position++;
+                }
             }
-
-            ViewPager pager = (ViewPager) findViewById(R.id.pager);
-            pager.setAdapter(vplanPagerAdapter);
-
-            //set a 1 dp margin between the fragments, filled with the divider_vertical drawable
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
-            pager.setCurrentItem(getTodayVplanId(), false);
         }
+
+        return dataMap;
     }
 
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.d(getPackageName(), "onConnectionSuspended: " + cause);
+    }
 
     private int getTodayVplanId() {
 
@@ -368,6 +494,12 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         SharedPreferences prefs = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         return prefs.getInt(SharedPrefs.TODAY_VPLAN, 0);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        apiClient.connect();
     }
 
     @Override
@@ -379,6 +511,22 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         viewPager.setCurrentItem(getTodayVplanId());
         appMode = AppModes.VPLAN;
         selectedAppmodeItem = 1 + appMode;
+    }
+
+    private void buildApiClient() {
+
+        apiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        Log.d(getPackageName(), "onConnectionFailed: " + connectionResult);
+                    }
+                })
+
+                        //request access to the Wearable API
+                .addApi(Wearable.API)
+                .build();
     }
 
     /**
@@ -501,7 +649,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 refresh(item);
                 return true;
             /*case R.id.tester:
-                new AsyncDownloader().execute(this);
+                startService(new Intent(this, DownloaderService.class).putExtra(DataKeys.ACTION, Args.NOTIFY_WEAR_UPDATE_UI));
                 return true;*/
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
@@ -523,6 +671,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
                     editor.apply();
                     fl.setVisibility(View.GONE);
+
+                    //sync this new dataset to wear
+                    sendDataToWatch();
                 } else {
                     item.setChecked(true);
                     SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -532,6 +683,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     editor.apply();
                     fl.setVisibility(View.VISIBLE);
                     filterWarning.setText(R.string.filter_enabled);
+
+                    //sync to wear
+                    sendDataToWatch();
                 }
                 //refresh adapter for viewPager
                 new PagerAdapterLoader().execute(this);
@@ -800,7 +954,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         new PagerAdapterLoader().execute(this);
     }
 
-
     public void displayLastUpdate(String lastUpdate) {
 
         TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
@@ -827,6 +980,67 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             //if pb is null, then data is already displayed, so no dummy layout available
             pb.setIndeterminate(false);
             pb.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * PagerAdapter that only displays one dummy fragment containing a progressbar
+     */
+    private class LoadingAdapter extends FragmentStatePagerAdapter {
+
+        public LoadingAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            Bundle args = new Bundle();
+            args.putBoolean(Args.VPLAN_LOADING_DUMMY, true);
+            Fragment loadingFragment = new VplanFragment();
+            loadingFragment.setArguments(args);
+
+            return loadingFragment;
+        }
+
+        @Override
+        public int getCount() {
+            return 1;
+        }
+    }
+
+    /**
+     * Loads a VplanPagerAdapter in a background task
+     */
+    private class PagerAdapterLoader extends AsyncTask<Activity, Void, VplanPagerAdapter> {
+
+        @Override
+        protected VplanPagerAdapter doInBackground(Activity... activities) {
+            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
+        }
+
+        @Override
+        protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
+
+            //check whether disabling of welcome tv and activation of tabstrip must be done
+            if (vplanPagerAdapter.hasData()) {
+
+                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+                welcome.setVisibility(View.GONE);
+
+                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+                tabStrip.setVisibility(View.VISIBLE);
+            }
+
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(vplanPagerAdapter);
+
+            //set a 1 dp margin between the fragments
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+            pager.setCurrentItem(getTodayVplanId(), false);
+
+            //sync wear
+            sendDataToWatch();
         }
     }
 
@@ -894,6 +1108,50 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 displayLastUpdate(refreshLastUpdate());
 
                 activatePagerAdapter();
+
+                sendDataToWatch();
+            }
+        }
+    }
+
+    private class SendToDataLayerThread extends Thread {
+
+        private String path;
+        private DataMap dataMap;
+        private int failCount = 0;
+
+        //Constructor for sending data objects to the data layer
+        public SendToDataLayerThread(String path, DataMap dataMap) {
+            this.path = path;
+            this.dataMap = dataMap;
+        }
+
+        @Override
+        public void run() {
+
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(apiClient).await();
+            for (Node node : nodes.getNodes()) {
+
+                //Construct a DataRequest and send over the data layer
+                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                putDMR.getDataMap().putAll(dataMap);
+
+                PutDataRequest request = putDMR.asPutDataRequest();
+                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
+
+                if (result.getStatus().isSuccess())
+                    Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
+                else {
+                    failCount++;
+                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+
+                    //retry later
+                    try {
+                        if (failCount <= 3) {
+                            Thread.sleep(2000);
+                        } //else stop it after 3 times trying
+                    } catch (InterruptedException e) {}
+                }
             }
         }
     }

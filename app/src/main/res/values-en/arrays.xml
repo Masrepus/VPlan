@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="upd_intervals">
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>5 hours</item>
+        <item>12 hours</item>
+        <item>daily</item>
+    </string-array>
+</resources>

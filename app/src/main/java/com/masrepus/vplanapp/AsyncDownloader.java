@@ -221,7 +221,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         datasource.open();
 
-        Cursor c = datasource.query(MySQLiteHelper.TABLE_LINKS, new String[]{MySQLiteHelper.COLUMN_URL});
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_URL});
 
         try {
             total_downloads = c.getCount();
@@ -233,7 +233,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                 //load every available vplan into the db
                 requestedVplanId = c.getPosition();
-                currentVPlanLink = c.getString(c.getColumnIndex(MySQLiteHelper.COLUMN_URL));
+                currentVPlanLink = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_URL));
 
                 editor.putInt(SharedPrefs.REQUESTED_VPLAN_ID, requestedVplanId)
                         .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
@@ -494,8 +494,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         datasource.close();
 
-        //save the current timestamp
-        timePublished = doc.select(XmlTags.TIME_PUBLISHED).first().text();
+        //save the current timestamp; add "Stand: " because it is missing in oinfo vplan
+        timePublished = "Stand: " + doc.select(XmlTags.TIME_PUBLISHED).first().text();
         saveCurrentTimestamp(headerCurrentDate);
     }
 
@@ -506,7 +506,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         if (stunde != null && !klasse.contentEquals("Klasse")) {
 
             if (requestedVplanId <= 4) {
-                datasource.createRowVplan(MySQLiteHelper.tablesVplan[requestedVplanId], stunde, klasse, status);
+                datasource.createRowVplan(SQLiteHelperVplan.tablesVplan[requestedVplanId], stunde, klasse, status);
             }
         }
     }
@@ -516,19 +516,19 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //clear the existing table for the requested vplan
         switch (requestedVplanId) {
             case 0:
-                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_0);
+                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_0);
                 break;
             case 1:
-                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_1);
+                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_1);
                 break;
             case 2:
-                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_2);
+                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_2);
                 break;
             case 3:
-                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_3);
+                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_3);
                 break;
             case 4:
-                datasource.newTable(MySQLiteHelper.TABLE_VPLAN_4);
+                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_4);
                 break;
         }
     }
@@ -692,7 +692,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
             int position = 0;
             datasource.open();
-            datasource.newTable(MySQLiteHelper.TABLE_LINKS);
+            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
 
             //now distribute the contents of availableFiles into a new list for the selection spinner
             for (Element row : availableFiles) {
@@ -909,7 +909,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
                     int position = 0;
                     datasource.open();
-                    datasource.newTable(MySQLiteHelper.TABLE_LINKS);
+                    datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
 
                     //now distribute the contents of availableFiles into a new list for the selection spinner
                     for (Element row : availableFiles) {
