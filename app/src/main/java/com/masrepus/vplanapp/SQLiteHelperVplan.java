@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class MySQLiteHelper extends SQLiteOpenHelper {
+public class SQLiteHelperVplan extends SQLiteOpenHelper {
 
     public static final String TABLE_VPLAN_0 = "vplantable0";
     public static final String COLUMN_ID = "_id";
@@ -60,7 +60,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     public static final String[] tablesVplan = {TABLE_VPLAN_0, TABLE_VPLAN_1, TABLE_VPLAN_2, TABLE_VPLAN_3, TABLE_VPLAN_4};
 
-    public MySQLiteHelper(Context context, String dbName) {
+    public SQLiteHelperVplan(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);
     }
 
