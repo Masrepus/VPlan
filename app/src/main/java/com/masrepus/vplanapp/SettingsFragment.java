@@ -59,7 +59,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         //if p is a preferencegroup, run initSummary for its children
         if (p instanceof PreferenceGroup) {
             PreferenceGroup group = (PreferenceGroup) p;
-            for (int i=0; i<group.getPreferenceCount(); i++) {
+            for (int i = 0; i < group.getPreferenceCount(); i++) {
                 initSummary(group.getPreference(i));
             }
         } else {

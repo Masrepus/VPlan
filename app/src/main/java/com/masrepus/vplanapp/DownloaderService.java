@@ -42,8 +42,8 @@ public class DownloaderService extends Service {
     int downloaded_total;
     String[] levels;
     int downloaded_levels = 0;
-    private SharedPreferences.Editor editor;
     DataSource datasource;
+    private SharedPreferences.Editor editor;
     private int lastRequestedVplanMode;
     private ArrayList<String> filterCurrent = new ArrayList<>();
     private GoogleApiClient apiClient;
@@ -346,7 +346,8 @@ public class DownloaderService extends Service {
                         if (failCount <= 3) {
                             Thread.sleep(2000);
                         } //else stop it after 3 times trying
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
         }
@@ -360,7 +361,8 @@ public class DownloaderService extends Service {
                 MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(apiClient, node.getId(), path, null).await();
 
                 //check for success
-                if (!result.getStatus().isSuccess()) Log.e(getPackageName(), "ERROR: failed to send Message: " + result.getStatus());
+                if (!result.getStatus().isSuccess())
+                    Log.e(getPackageName(), "ERROR: failed to send Message: " + result.getStatus());
                 else Log.v(getPackageName(), "Successfully sent message: " + path + " to " + node);
             }
         }
@@ -412,10 +414,11 @@ public class DownloaderService extends Service {
                     progressText = getString(R.string.preparing);
                     break;
                 case PARSING_FINISHED:
-                    progressText = String.valueOf(downloaded) + " von " + String.valueOf(total_downloads) + " " + getString(R.string.downloaded_prog);
+                    progressText = String.valueOf(downloaded_files) + " von " + String.valueOf(total_downloads) + " " + getString(R.string.downloaded_prog);
                     break;
-                case FINISHED_ALL:
-                    downloaded_total += downloaded;
+                case FINISHED_ALL_DAYS:
+                    //get the sum of all downloaded files
+                    downloaded_total += downloaded_files;
                     downloaded_levels++;
                     String files;
                     String level;
@@ -433,6 +436,9 @@ public class DownloaderService extends Service {
                 case ERR_NO_CREDS:
                 case ERR_NO_INTERNET:
                 case ERR_NO_INTERNET_OR_NO_CREDS:
+                    //prevent a infinite download loop: don't try this class level again this time
+                    downloaded_total += downloaded_files;
+                    downloaded_levels++;
                     progressText = getString(R.string.download_error_title);
                     error = true;
                     break;
@@ -443,7 +449,7 @@ public class DownloaderService extends Service {
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_v2))
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(progressText);
-            if (progress[0] == ProgressCode.FINISHED_ALL) {
+            if (progress[0] == ProgressCode.FINISHED_ALL_DAYS) {
 
                 //final text is a big one
                 builder.setStyle(new NotificationCompat.BigTextStyle(builder).bigText(progressText + bigTextSuffix));
@@ -460,14 +466,25 @@ public class DownloaderService extends Service {
                 notificationId = 2;
             } else {
                 //display a progressbar if still downloading
-                if (downloaded == total_downloads) {
-                    builder.setProgress(0, 0, false);
-                    builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
-                    builder.setOngoing(false);
-                    builder.setAutoCancel(true);
-                    notificationId = 1;
+                if (downloaded_files == total_downloads) {
+
+                    //check if there was an error downloading
+                    if (error) {
+                        builder.setProgress(0, 0, false)
+                                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                                .setOngoing(false)
+                                .addAction(android.R.drawable.stat_notify_sync_noanim, getString(R.string.retry), retryPending)
+                                .setAutoCancel(true);
+                        notificationId = 1;
+                    } else {
+                        builder.setProgress(0, 0, false);
+                        builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
+                        builder.setOngoing(false);
+                        builder.setAutoCancel(true);
+                        notificationId = 1;
+                    }
                 } else {
-                    builder.setProgress(total_downloads, downloaded, false);
+                    builder.setProgress(total_downloads, downloaded_files, false);
                     //if an error has happened then don't make the notification ongoing and add a retry action
                     if (!error) {
                         builder.setOngoing(true)
@@ -502,15 +519,19 @@ public class DownloaderService extends Service {
             super.onPostExecute(success);
             context.unregisterReceiver(cancelReceiver);
 
-            //only stop the service when all the levels are finished downloading
+            //only stop the service when all the levels are finished downloading or if there was an error
+            if (!success) {
+                stopSelf();
+                return;
+            }
+
             if (downloaded_levels == levels.length) {
 
                 //sync to wear
                 sendDataToWatch();
 
                 stopSelf();
-            }
-            else {
+            } else {
                 //parse the next vplan level
                 vplanMode = parseVplanMode(levels[downloaded_levels]);
 

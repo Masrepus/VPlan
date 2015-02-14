@@ -17,8 +17,8 @@ public class DrawerListBuilder {
     private Context context;
 
     /**
-     * @param headers all the header strings
-     * @param entries all the entry strings
+     * @param headers                all the header strings
+     * @param entries                all the entry strings
      * @param separateSectionsBefore indices where section headers should be inserted before that
      */
     public DrawerListBuilder(Context context, String[] headers, String[] entries, int... separateSectionsBefore) {
@@ -59,7 +59,7 @@ public class DrawerListBuilder {
         int headersPos = 0;
         items = new ArrayList<Item>();
 
-        for (int i=0; i<entries.length; i++) {
+        for (int i = 0; i < entries.length; i++) {
 
             //check whether a new block starts at the current position
             if (separatorPositions.contains(i)) {

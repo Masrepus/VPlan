@@ -77,19 +77,20 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         }
         listSizesBeforeFilter = new int[count];
 
-        for (int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
 
             //prepare the data for the adapters
             fillWithData(i);
         }
 
-        for (int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
 
             //create the right adapter for each fragment's listview, if the specific data list is empty, just leave the adapter on null
             try {
                 if (dataLists.size() > 0 && dataLists.get(i) != null && dataLists.get(i).size() > 0)
                     adapters.add(i, new VplanListAdapter(activity, dataLists.get(i)));
-            } catch(Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -239,7 +240,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             dataLists.set(id, null);
             try {
                 hiddenItems.set(id, null);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         datasource.close();
     }
@@ -276,7 +278,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             }
         } else args.putInt(Args.LIST_SIZE, 0);
 
-        if (listSizesBeforeFilter.length > i) args.putInt(Args.LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);
+        if (listSizesBeforeFilter.length > i)
+            args.putInt(Args.LIST_SIZE_ORIGINAL, listSizesBeforeFilter[i]);
         else args.putInt(Args.LIST_SIZE_ORIGINAL, 0);
         args.putBoolean(Args.VPLAN_LOADING_DUMMY, false);
         fragment.setArguments(args);

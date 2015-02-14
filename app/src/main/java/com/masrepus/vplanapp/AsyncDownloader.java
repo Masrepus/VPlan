@@ -46,7 +46,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private static final int MINFO = VplanModes.MINFO;
     private static final int OINFO = VplanModes.OINFO;
     ProgressCode progress;
-    int downloaded;
+    int downloaded_files;
     int total_downloads;
     Context context;
     ProgressBar progressBar;
@@ -61,6 +61,26 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private boolean downloaded11 = false;
     private boolean downloaded12 = false;
     private boolean downloadedUinfoMinfo = false;
+
+    public static String findRequestedTestsPage(Context context, int mode) {
+
+        //return the right url for the requested mode and grade: u/minfo have the same, only oinfo has a different one
+        String url = "";
+
+        switch (mode) {
+
+            case UINFO:
+            case MINFO:
+                url = context.getString(R.string.tests_base_url);
+                break;
+            case OINFO:
+                url = context.getString(R.string.vplan_base_url) + "oinfo/" + "srekursiv.php";
+                break;
+        }
+
+        if (!url.contentEquals("")) return url;
+        else return context.getString(R.string.tests_base_url);
+    }
 
     protected int getRequestedVplanMode() {
         //externalised so that the service can override this
@@ -111,7 +131,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     private boolean downloadTests() {
 
         publishProgress(ProgressCode.STARTED);
-        downloaded = 0;
+        downloaded_files = 0;
         SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         int vplanModeBefore = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
         SharedPreferences.Editor editor = pref.edit();
@@ -125,7 +145,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_oinfo), null)));
 
         //get total downloads to do
-        for (int i=0; i<2; i++) {
+        for (int i = 0; i < 2; i++) {
             total_downloads += filters.get(i).size();
         }
 
@@ -157,16 +177,14 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                             else total_downloads++;
                             parseOinfoTests();
                             downloaded11 = true;
-                        }
-                        else {
+                        } else {
                             grade = "12";
                             if (downloaded12) continue;
                             else total_downloads++;
                             parseOinfoTests();
                             downloaded12 = true;
                         }
-                    }
-                    else if (currFilter == filters.get(0)){
+                    } else if (currFilter == filters.get(0)) {
                         //uinfo or minfo
                         requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
                         parseUinfoMinfoTests(currGrade);
@@ -183,7 +201,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     }
                     return false;
                 }
-                downloaded++;
+                downloaded_files++;
                 publishProgress(ProgressCode.PARSING_FINISHED);
             }
         }
@@ -191,31 +209,24 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //reset shared prefs
         requestedVplanMode = vplanModeBefore;
 
-        publishProgress(ProgressCode.FINISHED_ALL);
+        publishProgress(ProgressCode.FINISHED_ALL_DAYS);
 
         return true;
     }
 
     private boolean downloadVplan(SharedPreferences.Editor editor) {
 
+        boolean success = true;
+
         //download new data and then refresh pager adapter
 
-        try {
-            publishProgress(ProgressCode.STARTED);
-            updateAvailableFilesList();
-        } catch (Exception e) {
-            //check whether this is because of missing creds
-            if (e.getMessage().contentEquals("failed to connect without creds")) {
-                publishProgress(ProgressCode.ERR_NO_CREDS);
-                return false;
-            } else if (e.getMessage().contentEquals("failed to connect")) {
-                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
-                return false;
-            } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                publishProgress(ProgressCode.ERR_NO_INTERNET);
-                return false;
-            }
-        }
+        publishProgress(ProgressCode.STARTED);
+        success = updateAvailableFilesList();
+
+        total_downloads = 0;
+        downloaded_files = 0;
+
+        if (!success) return false;
 
         if (isCancelled()) return false;
 
@@ -223,57 +234,46 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_URL});
 
-        try {
-            total_downloads = c.getCount();
-            downloaded = 0;
+        total_downloads = c.getCount();
+        downloaded_files = 0;
 
-            while (c.moveToNext()) {
+        while (c.moveToNext()) {
 
-                if (isCancelled()) return false;
+            if (isCancelled()) return false;
 
-                //load every available vplan into the db
-                requestedVplanId = c.getPosition();
-                currentVPlanLink = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_URL));
+            //load every available vplan into the db
+            requestedVplanId = c.getPosition();
+            currentVPlanLink = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_URL));
 
-                editor.putInt(SharedPrefs.REQUESTED_VPLAN_ID, requestedVplanId)
-                        .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
-                editor.apply();
+            editor.putInt(SharedPrefs.REQUESTED_VPLAN_ID, requestedVplanId)
+                    .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
+            editor.apply();
 
-                switch (requestedVplanMode) {
+            switch (requestedVplanMode) {
 
-                    //treat oinfo differently
+                //treat oinfo differently
 
-                    case VplanModes.OINFO:
-                        parseOinfoVplan();
-                        break;
-                    default:
-                        parseUinfoMinfoVplan();
-                        break;
-                }
+                case VplanModes.OINFO:
+                    success = parseOinfoVplan();
+                    break;
+                default:
+                    success = parseUinfoMinfoVplan();
+                    break;
+            }
 
-                downloaded = c.getPosition() + 1;
+            downloaded_files = c.getPosition() + 1;
+
+            if (success) {
+                //avoid reporting a successful download if there has actually been an error
                 publishProgress(ProgressCode.PARSING_FINISHED);
             }
-
-            publishProgress(ProgressCode.FINISHED_ALL);
-
-            datasource.close();
-
-            return true;
-        } catch (Exception e) {
-
-            //check whether this is because of missing creds
-            if (e.getMessage().contentEquals("failed to connect without creds")) {
-                publishProgress(ProgressCode.ERR_NO_CREDS);
-            } else if (e.getMessage().contentEquals("failed to connect")) {
-                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
-            } else if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                publishProgress(ProgressCode.ERR_NO_INTERNET);
-            } else {
-                e.printStackTrace();
-            }
-            return false;
         }
+
+        if (success) publishProgress(ProgressCode.FINISHED_ALL_DAYS);
+
+        datasource.close();
+
+        return success;
     }
 
     @Override
@@ -370,15 +370,17 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     /**
      * Takes care of all the downloading and db-inserting
-     *
-     * @throws Exception is thrown only if the returned encoding from encodeCredentials() was null or if there has been an error while downloading
      */
-    public void parseUinfoMinfoVplan() throws Exception {
+    public boolean parseUinfoMinfoVplan() {
 
         String encoding = encodeCredentials();
 
-        if (encoding == null && requestedVplanMode != VplanModes.OINFO)
-            throw new Exception("no creds available");
+        if (encoding == null && requestedVplanMode != VplanModes.OINFO) {
+
+            //no password saved
+            publishProgress(ProgressCode.ERR_NO_CREDS);
+            return false;
+        }
 
         Document doc;
 
@@ -386,14 +388,22 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         try {
             doc = Jsoup.connect(findRequestedVPlan()).header("Authorization", "Basic " + encoding).post();
         } catch (Exception e) {
-            if (encoding == null) {
-                if (requestedVplanMode != VplanModes.OINFO)
-                    throw new Exception("failed to connect without creds");
-                else throw new Exception("failed to connect oinfo");
-            } else throw new Exception("failed to connect");
+            if (e instanceof HttpStatusException) {
+                HttpStatusException exception = (HttpStatusException) e;
+
+                switch (exception.getStatusCode()) {
+
+                    case HttpStatus.SC_UNAUTHORIZED:
+                        publishProgress(ProgressCode.ERR_NO_CREDS);
+                        break;
+                    default:
+                        publishProgress(ProgressCode.ERR_NO_INTERNET);
+                }
+            }
+            return false;
         }
 
-        if (doc == null) return;
+        if (doc == null) return false;
 
         //tempContent contains all found tables
         Elements tempContent = doc.select("table[class=hyphenate]");
@@ -436,9 +446,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         parseVplan(tableRows);
 
         parseAvailableFiles(availableFiles);
+
+        return true;
     }
 
-    public void parseOinfoVplan() {
+    public boolean parseOinfoVplan() {
 
         Document doc;
 
@@ -457,10 +469,10 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         publishProgress(ProgressCode.ERR_NO_INTERNET);
                 }
             }
-            return;
+            return false;
         }
 
-        if (doc == null) return;
+        if (doc == null) return false;
 
         //save timePublished
         String headerCurrentDate = doc.child(0).select(XmlTags.HEADER).first().text();
@@ -497,6 +509,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //save the current timestamp; add "Stand: " because it is missing in oinfo vplan
         timePublished = "Stand: " + doc.select(XmlTags.TIME_PUBLISHED).first().text();
         saveCurrentTimestamp(headerCurrentDate);
+
+        return true;
     }
 
     public void insertVplanRow(String stunde, String klasse, String status) {
@@ -615,7 +629,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     //set the grade according to the first char in subject
                     if ("1".contentEquals(String.valueOf(course.charAt(0)))) grade = "Q11";
                     else if (String.valueOf(course.charAt(0)).contentEquals("2")) grade = "Q12";
-else grade ="Q11/12"; //those other courses belong to both 11 and 12
+                    else grade = "Q11/12"; //those other courses belong to both 11 and 12
 
                     //perform filtering
                     boolean isNeeded = false;
@@ -759,26 +773,6 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
         else return context.getString(R.string.tests_base_url) + grade;
     }
 
-    public static String findRequestedTestsPage(Context context, int mode) {
-
-        //return the right url for the requested mode and grade: u/minfo have the same, only oinfo has a different one
-        String url = "";
-
-        switch (mode) {
-
-            case UINFO:
-            case MINFO:
-                url = context.getString(R.string.tests_base_url);
-                break;
-            case OINFO:
-                url = context.getString(R.string.vplan_base_url) + "oinfo/" + "srekursiv.php";
-                break;
-        }
-
-        if (!url.contentEquals("")) return url;
-        else return context.getString(R.string.tests_base_url);
-    }
-
     /**
      * Called by findRequestedVplan in order to find the correct vplan url
      *
@@ -866,7 +860,7 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
     /**
      * Checks whether the device is online and if this is true it fetches the currently available files from the right internet page by calling findRequestedVplan()
      */
-    private void updateAvailableFilesList() throws Exception {
+    private boolean updateAvailableFilesList() {
 
         //load the list of files that are available just now, if internet connection is available, else just skip that
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -879,16 +873,29 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
             //encode uname and pw for http post
             String encoding = encodeCredentials();
 
-            if (encoding == null && requestedVplanMode != OINFO)
-                throw new Exception("failed to connect without creds");
+            if (encoding == null && requestedVplanMode != OINFO) {
+
+                publishProgress(ProgressCode.ERR_NO_CREDS);
+                return false;
+            }
 
             Document doc = null;
             try {
                 doc = Jsoup.connect(getVPlanUrl(VplanModes.FILES_ONLY, true)).header("Authorization", "Basic " + encoding).post();
             } catch (IOException e) {
-                e.printStackTrace();
-                if (encoding == null) throw new Exception("failed to connect oinfo");
-                else throw new Exception("failed to connect");
+                if (e instanceof HttpStatusException) {
+                    HttpStatusException exception = (HttpStatusException) e;
+
+                    switch (exception.getStatusCode()) {
+
+                        case HttpStatus.SC_UNAUTHORIZED:
+                            publishProgress(ProgressCode.ERR_NO_CREDS);
+                            break;
+                        default:
+                            publishProgress(ProgressCode.ERR_NO_INTERNET);
+                    }
+                }
+                return false;
             }
 
             if (doc != null) {
@@ -928,6 +935,12 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
                     datasource.close();
                 }
             }
+
+            return true;
+        } else {
+            //there is no internet connection
+            publishProgress(ProgressCode.ERR_NO_INTERNET);
+            return false;
         }
     }
 
@@ -939,7 +952,8 @@ else grade ="Q11/12"; //those other courses belong to both 11 and 12
 
         SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        if (appMode == AppModes.VPLAN) editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, lastUpdate);
+        if (appMode == AppModes.VPLAN)
+            editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, lastUpdate);
         else editor.putString(SharedPrefs.PREFIX_LAST_UPDATE + appMode, lastUpdate);
         editor.apply();
 

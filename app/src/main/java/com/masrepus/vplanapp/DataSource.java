@@ -72,7 +72,7 @@ public class DataSource {
     /**
      * Takes care of inserting all columns of a vplan item into its table
      *
-     * @param tableName the table where the columns will be inserted
+     * @param tableName            the table where the columns will be inserted
      * @param stunde,klasse,status the columns to insert
      */
     public void createRowVplan(String tableName, String stunde, String klasse, String status) {
@@ -139,7 +139,7 @@ public class DataSource {
     /**
      * Passes queries to the right database by checking which vplan mode is currently active
      *
-     * @param tableName       the tablename
+     * @param tableName  the tablename
      * @param projection the columns to query for
      * @return a cursor object containing the queried columns
      */

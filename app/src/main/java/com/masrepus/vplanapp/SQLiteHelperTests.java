@@ -27,9 +27,8 @@ public class SQLiteHelperTests extends SQLiteOpenHelper {
             + TABLE_TESTS_OINFO + "(" + SQLiteHelperVplan.COLUMN_ID
             + " integer primary key autoincrement, " + SQLiteHelperVplan.COLUMN_GRADE
             + " text, " + COLUMN_TYPE + " text, " + COLUMN_SUBJECT + " text, " + COLUMN_DATE + " text);";
-
-    private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_TESTS = "tests.db";
+    private static final int DATABASE_VERSION = 1;
 
 
     public SQLiteHelperTests(Context context, String dbName) {
