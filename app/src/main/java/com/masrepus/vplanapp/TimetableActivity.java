@@ -33,7 +33,24 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     protected void onResume() {
         super.onResume();
 
+        //set the appmode to timetable
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE);
+        editor.apply();
+
         prepareDrawer();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //set the appmode to vplan
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
+        editor.apply();
     }
 
     @Override

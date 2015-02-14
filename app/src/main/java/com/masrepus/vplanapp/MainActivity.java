@@ -511,6 +511,12 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         viewPager.setCurrentItem(getTodayVplanId());
         appMode = AppModes.VPLAN;
         selectedAppmodeItem = 1 + appMode;
+
+        //set the appmode to vplan
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
+        editor.apply();
     }
 
     private void buildApiClient() {
@@ -732,7 +738,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode);
-        editor.putInt(SharedPrefs.APPMODE, appMode);
+        editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         editor.apply();
 
         super.onPause();

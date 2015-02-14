@@ -85,6 +85,12 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
             PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
         }
 
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        //set the appmode to exams
+        editor.putInt(SharedPrefs.APPMODE, AppModes.TESTS);
+        editor.apply();
+
         prepareDrawer();
     }
 
@@ -159,7 +165,8 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         //save the filter state
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(SharedPrefs.HIDE_OLD_EXAMS, noOldItems);
+        editor.putBoolean(SharedPrefs.HIDE_OLD_EXAMS, noOldItems)
+                .putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         editor.apply();
 
         super.onPause();
