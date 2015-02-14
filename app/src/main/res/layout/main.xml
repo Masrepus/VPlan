@@ -129,7 +129,8 @@
                 android:layout_above="@+id/settings_frame"
                 android:divider="@null"
                 android:listSelector="@drawable/yellow_selector"
-                android:layout_below="@+id/lastUpdateFrame" />
+                android:layout_below="@+id/lastUpdateFrame"
+                android:requiresFadingEdge="vertical" />
 
             <FrameLayout
                 android:layout_width="match_parent"
