@@ -53,12 +53,11 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
             + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
-
+    public static final String[] tablesVplan = {TABLE_VPLAN_0, TABLE_VPLAN_1, TABLE_VPLAN_2, TABLE_VPLAN_3, TABLE_VPLAN_4};
     public static final String DATABASE_UINFO = "uinfo.db";
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";
     private static final int DATABASE_VERSION = 1;
-    public static final String[] tablesVplan = {TABLE_VPLAN_0, TABLE_VPLAN_1, TABLE_VPLAN_2, TABLE_VPLAN_3, TABLE_VPLAN_4};
 
     public SQLiteHelperVplan(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);

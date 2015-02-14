@@ -51,7 +51,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             View rootView = inflater.inflate(
                     R.layout.vplan_list, container, false);
 
-                //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
+            //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
             if (listSizeBeforeFilter > 0) {
                 if (listSize == 0) {
                     rootView = inflater.inflate(
@@ -61,7 +61,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     timePublishedTV.setText(currTimePublished);
 
                     //get the hidden items
-                    hiddenItems = ((ArrayList<Row>)args.getSerializable(Args.HIDDEN_ITEMS));
+                    hiddenItems = ((ArrayList<Row>) args.getSerializable(Args.HIDDEN_ITEMS));
                     displayHiddenItemsCount(rootView, hiddenItemsCount);
 
                     return rootView;
@@ -76,7 +76,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
                     //get hidden items and activate the onclick listener for the footer
                     //hiddenItems = pagerAdapter.getHiddenItems(id);
-                    hiddenItems = ((ArrayList<Row>)args.getSerializable(Args.HIDDEN_ITEMS));
+                    hiddenItems = ((ArrayList<Row>) args.getSerializable(Args.HIDDEN_ITEMS));
                     addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
 
                     listView.setAdapter(adapter);

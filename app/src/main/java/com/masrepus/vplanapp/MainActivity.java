@@ -648,9 +648,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             case R.id.action_refresh:
                 refresh(item);
                 return true;
-            /*case R.id.tester:
+            case R.id.tester:
                 startService(new Intent(this, DownloaderService.class).putExtra(DataKeys.ACTION, Args.NOTIFY_WEAR_UPDATE_UI));
-                return true;*/
+                return true;
             case R.id.action_open_browser:
                 //fire an action_view intent with the vplan url that contains creds
                 Uri link = Uri.parse(getVPlanUrl(requestedVplanMode, true));
@@ -1060,7 +1060,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 case PARSING_FINISHED:
                     progress = (ProgressCode) values[0];
                     progressBar.setIndeterminate(false);
-                    progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
+                    progressBar.setProgress((int) (100 * (double) downloaded_files / total_downloads));
                     break;
                 case ERR_NO_CREDS:
                     progress = (ProgressCode) values[0];
@@ -1150,7 +1150,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                         if (failCount <= 3) {
                             Thread.sleep(2000);
                         } //else stop it after 3 times trying
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
         }

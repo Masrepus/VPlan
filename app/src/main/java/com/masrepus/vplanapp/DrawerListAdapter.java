@@ -15,8 +15,8 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
 import java.util.ArrayList;
 
 /**
-* Created by samuel on 07.12.14.
-*/
+ * Created by samuel on 07.12.14.
+ */
 class DrawerListAdapter extends ArrayAdapter<Item> {
 
     private Context context;
@@ -98,8 +98,10 @@ class DrawerListAdapter extends ArrayAdapter<Item> {
 
                     //set the appmode tag according to title
                     int appmodeTag;
-                    if (entry.getTitle().contentEquals(context.getString(R.string.substitutions))) appmodeTag = AppModes.VPLAN;
-                    else if (entry.getTitle().contentEquals(context.getString(R.string.timetable))) appmodeTag = AppModes.TIMETABLE;
+                    if (entry.getTitle().contentEquals(context.getString(R.string.substitutions)))
+                        appmodeTag = AppModes.VPLAN;
+                    else if (entry.getTitle().contentEquals(context.getString(R.string.timetable)))
+                        appmodeTag = AppModes.TIMETABLE;
                     else appmodeTag = AppModes.TESTS;
 
                     convertView.setTag(R.id.TAG_APPMODE, appmodeTag);
