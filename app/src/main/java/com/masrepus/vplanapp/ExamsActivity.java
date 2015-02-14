@@ -80,10 +80,10 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         callingActivity = getIntent().getStringExtra(Args.CALLING_ACTIVITY);
         if (callingActivity == null) callingActivity = "";
 
-            if (!callingActivity.contentEquals("")) {
-                listener = new SettingsPrefListener(this);
-                PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
-            }
+        if (!callingActivity.contentEquals("")) {
+            listener = new SettingsPrefListener(this);
+            PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
+        }
 
         prepareDrawer();
     }
@@ -282,7 +282,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
                     if (currDate.before(today)) continue;
                 }
             }
-            
+
             String subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
             String type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
             String grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
@@ -383,6 +383,12 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         }
     }
 
+    public void displayLastUpdate(String lastUpdate) {
+
+        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
+        lastUpdateTv.setText(lastUpdate);
+    }
+
     private class ExamsListAdapter extends ArrayAdapter<ExamsRow> {
 
         private ArrayList<ExamsRow> examsList;
@@ -419,7 +425,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
                 if (row.getType().toCharArray().length > 4) {
                     String shortType = "";
                     char[] chars = row.getType().toCharArray();
-                    for (int i=0; i<2; i++) {
+                    for (int i = 0; i < 2; i++) {
                         shortType += chars[i];
                     }
                     //at the end add ...
@@ -445,12 +451,6 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
             protected TextView type;
             protected TextView grade;
         }
-    }
-
-    public void displayLastUpdate(String lastUpdate) {
-
-        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
-        lastUpdateTv.setText(lastUpdate);
     }
 
     private class BgDownloader extends AsyncDownloader {
@@ -487,7 +487,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
                 case PARSING_FINISHED:
                     progress = (ProgressCode) values[0];
                     progressBar.setIndeterminate(false);
-                    progressBar.setProgress((int) (100 * (double) downloaded / total_downloads));
+                    progressBar.setProgress((int) (100 * (double) downloaded_files / total_downloads));
                     break;
                 case ERR_NO_CREDS:
                     progress = (ProgressCode) values[0];

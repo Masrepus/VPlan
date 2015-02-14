@@ -14,7 +14,14 @@ public class Row implements Serializable {
     private String status;
 
 
-    public Row() {}
+    public Row() {
+    }
+
+    public Row(DataMap map) {
+        stunde = map.getString("stunde");
+        status = map.getString("status");
+        klasse = map.getString("klasse");
+    }
 
     public long getId() {
         return id;
@@ -46,12 +53,6 @@ public class Row implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Row(DataMap map) {
-        stunde = map.getString("stunde");
-        status = map.getString("status");
-        klasse = map.getString("klasse");
     }
 
     public DataMap putToDataMap(DataMap map) {

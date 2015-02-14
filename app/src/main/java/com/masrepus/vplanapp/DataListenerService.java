@@ -3,10 +3,6 @@ package com.masrepus.vplanapp;
 import android.content.Intent;
 import android.util.Log;
 
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.masrepus.vplanapp.constants.Args;
