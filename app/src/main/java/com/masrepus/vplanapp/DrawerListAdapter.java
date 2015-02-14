@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by samuel on 07.12.14.
  */
-class DrawerListAdapter extends ArrayAdapter<Item> {
+ public class DrawerListAdapter extends ArrayAdapter<Item> {
 
     private Context context;
     private Activity activity;
