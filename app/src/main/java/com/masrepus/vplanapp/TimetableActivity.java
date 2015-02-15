@@ -19,8 +19,14 @@ import android.widget.TextView;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 
 public class TimetableActivity extends ActionBarActivity implements View.OnClickListener {
+
+    private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,10 +38,24 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        initAdapter();
+    }
+
+    private void initAdapter() {
+
         //prepare the pager
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
         pager.setAdapter(adapter);
+        //scroll to today's page
+        Calendar calendar = Calendar.getInstance();
+        String today = weekdays.format(calendar.getTime());
+        int todayPosition = 0;
+
+        for (int i = 0; i < 5; i++) {
+            if (today.contentEquals(adapter.getPageTitle(i))) todayPosition = i;
+        }
+        pager.setCurrentItem(todayPosition);
 
         //prepare the title strip
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
