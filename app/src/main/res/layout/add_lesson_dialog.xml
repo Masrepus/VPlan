@@ -1,7 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="fill_parent"
-    android:layout_height="90dp"
-    android:background="@color/blue">
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/lesson"
+            android:id="@+id/textView8"
+            android:textStyle="bold"
+            android:layout_centerVertical="true" />
+
+        <com.masrepus.vplanapp.MyNumberPicker
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            min="1"
+            max="11"
+            android:layout_alignParentRight="true"
+            android:id="@+id/lessonPicker" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/subject"
+            android:id="@+id/textView7"
+            android:textStyle="bold" />
+
+        <MultiAutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/subjectACTV"
+            android:layout_marginTop="15dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/room"
+            android:id="@+id/textView9"
+            android:textStyle="bold" />
+
+        <MultiAutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/roomACTV"
+            android:layout_marginTop="15dp" />
+    </LinearLayout>
 
 </LinearLayout>

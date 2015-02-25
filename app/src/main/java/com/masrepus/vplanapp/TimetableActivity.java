@@ -1,6 +1,7 @@
 package com.masrepus.vplanapp;
 
-import android.app.Dialog;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,9 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
-public class TimetableActivity extends ActionBarActivity implements View.OnClickListener {
+public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
+    private View dialogView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +42,6 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         initAdapter();
-
-        addLesson();
     }
 
     private void initAdapter() {
@@ -113,24 +114,35 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 return super.onOptionsItemSelected(item);
             case R.id.action_add:
                 //add a lesson to the currently visible day
-                addLesson();
+                showAddLessonDialog();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void addLesson() {
-
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        int position = pager.getCurrentItem();
+    private void showAddLessonDialog() {
 
         //now show the user a dialog where he can add a new lesson
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.add_lesson_dialog);
-        dialog.setTitle("Title");
-        dialog.show();
-        //TODO addLesson implementieren
+        dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.add_lesson))
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, this)
+                .setNegativeButton(R.string.cancel, this)
+                .show();
+    }
+
+    private void addLesson(int day, int lesson, String subject, String room) {
+
+        DataSource datasource = new DataSource(this);
+        datasource.open();
+
+        //save the lesson details in the timetable db, in the right table
+        String tableName = SQLiteHelperTimetable.DAYS[day];
+        datasource.createRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
+
+        datasource.close();
     }
 
     private void prepareDrawer() {
@@ -198,5 +210,33 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     }
 
     public void onSettingsClick(View view) {
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        int position = pager.getCurrentItem();
+
+        //a button in the add-lesson dialog was clicked, determine which one
+        switch (which) {
+
+            case DialogInterface.BUTTON_POSITIVE:
+                //save the entered data
+                AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
+                AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
+                MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
+
+                addLesson(position, lessonPicker.getValue(), subjectACTV.getText().toString(), roomACTV.getText().toString());
+
+                //refresh the timetable views
+                TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
+                pager.setAdapter(adapter);
+                pager.setCurrentItem(position);
+                break;
+            default:
+                dialog.dismiss();
+                break;
+        }
     }
 }

@@ -69,6 +69,20 @@ public class DataSource {
         databaseTimetable.insert(tableName, null, values);
     }
 
+    public void addSubject(String subject) {
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelperTimetable.COLUMN_SUBJECT, subject);
+
+        databaseTimetable.insert(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, null, values);
+    }
+
+    public void addRoom(String room) {
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelperTimetable.COLUMN_SUBJECT, room);
+
+        databaseTimetable.insert(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, null, values);
+    }
+
     /**
      * Takes care of inserting all columns of a vplan item into its table
      *
