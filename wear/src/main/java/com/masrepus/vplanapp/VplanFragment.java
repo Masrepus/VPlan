@@ -1,12 +1,9 @@
 package com.masrepus.vplanapp;
 
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
 import android.support.wearable.view.WearableListView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +15,7 @@ import android.widget.TextView;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by samuel on 16.01.15.

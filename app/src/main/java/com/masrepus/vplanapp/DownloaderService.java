@@ -184,7 +184,7 @@ public class DownloaderService extends Service {
             Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
                     SQLiteHelperVplan.COLUMN_STATUS});
 
-            ArrayList<Row> tempList = new ArrayList<Row>();
+            ArrayList<Row> tempList = new ArrayList<>();
 
             //check whether filter is active
             Boolean isFilterActive = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);

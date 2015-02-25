@@ -153,7 +153,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         getMenuInflater().inflate(R.menu.exams, menu);
 
         //init the filter item
-        MenuItem filterItem = (MenuItem) menu.findItem(R.id.action_activate_filter);
+        MenuItem filterItem = menu.findItem(R.id.action_activate_filter);
         filterItem.setChecked(noOldItems);
 
         return true;
@@ -237,7 +237,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         DataSource datasource = new DataSource(this);
         datasource.open();
 
-        ArrayList<ExamsRow> examsList = new ArrayList<ExamsRow>();
+        ArrayList<ExamsRow> examsList = new ArrayList<>();
 
         //get the data from both test tables
         Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});

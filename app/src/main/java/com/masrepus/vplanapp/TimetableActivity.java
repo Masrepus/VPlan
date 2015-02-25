@@ -1,10 +1,10 @@
 package com.masrepus.vplanapp;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -39,6 +39,8 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         initAdapter();
+
+        addLesson();
     }
 
     private void initAdapter() {
@@ -109,9 +111,26 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
                 return super.onOptionsItemSelected(item);
+            case R.id.action_add:
+                //add a lesson to the currently visible day
+                addLesson();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addLesson() {
+
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        int position = pager.getCurrentItem();
+
+        //now show the user a dialog where he can add a new lesson
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.add_lesson_dialog);
+        dialog.setTitle("Title");
+        dialog.show();
+        //TODO addLesson implementieren
     }
 
     private void prepareDrawer() {
@@ -176,5 +195,8 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                     startActivity(new Intent(this, ExamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         }
+    }
+
+    public void onSettingsClick(View view) {
     }
 }

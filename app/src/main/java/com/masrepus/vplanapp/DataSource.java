@@ -305,11 +305,7 @@ public class DataSource {
         String[] test = new String[1];
         test[0] = SQLiteHelperTimetable.COLUMN_LESSON;
         Cursor c = query(tableName, test);
-        if (c.getCount() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return c.getCount() > 0;
     }
 
     /**
@@ -324,10 +320,6 @@ public class DataSource {
         String[] test = new String[1];
         test[0] = SQLiteHelperVplan.COLUMN_ID;
         Cursor c = query(tablename, test);
-        if (c.getCount() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return c.getCount() > 0;
     }
 }

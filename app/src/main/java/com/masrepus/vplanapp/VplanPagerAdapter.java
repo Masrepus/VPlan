@@ -65,9 +65,9 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
     public void initData() {
 
-        adapters = new ArrayList<VplanListAdapter>(count);
-        hiddenItems = new ArrayList<ArrayList<Row>>(count);
-        dataLists = new ArrayList<ArrayList<Row>>(count);
+        adapters = new ArrayList<>(count);
+        hiddenItems = new ArrayList<>(count);
+        dataLists = new ArrayList<>(count);
 
         //fill the arraylists with null items
         for (int i = 0; i < count; i++) {
@@ -141,8 +141,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
                     SQLiteHelperVplan.COLUMN_STATUS});
 
-            ArrayList<Row> list = new ArrayList<Row>();
-            ArrayList<Row> tempList = new ArrayList<Row>();
+            ArrayList<Row> list = new ArrayList<>();
+            ArrayList<Row> tempList = new ArrayList<>();
 
             //check whether filter is active
             Boolean isFilterActive = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
@@ -212,7 +212,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
                 //now save the differences in the hiddenItems list
                 dataLists.set(id, list);
-                hiddenItems.set(id, new ArrayList<Row>(nonOverLap(tempList, list)));
+                hiddenItems.set(id, new ArrayList<>(nonOverLap(tempList, list)));
                 listSizesBeforeFilter[id] = tempList.size();
 
             } else {
@@ -222,8 +222,8 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
                     //only add to list if row isn't null
                     String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
-                    if (help == "Klasse") continue;
-                    if (help == "") continue;
+                    if (help.contentEquals("Klasse")) continue;
+                    if (help.contentEquals("")) continue;
 
                     row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
                     row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
@@ -330,14 +330,14 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     private Collection<Row> union(Collection<Row> coll1, Collection<Row> coll2) {
-        Set<Row> union = new HashSet<Row>(coll1);
-        union.addAll(new HashSet<Row>(coll2));
+        Set<Row> union = new HashSet<>(coll1);
+        union.addAll(new HashSet<>(coll2));
         return union;
     }
 
     private Collection<Row> intersect(Collection<Row> coll1, Collection<Row> coll2) {
-        Set<Row> intersection = new HashSet<Row>(coll1);
-        intersection.retainAll(new HashSet<Row>(coll2));
+        Set<Row> intersection = new HashSet<>(coll1);
+        intersection.retainAll(new HashSet<>(coll2));
 
         return intersection;
     }

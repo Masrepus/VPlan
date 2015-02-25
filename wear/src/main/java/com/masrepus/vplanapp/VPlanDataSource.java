@@ -2,7 +2,6 @@ package com.masrepus.vplanapp;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -101,10 +100,6 @@ public class VPlanDataSource {
         String[] test = new String[1];
         test[0] = SQLiteHelperVplan.COLUMN_ID;
         Cursor c = query(tablename, test);
-        if (c.getCount() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return c.getCount() > 0;
     }
 }

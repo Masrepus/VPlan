@@ -39,9 +39,9 @@ public class SettingsPrefListener implements SharedPreferences.OnSharedPreferenc
     private void refreshFilters() {
 
         //create a new list and fill it
-        ArrayList<String> filterUinfoTemp = new ArrayList<String>();
-        ArrayList<String> filterMinfoTemp = new ArrayList<String>();
-        ArrayList<String> filterOinfoTemp = new ArrayList<String>();
+        ArrayList<String> filterUinfoTemp = new ArrayList<>();
+        ArrayList<String> filterMinfoTemp = new ArrayList<>();
+        ArrayList<String> filterOinfoTemp = new ArrayList<>();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         keys = pref.getAll();
         String[] uinfoKeys = {context.getString(R.string.key_grade5), context.getString(R.string.key_grade6), context.getString(R.string.key_grade7)};
@@ -96,9 +96,9 @@ public class SettingsPrefListener implements SharedPreferences.OnSharedPreferenc
         //save the filters in shared prefs
         pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        Set<String> unterstufeSet = new HashSet<String>(filterUinfoTemp);
-        Set<String> mittelstufeSet = new HashSet<String>(filterMinfoTemp);
-        Set<String> oberstufeSet = new HashSet<String>(filterOinfoTemp);
+        Set<String> unterstufeSet = new HashSet<>(filterUinfoTemp);
+        Set<String> mittelstufeSet = new HashSet<>(filterMinfoTemp);
+        Set<String> oberstufeSet = new HashSet<>(filterOinfoTemp);
         editor.putStringSet(context.getString(R.string.pref_key_filter_uinfo), unterstufeSet)
                 .putStringSet(context.getString(R.string.pref_key_filter_minfo), mittelstufeSet)
                 .putStringSet(context.getString(R.string.pref_key_filter_oinfo), oberstufeSet)

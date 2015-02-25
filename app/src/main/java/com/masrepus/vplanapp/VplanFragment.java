@@ -42,9 +42,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
         if (args.getBoolean(Args.VPLAN_LOADING_DUMMY)) {
 
-            View rootView = inflater.inflate(
+            return inflater.inflate(
                     R.layout.vplan_loading_dummy, container, false);
-            return rootView;
         } else {
 
             //The last two args ensure LayoutParams are inflated properly

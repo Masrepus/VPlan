@@ -137,12 +137,12 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         SharedPreferences.Editor editor = pref.edit();
 
         //get the filter sets
-        filters = new ArrayList<ArrayList<String>>();
-        filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_uinfo), null)));
+        filters = new ArrayList<>();
+        filters.add(new ArrayList<>(pref.getStringSet(context.getString(R.string.pref_key_filter_uinfo), null)));
 
-        filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_minfo), null)));
+        filters.add(new ArrayList<>(pref.getStringSet(context.getString(R.string.pref_key_filter_minfo), null)));
 
-        filters.add(new ArrayList<String>(pref.getStringSet(context.getString(R.string.pref_key_filter_oinfo), null)));
+        filters.add(new ArrayList<>(pref.getStringSet(context.getString(R.string.pref_key_filter_oinfo), null)));
 
         //get total downloads to do
         for (int i = 0; i < 2; i++) {
@@ -319,8 +319,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     String type = split2[0].trim();
 
                     //find position of this test's type in types-array and give it the correct abbreviation
-                    ArrayList<String> types = new ArrayList<String>(Arrays.asList(context.getResources().getStringArray(R.array.test_types)));
-                    ArrayList<String> types_short = new ArrayList<String>(Arrays.asList(context.getResources().getStringArray(R.array.test_types_short)));
+                    ArrayList<String> types = new ArrayList<>(Arrays.asList(context.getResources().getStringArray(R.array.test_types)));
+                    ArrayList<String> types_short = new ArrayList<>(Arrays.asList(context.getResources().getStringArray(R.array.test_types_short)));
                     if (types.contains(type)) {
                         type = types_short.get(types.indexOf(type));
                     }
@@ -846,10 +846,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         byte[] data = null;
         try {
             data = creds.getBytes("UTF-8");
-        } catch (UnsupportedOperationException e) {
-            e.printStackTrace();
-            Log.e(context.getPackageName(), context.getString(R.string.err_getBytes));
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedOperationException | UnsupportedEncodingException e) {
             e.printStackTrace();
             Log.e(context.getPackageName(), context.getString(R.string.err_getBytes));
         }

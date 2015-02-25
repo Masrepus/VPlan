@@ -25,7 +25,7 @@ public class DrawerListBuilder {
         this.context = context;
         this.headers = headers;
 
-        separatorPositions = new ArrayList<Integer>();
+        separatorPositions = new ArrayList<>();
         for (int i = 0; i < separateSectionsBefore.length; i++) {
             separatorPositions.add(i, separateSectionsBefore[i]);
         }
@@ -57,7 +57,7 @@ public class DrawerListBuilder {
     public void buildItemList(String[] entries) {
 
         int headersPos = 0;
-        items = new ArrayList<Item>();
+        items = new ArrayList<>();
 
         for (int i = 0; i < entries.length; i++) {
 

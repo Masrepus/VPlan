@@ -69,10 +69,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final String ACTIVITY_NAME = "MainActivity";
-    public ArrayList<String> filterCurrent = new ArrayList<String>();
-    public ArrayList<String> filterUnterstufe = new ArrayList<String>();
-    public ArrayList<String> filterMittelstufe = new ArrayList<String>();
-    public ArrayList<String> filterOberstufe = new ArrayList<String>();
+    public ArrayList<String> filterCurrent = new ArrayList<>();
+    public ArrayList<String> filterUnterstufe = new ArrayList<>();
+    public ArrayList<String> filterMittelstufe = new ArrayList<>();
+    public ArrayList<String> filterOberstufe = new ArrayList<>();
     private int appMode;
     private int requestedVplanMode;
     private int requestedVplanId;
@@ -387,8 +387,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
                     SQLiteHelperVplan.COLUMN_STATUS});
 
-            ArrayList<Row> list = new ArrayList<Row>();
-            ArrayList<Row> tempList = new ArrayList<Row>();
+            ArrayList<Row> list = new ArrayList<>();
+            ArrayList<Row> tempList = new ArrayList<>();
 
             //check whether filter is active
             Boolean isFilterActive = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
@@ -763,9 +763,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private void refreshFilters() {
 
         //create a new list and fill it
-        ArrayList<String> filterUinfoTemp = new ArrayList<String>();
-        ArrayList<String> filterMinfoTemp = new ArrayList<String>();
-        ArrayList<String> filterOinfoTemp = new ArrayList<String>();
+        ArrayList<String> filterUinfoTemp = new ArrayList<>();
+        ArrayList<String> filterMinfoTemp = new ArrayList<>();
+        ArrayList<String> filterOinfoTemp = new ArrayList<>();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         keys = pref.getAll();
         String[] uinfoKeys = {getString(R.string.key_grade5), getString(R.string.key_grade6), getString(R.string.key_grade7)};
@@ -838,9 +838,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //save the filters in shared prefs
         pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        Set<String> unterstufeSet = new HashSet<String>(filterUnterstufe);
-        Set<String> mittelstufeSet = new HashSet<String>(filterMittelstufe);
-        Set<String> oberstufeSet = new HashSet<String>(filterOberstufe);
+        Set<String> unterstufeSet = new HashSet<>(filterUnterstufe);
+        Set<String> mittelstufeSet = new HashSet<>(filterMittelstufe);
+        Set<String> oberstufeSet = new HashSet<>(filterOberstufe);
         editor.putStringSet(getString(R.string.pref_key_filter_uinfo), unterstufeSet)
                 .putStringSet(getString(R.string.pref_key_filter_minfo), mittelstufeSet)
                 .putStringSet(getString(R.string.pref_key_filter_oinfo), oberstufeSet)
