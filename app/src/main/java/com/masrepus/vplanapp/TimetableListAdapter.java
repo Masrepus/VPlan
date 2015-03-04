@@ -1,5 +1,6 @@
 package com.masrepus.vplanapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,12 @@ import java.util.ArrayList;
 public class TimetableListAdapter extends ArrayAdapter implements Serializable {
 
     private ArrayList<TimetableRow> rows;
+    private TimetableActivity activity;
 
-    public TimetableListAdapter(Context context, ArrayList<TimetableRow> rows) {
-        super(context, R.layout.timetable_item, rows);
+    public TimetableListAdapter(TimetableActivity activity, ArrayList<TimetableRow> rows) {
+        super(activity, R.layout.timetable_item, rows);
         this.rows = rows;
+        this.activity = activity;
     }
 
     @Override
@@ -47,6 +50,9 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
         view.lesson.setText(item.getLesson());
         view.subject.setText(item.getSubject());
         view.room.setText(item.getRoom());
+
+        //let the timetable activity handle long clicks
+        rowView.setOnLongClickListener(activity);
 
         return rowView;
     }

@@ -69,6 +69,22 @@ public class DataSource {
         databaseTimetable.insert(tableName, null, values);
     }
 
+    public void updateRowTimetable(String tableName, String lesson, String subject, String room) {
+
+        //create new ContentValues with the column name as key and the cell data as value
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelperTimetable.COLUMN_LESSON, lesson);
+        values.put(SQLiteHelperTimetable.COLUMN_SUBJECT, subject);
+        values.put(SQLiteHelperTimetable.COLUMN_ROOM, room);
+
+        databaseTimetable.update(tableName, values, SQLiteHelperTimetable.COLUMN_LESSON + "=" + lesson, null);
+    }
+
+    public void deleteRowTimetable(String tableName, String lesson) {
+
+        databaseTimetable.delete(tableName, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lesson + "'", null);
+    }
+
     public void addSubject(String subject) {
         ContentValues values = new ContentValues();
         values.put(SQLiteHelperTimetable.COLUMN_SUBJECT, subject);

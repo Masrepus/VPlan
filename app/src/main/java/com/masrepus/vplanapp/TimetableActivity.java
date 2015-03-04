@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -25,10 +26,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
-public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener {
+public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener {
 
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
     private View dialogView;
+    private DataSource datasource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        datasource = new DataSource(this);
 
         initAdapter();
     }
@@ -138,9 +142,12 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         DataSource datasource = new DataSource(this);
         datasource.open();
 
-        //save the lesson details in the timetable db, in the right table
+        //save the lesson details in the timetable db, if it doesn't exist already
         String tableName = SQLiteHelperTimetable.DAYS[day];
-        datasource.createRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
+
+        Cursor c = datasource.query(tableName, new String[]{SQLiteHelperTimetable.COLUMN_LESSON}, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lesson + "'");
+        if (c.getCount() == 0) datasource.createRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
+        else datasource.updateRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
 
         datasource.close();
     }
@@ -216,7 +223,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     public void onClick(DialogInterface dialog, int which) {
 
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        int position = pager.getCurrentItem();
+        int day = pager.getCurrentItem();
 
         //a button in the add-lesson dialog was clicked, determine which one
         switch (which) {
@@ -227,16 +234,98 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
                 MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
 
-                addLesson(position, lessonPicker.getValue(), subjectACTV.getText().toString(), roomACTV.getText().toString());
+                addLesson(day, lessonPicker.getValue(), subjectACTV.getText().toString(), roomACTV.getText().toString());
+
+                saveSubject(subjectACTV.getText().toString());
 
                 //refresh the timetable views
                 TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
                 pager.setAdapter(adapter);
-                pager.setCurrentItem(position);
+                pager.setCurrentItem(day);
                 break;
             default:
                 dialog.dismiss();
                 break;
         }
+    }
+
+    private void saveSubject(String subject) {
+
+        //add this subject to the database if it doesn't exist already
+        datasource.open();
+        Cursor c = datasource.query(SQLiteHelperTimetable.TABLE_ROOMS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_SUBJECT}, SQLiteHelperTimetable.COLUMN_SUBJECT + "='" + subject + "'");
+
+        if (c.getCount() == 0) datasource.addSubject(subject);
+
+        datasource.close();
+    }
+
+    @Override
+    public boolean onLongClick(final View v) {
+
+        //show a dialog and ask the user if this lesson should be edited or deleted
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.edit_or_delete))
+                .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        TextView lesson = (TextView) v.findViewById(R.id.lesson);
+                        removeLesson(lesson.getText().toString());
+                    }
+                })
+                .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.edit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        editLesson(v);
+                    }
+                }).show();
+
+        return true;
+    }
+
+    private void editLesson(View lessonView) {
+
+        //show the add lesson dialog but with the values of the lesson being edited preset
+        dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
+
+        //load the values
+        AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
+        TextView subjectOld = (TextView) lessonView.findViewById(R.id.subject);
+        subjectACTV.setText(subjectOld.getText());
+
+        AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
+        TextView roomOld = (TextView) lessonView.findViewById(R.id.room);
+        roomACTV.setText(roomOld.getText());
+
+        MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
+        TextView lesson = (TextView) lessonView.findViewById(R.id.lesson);
+        lessonPicker.setValue(Integer.parseInt(lesson.getText().toString()));
+
+        //now init the dialog and show it
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.edit_lesson))
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, this)
+                .setNegativeButton(R.string.cancel, this)
+                .show();
+    }
+
+    private void removeLesson(String lesson) {
+
+        //find out the currently visible day
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        int position = pager.getCurrentItem();
+        String tableName = SQLiteHelperTimetable.DAYS[position];
+
+        //delete the row in this day's timetable that contains this lesson attribute
+        datasource.open();
+        datasource.deleteRowTimetable(tableName, lesson);
+        datasource.close();
     }
 }

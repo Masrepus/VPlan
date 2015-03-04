@@ -195,5 +195,9 @@
     <string name="timetable">Stundenplan</string>
     <string name="room">Raum</string>
     <string name="add_lesson">Stunde hinzufügen</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="edit_or_delete">Soll diese Stunde bearbeitet oder gelöscht werden?</string>
+    <string name="delete">Löschen</string>
+    <string name="edit_lesson">Stunde bearbeiten</string>
 
 </resources>

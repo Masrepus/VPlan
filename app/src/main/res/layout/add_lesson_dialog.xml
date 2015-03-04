@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp">
 
     <RelativeLayout
         android:orientation="vertical"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentLeft="false"
+        android:id="@+id/lessonPickerLayout"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true">
 
         <TextView
             android:layout_width="wrap_content"
@@ -17,15 +21,17 @@
             android:text="@string/lesson"
             android:id="@+id/textView8"
             android:textStyle="bold"
-            android:layout_centerVertical="true" />
+            android:layout_alignParentLeft="false"
+            android:layout_centerHorizontal="true" />
 
         <com.masrepus.vplanapp.MyNumberPicker
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             min="1"
             max="11"
-            android:layout_alignParentRight="true"
-            android:id="@+id/lessonPicker" />
+            android:layout_alignParentRight="false"
+            android:id="@+id/lessonPicker"
+            android:layout_below="@+id/textView8" />
 
     </RelativeLayout>
 
@@ -34,7 +40,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentRight="false"
+        android:id="@+id/subjectLayout"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/lessonPickerLayout">
 
         <TextView
             android:layout_width="wrap_content"
@@ -57,7 +67,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp" >
+        android:layout_marginBottom="10dp"
+        android:id="@+id/roomLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/lessonPickerLayout">
 
         <TextView
             android:layout_width="wrap_content"
@@ -74,4 +87,4 @@
             android:layout_marginTop="15dp" />
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

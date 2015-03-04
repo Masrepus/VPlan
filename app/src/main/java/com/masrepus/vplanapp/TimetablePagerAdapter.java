@@ -22,13 +22,14 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
     private Calendar calendar;
     private int[] daysOfWeek = {Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY};
+    private TimetableActivity activity;
 
 
-    public TimetablePagerAdapter(Context context, FragmentManager fm) {
+    public TimetablePagerAdapter(TimetableActivity activity, FragmentManager fm) {
         super(fm);
         calendar = Calendar.getInstance();
 
-        DataSource datasource = new DataSource(context);
+        DataSource datasource = new DataSource(activity);
         datasource.open();
 
         //create the adapters for the fragments and store them here
@@ -48,7 +49,7 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             }
 
             //now build a new adapter for this weekday
-            adapters.add(new TimetableListAdapter(context, rows));
+            adapters.add(new TimetableListAdapter(activity, rows));
         }
     }
 
