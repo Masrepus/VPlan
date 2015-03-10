@@ -194,5 +194,6 @@
     <string name="title_activity_timetable">Stundenplan</string>
     <string name="timetable">Stundenplan</string>
     <string name="room">Raum</string>
+    <string name="tutorial">Tutorial</string>
 
 </resources>

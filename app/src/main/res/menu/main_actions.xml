@@ -22,6 +22,11 @@
         android:title="@string/activate_filter"
         android:checkable="true" />
     <item
+        android:id="@+id/action_help"
+        android:title="@string/tutorial"
+        android:icon="@drawable/ic_action_help"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/tester"
         android:title="test" />
 

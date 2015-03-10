@@ -41,6 +41,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -697,9 +699,20 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 new PagerAdapterLoader().execute(this);
 
                 return true;
+            case R.id.action_help:
+                showTutorial();
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showTutorial() {
+        new ShowcaseView.Builder(this)
+                .setTarget(new ActionViewTarget(this, ActionViewTarget.Type.HOME))
+                .setContentTitle("Tutorial der SGP-App")
+                .setContentText("Klicke zum Öffnen des seitlichen Menüs auf den Home/Zurück Button oder wische vom linken Bildschirmrand nach rechts.")
+                .hideOnTouchOutside()
+                .build();
     }
 
     public void refresh(View v) {

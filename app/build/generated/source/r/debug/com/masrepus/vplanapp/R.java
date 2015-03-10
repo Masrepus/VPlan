@@ -1625,18 +1625,19 @@ containing a value of this type.
         public static final int divider=0x7f020055;
         public static final int drawer_shadow=0x7f020056;
         public static final int hand=0x7f020057;
-        public static final int ic_cancel=0x7f020058;
-        public static final int ic_drawer=0x7f020059;
-        public static final int ic_launcher_v2=0x7f02005a;
-        public static final int ic_plusone_medium_off_client=0x7f02005b;
-        public static final int ic_plusone_small_off_client=0x7f02005c;
-        public static final int ic_plusone_standard_off_client=0x7f02005d;
-        public static final int ic_plusone_tall_off_client=0x7f02005e;
-        public static final int ic_refresh=0x7f02005f;
-        public static final int ic_settings=0x7f020060;
-        public static final int ic_website=0x7f020061;
-        public static final int section_header=0x7f020062;
-        public static final int yellow_selector=0x7f020063;
+        public static final int ic_action_help=0x7f020058;
+        public static final int ic_cancel=0x7f020059;
+        public static final int ic_drawer=0x7f02005a;
+        public static final int ic_launcher_v2=0x7f02005b;
+        public static final int ic_plusone_medium_off_client=0x7f02005c;
+        public static final int ic_plusone_small_off_client=0x7f02005d;
+        public static final int ic_plusone_standard_off_client=0x7f02005e;
+        public static final int ic_plusone_tall_off_client=0x7f02005f;
+        public static final int ic_refresh=0x7f020060;
+        public static final int ic_settings=0x7f020061;
+        public static final int ic_website=0x7f020062;
+        public static final int section_header=0x7f020063;
+        public static final int yellow_selector=0x7f020064;
     }
     public static final class id {
         public static final int TAG_APPMODE=0x7f0b0000;
@@ -1657,6 +1658,7 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f0b002d;
         public static final int action_bar_title=0x7f0b002c;
         public static final int action_context_bar=0x7f0b0040;
+        public static final int action_help=0x7f0b007d;
         public static final int action_menu_divider=0x7f0b000b;
         public static final int action_menu_presenter=0x7f0b000c;
         public static final int action_mode_bar=0x7f0b003c;
@@ -1744,7 +1746,7 @@ containing a value of this type.
         public static final int subject=0x7f0b0050;
         public static final int submit_area=0x7f0b004a;
         public static final int tabMode=0x7f0b0017;
-        public static final int tester=0x7f0b007d;
+        public static final int tester=0x7f0b007e;
         public static final int textView=0x7f0b005a;
         public static final int textView2=0x7f0b005c;
         public static final int textView3=0x7f0b0059;
@@ -2049,16 +2051,17 @@ containing a value of this type.
         public static final int timetable=0x7f0d00e0;
         public static final int title_activity_exams=0x7f0d00e1;
         public static final int title_activity_timetable=0x7f0d00e2;
-        public static final int type=0x7f0d00e3;
-        public static final int uname=0x7f0d00e4;
-        public static final int unterstufe=0x7f0d00e5;
-        public static final int update_int=0x7f0d00e6;
-        public static final int updating=0x7f0d00e7;
-        public static final int vplan=0x7f0d00e8;
-        public static final int vplan_base_cred=0x7f0d00e9;
-        public static final int vplan_base_url=0x7f0d00ea;
-        public static final int wr=0x7f0d00eb;
-        public static final int wsem=0x7f0d00ec;
+        public static final int tutorial=0x7f0d00e3;
+        public static final int type=0x7f0d00e4;
+        public static final int uname=0x7f0d00e5;
+        public static final int unterstufe=0x7f0d00e6;
+        public static final int update_int=0x7f0d00e7;
+        public static final int updating=0x7f0d00e8;
+        public static final int vplan=0x7f0d00e9;
+        public static final int vplan_base_cred=0x7f0d00ea;
+        public static final int vplan_base_url=0x7f0d00eb;
+        public static final int wr=0x7f0d00ec;
+        public static final int wsem=0x7f0d00ed;
     }
     public static final class style {
         public static final int Base_TextAppearance_AppCompat=0x7f0e0000;
