@@ -555,7 +555,7 @@ public class DownloaderService extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                cancel(false);
+                cancel(true);
             }
         }
     }

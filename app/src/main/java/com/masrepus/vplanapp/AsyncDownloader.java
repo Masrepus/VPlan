@@ -160,12 +160,13 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
         datasource.close();
 
+        boolean success = false;
         //call parseTestsToSql for each filtered grade/course
         for (ArrayList<String> currFilter : filters) {
 
             for (String currGrade : currFilter) {
                 grade = currGrade;
-                try {
+
                     if (currFilter == filters.get(2)) {
                         //oinfo
 
@@ -175,32 +176,29 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                             //check whether this grade has been downloaded already
                             if (downloaded11) continue;
                             else total_downloads++;
-                            parseOinfoTests();
+                            success = parseOinfoTests();
                             downloaded11 = true;
                         } else {
                             grade = "12";
                             if (downloaded12) continue;
                             else total_downloads++;
-                            parseOinfoTests();
+                            success = parseOinfoTests();
                             downloaded12 = true;
                         }
+                        if (!success) return false;
                     } else if (currFilter == filters.get(0)) {
                         //uinfo or minfo
                         requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
-                        parseUinfoMinfoTests(currGrade);
+                        success = parseUinfoMinfoTests(currGrade);
+
+                        if (!success) return false;
                     } else {
                         requestedVplanMode = MINFO;
-                        parseUinfoMinfoTests(currGrade);
+                        success = parseUinfoMinfoTests(currGrade);
+
+                        if (!success) return false;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (e.getMessage() != null) {
-                        if (e.getMessage().contentEquals("failed to connect oinfo")) {
-                            publishProgress(ProgressCode.ERR_NO_INTERNET);
-                        }
-                    }
-                    return false;
-                }
+
                 downloaded_files++;
                 publishProgress(ProgressCode.PARSING_FINISHED);
             }
@@ -216,7 +214,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
     private boolean downloadVplan(SharedPreferences.Editor editor) {
 
-        boolean success = true;
+        boolean success = false;
 
         //download new data and then refresh pager adapter
 
@@ -281,14 +279,27 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         if (success) refreshLastUpdate();
     }
 
-    public void parseUinfoMinfoTests(String grade) throws Exception {
+    public boolean parseUinfoMinfoTests(String grade) {
 
         Document doc;
 
         try {
             doc = Jsoup.connect(findRequestedTestsPage()).get();
-        } catch (HttpStatusException e) {
-            throw new Exception("failed to connect oinfo");
+        } catch (IOException e) {
+
+            if (e instanceof HttpStatusException) {
+                switch (((HttpStatusException)e).getStatusCode()) {
+
+                    case HttpStatus.SC_UNAUTHORIZED:
+                        publishProgress(ProgressCode.ERR_NO_CREDS);
+                        break;
+                    default:
+                        publishProgress(ProgressCode.ERR_NO_INTERNET);
+                        break;
+                }
+            } else publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+
+            return false;
         }
 
         Element list = doc.select("li").first();
@@ -343,16 +354,29 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         downloadedUinfoMinfo = true;
         publishProgress(ProgressCode.PARSING_FINISHED);
+        return true;
     }
 
-    public void parseOinfoTests() throws Exception {
+    public boolean parseOinfoTests() {
 
         Document doc;
 
         try {
             doc = Jsoup.connect(findRequestedTestsPage()).get();
         } catch (IOException e) {
-            throw new Exception("failed to connect oinfo");
+            if (e instanceof HttpStatusException) {
+                switch (((HttpStatusException)e).getStatusCode()) {
+
+                    case HttpStatus.SC_UNAUTHORIZED:
+                        publishProgress(ProgressCode.ERR_NO_CREDS);
+                        break;
+                    default:
+                        publishProgress(ProgressCode.ERR_NO_INTERNET);
+                        break;
+                }
+            } else publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+
+            return false;
         }
 
         //get the table element
@@ -366,6 +390,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         parseOinfoTestData(tableRows);
 
         publishProgress(ProgressCode.PARSING_FINISHED);
+        return true;
     }
 
     /**
@@ -398,6 +423,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         break;
                     default:
                         publishProgress(ProgressCode.ERR_NO_INTERNET);
+                        break;
                 }
             }
             return false;
@@ -846,10 +872,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         byte[] data = null;
         try {
             data = creds.getBytes("UTF-8");
-        } catch (UnsupportedOperationException e) {
-            e.printStackTrace();
-            Log.e(context.getPackageName(), context.getString(R.string.err_getBytes));
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedOperationException | UnsupportedEncodingException e) {
             e.printStackTrace();
             Log.e(context.getPackageName(), context.getString(R.string.err_getBytes));
         }
@@ -862,13 +885,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
      */
     private boolean updateAvailableFilesList() {
 
-        //load the list of files that are available just now, if internet connection is available, else just skip that
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
-
-        if (activeNetwork != null && activeNetwork.isConnected()) {
-
-            //we are online
+        //load the list of files that are available just now
 
             //encode uname and pw for http post
             String encoding = encodeCredentials();
@@ -893,6 +910,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                             break;
                         default:
                             publishProgress(ProgressCode.ERR_NO_INTERNET);
+                            break;
                     }
                 }
                 return false;
@@ -937,11 +955,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             }
 
             return true;
-        } else {
-            //there is no internet connection
-            publishProgress(ProgressCode.ERR_NO_INTERNET);
-            return false;
-        }
     }
 
     public String refreshLastUpdate() {
