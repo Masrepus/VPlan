@@ -80,5 +80,19 @@
     <string name="vplan">Substitution Plan</string>
     <string name="title_activity_timetable">Timetable</string>
     <string name="room">Room</string>
+    <string name="filter">Filter</string>
+    <string name="filter_explanations">In order to filter the substitution plan, you first have to go to the settings and add classes/courses to your filter.</string>
+    <string name="msg_start_tutorial">Would you like to start a short tutorial about the features of the SGP App?</string>
+    <string name="next">Next</string>
+    <string name="tut_drawer_text">Here you can switch between different views: substitution plan and exams. \nInside a view you can change between Ober-, Mittel- and Unterstufe.</string>
+    <string name="tut_drawer_title">Slide-out menu</string>
+    <string name="tut_start_text">Click on the home/back button in the upper left corner or swipe from the left screen edge to the right in order to open the slide-out menu.</string>
+    <string name="tut_start_title">Tutorial</string>
+    <string name="tutorial">Tutorial</string>
+    <string name="tut_filter_hardware_menu">Now you can filter the substitution plan so that you only see the entries relevant for your class/your courses. \nYou can save your class or your courses in settings. \n \nYour device has got a hardware menu button next to your home button. Use it to open the menu which will give you further options.</string>
+    <string name="tut_filter_no_menubutton">Now you can filter the substitution plan so that you only see the entries relevant for your class/your courses. \nYou can save your class or your courses in settings. \n \nClick on the menu button to get further options</string>
+    <string name="tut_exams">Here you can see the upcoming tests for your classes/courses. \nThe classes and courses you have already got in your filter for the substitution plan are used for this.</string>
+    <string name="tut_refresh_text">Click here to refresh the substitution plan data.</string>
+    <string name="tut_refresh_title">Refresh data</string>
 
 </resources>

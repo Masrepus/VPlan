@@ -21,6 +21,11 @@
         android:title="@string/hide_past_exams"
         android:checkable="true"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_help"
+        android:title="@string/tutorial"
+        android:icon="@drawable/ic_action_help"
+        app:showAsAction="always" />
 
     <!--<item
         android:id="@+id/tester"

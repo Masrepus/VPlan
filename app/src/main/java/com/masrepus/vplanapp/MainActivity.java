@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,25 +26,33 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.ActionMenuPresenter;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
+import com.github.amlcurran.showcaseview.targets.PointTarget;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -64,6 +74,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,6 +100,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private GoogleApiClient apiClient;
     private ArrayList<DataMap> dataMaps;
     private BroadcastReceiver updateRequestReceiver;
+    private ShowcaseView showcase;
+    private boolean tutorialMode;
 
     /**
      * Called when the activity is first created.
@@ -150,7 +163,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -177,6 +190,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                             actionBar.setTitle(R.string.oberstufe);
                             break;
                     }
+
+                    if (tutorialMode) {
+                        refreshTutorial();
+                    }
                 }
 
                 @Override
@@ -184,6 +201,22 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     super.onDrawerOpened(drawerView);
 
                     actionBar.setTitle(R.string.sgp);
+
+                    //if we are in tutorial mode continue giving instructions
+                    if (tutorialMode) {
+                        showcase.setTarget(Target.NONE);
+                        showcase.setContentTitle(getString(R.string.tut_drawer_title));
+                        showcase.setContentText(getString(R.string.tut_drawer_text));
+                        showcase.setButtonText(getString(R.string.next));
+                        showcase.setShouldCentreText(true);
+                        showcase.overrideButtonClick(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                                layout.closeDrawers();
+                            }
+                        });
+                    }
                 }
             };
 
@@ -243,6 +276,88 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
         buildApiClient();
+
+        //check if the tutorial has never been shown yet
+        tutorialMode = !pref.getBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", false);
+
+        if (tutorialMode) {
+            askAboutTutorial();
+        }
+    }
+
+    private void refreshTutorial() {
+        //tell the user how to refresh vplan data and then take him over to the overflow menu in order to add some classes to his filter
+        if (showcase == null) {
+            showcase = new ShowcaseView.Builder(this).build();
+            showcase.setButtonPosition(getRightParam(getResources()));
+            showcase.setButtonText(getString(R.string.next));
+            showcase.setStyle(R.style.ShowcaseTheme);
+        }
+
+        showcase.setTarget(new ViewTarget(findViewById(R.id.action_refresh)));
+        showcase.setContentTitle(getString(R.string.tut_refresh_title));
+        showcase.setContentText(getString(R.string.tut_refresh_text));
+        showcase.overrideButtonClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showcase.hide();
+                View refresh = findViewById(R.id.action_refresh);
+                refresh.performClick();
+            }
+        });
+    }
+
+    private void overflowTutorial() {
+        //continue to the settings menu and tell the user if the device has a hardware menu button
+
+        if (ViewConfiguration.get(MainActivity.this).hasPermanentMenuKey()) {
+            if (showcase == null) {
+                showcase = new ShowcaseView.Builder(this)
+                        .setStyle(R.style.ShowcaseTheme)
+                        .build();
+                showcase.setButtonPosition(getRightParam(getResources()));
+            }
+
+            showcase.setTarget(Target.NONE);
+            showcase.setContentTitle(getString(R.string.filter));
+            showcase.setContentText(getString(R.string.tut_filter_hardware_menu));
+            showcase.setShouldCentreText(false);
+            showcase.overrideButtonClick(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showcase.hide();
+                    MainActivity.this.openOptionsMenu();
+                }
+            });
+        } else {
+            if (showcase == null) {
+                showcase = new ShowcaseView.Builder(this)
+                        .setStyle(R.style.ShowcaseTheme)
+                        .build();
+                showcase.setButtonPosition(getRightParam(getResources()));
+            }
+
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            final List<View> views = toolbar.getTouchables();
+            ViewTarget target = new ViewTarget(views.get(views.size()-2)); //overflow
+
+            showcase.setTarget(target);
+            showcase.setContentTitle(getString(R.string.filter));
+            showcase.setContentText(getString(R.string.tut_filter_no_menubutton));
+            showcase.setShouldCentreText(false);
+            showcase.overrideButtonClick(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showcase.hide();
+                    views.get(views.size() - 2).performClick();
+                }
+            });
+        }
+        showcase.show();
+        tutorialMode = false;
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
+        pref.edit().putBoolean(SharedPrefs.TUT_RUNNING, false).apply();
     }
 
     @Override
@@ -487,7 +602,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.d(getPackageName(), "onConnectionSuspended: " + cause);
+        Log.d("Google Services", "onConnectionSuspended: " + cause);
     }
 
     private int getTodayVplanId() {
@@ -528,7 +643,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-                        Log.d(getPackageName(), "onConnectionFailed: " + connectionResult);
+                        Log.d("Google Services", "onConnectionFailed: " + connectionResult);
                     }
                 })
 
@@ -669,50 +784,134 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 return true;
             case R.id.action_activate_filter:
-                //display the grey status bar for the filter or disable it
-                FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
-                TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
-                    editor.apply();
-                    fl.setVisibility(View.GONE);
-
-                    //sync this new dataset to wear
-                    sendDataToWatch();
+                //tell the user how the filter works if the current filter is still empty
+                if (filterCurrent.isEmpty()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(getString(R.string.filter))
+                            .setMessage(getString(R.string.filter_explanations))
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
                 } else {
-                    item.setChecked(true);
-                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                    SharedPreferences.Editor editor = pref.edit();
+                    //display the grey status bar for the filter or disable it
+                    FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
+                    TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
+                    if (item.isChecked()) {
+                        item.setChecked(false);
+                        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
+                        editor.apply();
+                        fl.setVisibility(View.GONE);
 
-                    editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, true);
-                    editor.apply();
-                    fl.setVisibility(View.VISIBLE);
-                    filterWarning.setText(R.string.filter_enabled);
+                        //sync this new dataset to wear
+                        sendDataToWatch();
+                    } else {
+                        item.setChecked(true);
+                        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                        SharedPreferences.Editor editor = pref.edit();
 
-                    //sync to wear
-                    sendDataToWatch();
+                        editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, true);
+                        editor.apply();
+                        fl.setVisibility(View.VISIBLE);
+                        filterWarning.setText(R.string.filter_enabled);
+
+                        //sync to wear
+                        sendDataToWatch();
+                    }
+                    //refresh adapter for viewPager
+                    new PagerAdapterLoader().execute(this);
                 }
-                //refresh adapter for viewPager
-                new PagerAdapterLoader().execute(this);
-
                 return true;
             case R.id.action_help:
-                showTutorial();
+                SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true);
+                tutorialMode = true;
+                askAboutTutorial();
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private void askAboutTutorial() {
+
+        //first ask the user if he really wants to start the tutorial now
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.tutorial))
+                .setMessage(getString(R.string.msg_start_tutorial))
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                        pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
+                        dialog.dismiss();
+                    }
+                })
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showTutorial();
+                        dialog.dismiss();
+                    }
+                }).show();
+    }
+
     private void showTutorial() {
-        new ShowcaseView.Builder(this)
-                .setTarget(new ActionViewTarget(this, ActionViewTarget.Type.HOME))
-                .setContentTitle("Tutorial der SGP-App")
-                .setContentText("Klicke zum Öffnen des seitlichen Menüs auf den Home/Zurück Button oder wische vom linken Bildschirmrand nach rechts.")
-                .hideOnTouchOutside()
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        pref.edit().putBoolean(SharedPrefs.TUT_RUNNING, true).apply();
+
+        showcase = new ShowcaseView.Builder(this)
+                .setTarget(new PointTarget(16, 16))
+                .setContentTitle(getString(R.string.tut_start_title))
+                .setContentText(getString(R.string.tut_start_text))
+                .setStyle(R.style.ShowcaseTheme)
                 .build();
+        showcase.setButtonPosition(getRightParam(getResources()));
+        showcase.setButtonText(getString(R.string.next));
+        showcase.overrideButtonClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                layout.openDrawer(Gravity.START);
+            }
+        });
+        showcase.setBlocksTouches(false);
+    }
+
+    public int getNavigationBarHeight(int orientation) {
+        try {
+            Resources resources = getResources();
+            int id = resources.getIdentifier(
+                    orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape",
+                    "dimen", "android");
+            if (id > 0) {
+                return resources.getDimensionPixelSize(id);
+            }
+        } catch (NullPointerException | IllegalArgumentException | Resources.NotFoundException e) {
+            return 0;
+        }
+        return 0;
+    }
+
+    public RelativeLayout.LayoutParams getRightParam(Resources res) {
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        int margin = ((Number) (res.getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, getNavigationBarHeight(res.getConfiguration().orientation
+        ) + (int) res.getDisplayMetrics().density * 10);
+        return lps;
     }
 
     public void refresh(View v) {
@@ -1129,6 +1328,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 activatePagerAdapter();
 
                 sendDataToWatch();
+
+                //if we are in tutorial mode, resume
+                SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                if (pref.getBoolean(SharedPrefs.TUT_RUNNING, false)) overflowTutorial();
             }
         }
     }
@@ -1159,10 +1362,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
 
                 if (result.getStatus().isSuccess())
-                    Log.v(getPackageName(), "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
+                    Log.v("Wear Api", "DataMap: " + dataMap + "sent to: " + node.getDisplayName());
                 else {
                     failCount++;
-                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+                    Log.e("Wear Api", "ERROR: failed to send DataMap! (" + failCount + ")");
 
                     //retry later
                     try {

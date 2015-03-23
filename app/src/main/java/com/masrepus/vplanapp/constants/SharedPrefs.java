@@ -19,4 +19,6 @@ public class SharedPrefs {
     public static final String HIDE_OLD_EXAMS = "hideOldExams";
     public static final String SELECTED_APPMODE_ITEM = "selectedAppmodeItem";
     public static final String SELECTED_VPLAN_ITEM = "selectedVplanItem";
+    public static final String TUT_SHOWN_PREFIX = "tutShown";
+    public static final String TUT_RUNNING = "tutRunning";
 }

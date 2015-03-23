@@ -16,4 +16,7 @@ public class Args {
     public static final String ACTION_REFRESH = "com.masrepus.vplanapp.action.refresh";
     public static final String ACTION_UPDATE_UI = "com.masrepus.vplanapp.action.updateUI";
     public static final String NOTIFY_WEAR_UPDATE_UI = "notifyWear";
+    public static final String ACTION_TUTORIAL = "tutorial";
+    public static final String TUT_GENERAL = "general";
+    public static final String TUT_FILTER = "filter";
 }

@@ -20,7 +20,7 @@ public class DataListenerService extends WearableListenerService {
         if (messageEvent.getPath().equals(Args.ACTION_REFRESH)) {
             //start an update in the background
             startService(new Intent(getApplicationContext(), DownloaderService.class).putExtra(DataKeys.ACTION, Args.NOTIFY_WEAR_UPDATE_UI));
-            Log.v(getPackageName(), "Received message: " + messageEvent.getPath());
+            Log.v("Wear Api", "Received message: " + messageEvent.getPath());
         }
     }
 }

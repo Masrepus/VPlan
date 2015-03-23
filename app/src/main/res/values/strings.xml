@@ -195,5 +195,18 @@
     <string name="timetable">Stundenplan</string>
     <string name="room">Raum</string>
     <string name="tutorial">Tutorial</string>
+    <string name="next">Weiter</string>
+    <string name="tut_start_title">Tutorial</string>
+    <string name="tut_start_text">Klicke zum Öffnen des seitlichen Menüs auf den Home/Zurück Button in der linken oberen Ecke oder wische vom linken Bildschirmrand nach rechts.</string>
+    <string name="tut_drawer_text">Hier kann zwischen den verschiedenen Ansichten gewechselt werden: Vertretungsplan und Prüfungen.\nInnerhalb einer Ansicht kann zwischen Ober-, Mittel- und Unterstufe gewechselt werden</string>
+    <string name="tut_drawer_title">Seitliches Menü</string>
+    <string name="filter">Filter</string>
+    <string name="filter_explanations">Um den Vertretungsplan filtern zu können, müssen zuerst in den Einstellungen Klassen bzw. Kurse zu deinem Filter hinzugefügt werden.</string>
+    <string name="msg_start_tutorial">Möchtest du eine kurze Einführung in die Funktionen der SGP App starten?</string>
+    <string name="tut_filter_hardware_menu">Nun kannst du den Vertretungsplan filtern, um nur die für deine Klasse bzw. deine Kurse relevanten Einträge zu sehen. \nDeine Klasse oder deine Kurse kannst du in den Einstellungen festlegen. \n \nDein Gerät hat einen Hardware-Menüknopf neben dem Homebutton. Öffne damit das Menü, um weiter Optionen zu erhalten.</string>
+    <string name="tut_filter_no_menubutton">Nun kannst du den Vertretungsplan filtern, um nur die für deine Klasse bzw. deine Kurse relevanten Einträge zu sehen. \nDeine Klasse oder deine Kurse kannst du in den Einstellungen festlegen. \n \nKlicke auf den Menü-Button, um weitere Optionen zu erhalten</string>
+    <string name="tut_refresh_title">Daten Aktualisieren</string>
+    <string name="tut_refresh_text">Klicke hier, um die Daten des Vertretungsplans zu aktualisieren.</string>
+    <string name="tut_exams">Hier kannst du auf einen Blick sehen, welche Prüfungen für deine Klasse bzw. deine Kurse anstehen. \nDafür werden alle Klassen und Kurse verwendet, die du bereits in deinem Vertretungsplan-Filter gespeichert hast.</string>
 
 </resources>
