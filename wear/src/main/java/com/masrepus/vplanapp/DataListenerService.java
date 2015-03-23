@@ -25,7 +25,7 @@ public class DataListenerService extends WearableListenerService {
         if (messageEvent.getPath().equals(Args.ACTION_UPDATE_UI)) {
             //start an update in the background
             sendBroadcast(new Intent(Args.ACTION_UPDATE_UI));
-            Log.v(getPackageName(), "Received message: " + messageEvent.getPath());
+            Log.v("Wear Api", "Received message: " + messageEvent.getPath());
         }
     }
 
@@ -42,15 +42,15 @@ public class DataListenerService extends WearableListenerService {
                 //check the data path and react accordingly
                 String path = event.getDataItem().getUri().getPath();
                 if (path.contentEquals(DataKeys.VPLAN)) {
-                    Log.v(getPackageName(), "Vplan data received on watch: " + dataMap);
+                    Log.v("Wear Api", "Vplan data received on watch: " + dataMap);
 
                     saveVplanFiles(dataMap);
                 } else if (path.contentEquals(DataKeys.HEADERS)) {
-                    Log.v(getPackageName(), "Headers received on watch: " + dataMap);
+                    Log.v("Wear Api", "Headers received on watch: " + dataMap);
 
                     saveHeaders(dataMap);
                 } else if (path.contentEquals(DataKeys.META_DATA)) {
-                    Log.v(getPackageName(), "Meta-data received on watch: " + dataMap);
+                    Log.v("Wear Api", "Meta-data received on watch: " + dataMap);
 
                     saveLastUpdate(dataMap.getString(SharedPrefs.LAST_UPDATE));
                     saveTimePublishedTimestamps(dataMap.getStringArray(DataKeys.TIME_PUBLISHED_TIMESTAMPS));
@@ -59,7 +59,7 @@ public class DataListenerService extends WearableListenerService {
 
                     if (dataMap.getString(DataKeys.ACTION).contentEquals(Args.ACTION_UPDATE_UI)) sendBroadcast(new Intent(this, MainActivity.class).setAction(Args.ACTION_UPDATE_UI));
                 }
-            } else Log.v(getPackageName(), "Skipped incoming data item (type: " + event.getType() + ")");
+            } else Log.v("Wear Api", "Skipped incoming data item (type: " + event.getType() + ")");
         }
     }
 
@@ -109,7 +109,7 @@ public class DataListenerService extends WearableListenerService {
             editor.apply();
         }
 
-        Log.v(getPackageName(), "Successfully saved headers in SharedPrefs: " + dataMap);
+        Log.v("DataListenerService", "Successfully saved headers in SharedPrefs: " + dataMap);
     }
 
     private void saveVplanFiles(DataMap dataMap) {
@@ -134,6 +134,6 @@ public class DataListenerService extends WearableListenerService {
             }
         }
 
-        Log.v(getPackageName(), "Data saved in db: " + dataMap.size() + " days");
+        Log.v("DataListenerService", "Data saved in db: " + dataMap.size() + " days");
     }
 }
