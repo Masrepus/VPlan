@@ -26,8 +26,8 @@
         android:title="@string/tutorial"
         android:icon="@drawable/ic_action_help"
         app:showAsAction="ifRoom" />
-    <item
+    <!--<item
         android:id="@+id/tester"
-        android:title="test" />
+        android:title="test" />-->
 
 </menu>

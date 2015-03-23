@@ -1747,7 +1747,6 @@ containing a value of this type.
         public static final int subject=0x7f0b0050;
         public static final int submit_area=0x7f0b004a;
         public static final int tabMode=0x7f0b0017;
-        public static final int tester=0x7f0b007e;
         public static final int textView=0x7f0b005a;
         public static final int textView2=0x7f0b005c;
         public static final int textView3=0x7f0b0059;
