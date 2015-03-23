@@ -95,7 +95,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 //it isn't the password field
                 etPref.setSummary(preferences.getString(etPref.getKey(), ""));
-            } else etPref.setSummary("*****");
+            } else if (!etPref.getText().isEmpty()) etPref.setSummary("*****");
+            else etPref.setSummary("");
         }
 
         if (p instanceof ListPreference) {

@@ -61,7 +61,7 @@ public class DownloaderService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d(getPackageName(), "Starting bg download service");
+        Log.d("DownloaderService", "Starting bg download service");
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -71,7 +71,7 @@ public class DownloaderService extends Service {
         String action = intent.getStringExtra(DataKeys.ACTION);
         if (action != null) {
             notifyWear = action.contentEquals(Args.NOTIFY_WEAR_UPDATE_UI);
-            Log.d(getPackageName(), "notifyWear = " + notifyWear);
+            Log.d("Wear Api", "notifyWear = " + notifyWear);
         } else notifyWear = false;
 
         lastRequestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
@@ -284,7 +284,7 @@ public class DownloaderService extends Service {
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-                        Log.d(getPackageName(), "onConnectionFailed: " + connectionResult);
+                        Log.d("Google Services", "onConnectionFailed: " + connectionResult);
                     }
                 })
 
@@ -336,10 +336,10 @@ public class DownloaderService extends Service {
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
 
                 if (result.getStatus().isSuccess())
-                    Log.v(getPackageName(), path + " " + dataMap + "sent to: " + node.getDisplayName());
+                    Log.v("Wear Api", path + " " + dataMap + "sent to: " + node.getDisplayName());
                 else {
                     failCount++;
-                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+                    Log.e("Wear Api", "ERROR: failed to send DataMap! (" + failCount + ")");
 
                     //retry later
                     try {
@@ -362,8 +362,8 @@ public class DownloaderService extends Service {
 
                 //check for success
                 if (!result.getStatus().isSuccess())
-                    Log.e(getPackageName(), "ERROR: failed to send Message: " + result.getStatus());
-                else Log.v(getPackageName(), "Successfully sent message: " + path + " to " + node);
+                    Log.e("Wear Api", "ERROR: failed to send Message: " + result.getStatus());
+                else Log.v("Wear Api", "Successfully sent message: " + path + " to " + node);
             }
         }
 
@@ -555,7 +555,7 @@ public class DownloaderService extends Service {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                cancel(false);
+                cancel(true);
             }
         }
     }

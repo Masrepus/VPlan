@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,8 +26,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.ProgressCode;
@@ -50,6 +55,9 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
     private SettingsPrefListener listener;
     private String callingActivity;
 
+    private ShowcaseView showcase;
+    private boolean tutorialMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +72,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
 
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         noOldItems = pref.getBoolean(SharedPrefs.HIDE_OLD_EXAMS, false);
+        tutorialMode = !pref.getBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "ExamsActivity", false);
 
         //hide or show hidden items info
         FrameLayout hiddenItemsFL = (FrameLayout) findViewById(R.id.frameLayout2);
@@ -71,6 +80,49 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         else hiddenItemsFL.setVisibility(View.GONE);
 
         refreshAdapter();
+
+        if (tutorialMode) {
+            showTutorial();
+            pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "ExamsActivity", true).apply();
+        }
+    }
+
+    private void showTutorial() {
+        showcase = new ShowcaseView.Builder(this)
+                .setStyle(R.style.ShowcaseTheme)
+                .setTarget(Target.NONE)
+                .setContentTitle(getString(R.string.title_activity_exams))
+                .setContentText(getString(R.string.tut_exams))
+                .build();
+        showcase.setHideOnTouchOutside(false);
+        showcase.setButtonPosition(getRightParam(getResources()));
+        showcase.setBlocksTouches(false);
+        showcase.show();
+    }
+
+    public RelativeLayout.LayoutParams getRightParam(Resources res) {
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        int margin = ((Number) (res.getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, getNavigationBarHeight(res.getConfiguration().orientation
+        ) + (int) res.getDisplayMetrics().density * 10);
+        return lps;
+    }
+
+    public int getNavigationBarHeight(int orientation) {
+        try {
+            Resources resources = getResources();
+            int id = resources.getIdentifier(
+                    orientation == Configuration.ORIENTATION_PORTRAIT ? "navigation_bar_height" : "navigation_bar_height_landscape",
+                    "dimen", "android");
+            if (id > 0) {
+                return resources.getDimensionPixelSize(id);
+            }
+        } catch (NullPointerException | IllegalArgumentException | Resources.NotFoundException e) {
+            return 0;
+        }
+        return 0;
     }
 
     @Override
@@ -228,6 +280,11 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
 
                 refreshAdapter();
                 return true;
+            case R.id.action_help:
+                pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "ExamsActivity", true).apply();
+                tutorialMode = true;
+                showTutorial();
         }
         return super.onOptionsItemSelected(item);
     }
