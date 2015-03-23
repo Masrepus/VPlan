@@ -75,6 +75,8 @@ public class ShowcaseView extends RelativeLayout
     private long fadeOutMillis;
     private boolean isShowing;
 
+    private View mHandy;
+
     protected ShowcaseView(Context context, boolean newStyle) {
         this(context, null, R.styleable.CustomTheme_showcaseViewStyle, newStyle);
     }
@@ -131,6 +133,81 @@ public class ShowcaseView extends RelativeLayout
             addView(mEndButton);
         }
 
+    }
+
+    /**
+     * Adds an animated hand performing a gesture.
+     * All parameters passed to this method are relative to the center of the showcased view.
+     * @param offsetStartX  x-offset of the start position
+     * @param offsetStartY  y-offset of the start position
+     * @param offsetEndX    x-offset of the end position
+     * @param offsetEndY    y-offset of the end position
+     * @see com.github.amlcurran.showcaseview.ShowcaseView#animateGesture(float, float, float, float, boolean)
+     */
+    public void animateGesture(float offsetStartX, float offsetStartY, float offsetEndX,
+                               float offsetEndY) {
+        animateGesture(offsetStartX, offsetStartY, offsetEndX, offsetEndY, false);
+    }
+
+    /**
+     * Adds an animated hand performing a gesture.
+     * @param startX                x-coordinate or x-offset of the start position
+     * @param startY                y-coordinate or x-offset of the start position
+     * @param endX                  x-coordinate or x-offset of the end position
+     * @param endY                  y-coordinate or x-offset of the end position
+     * @param absoluteCoordinates   If true, this will use absolute coordinates instead of coordinates relative to the center of the showcased view
+     */
+    public void animateGesture(float startX, float startY, float endX,
+                               float endY, boolean absoluteCoordinates) {
+        mHandy = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.handy, null);
+        addView(mHandy);
+        moveHand(startX, startY, endX, endY, absoluteCoordinates, new AnimationUtils.AnimationEndListener() {
+            @Override
+            public void onAnimationEnd() {
+                removeView(mHandy);
+            }
+        });
+    }
+
+    private void moveHand(float startX, float startY, float endX,
+                          float endY, boolean absoluteCoordinates, AnimationUtils.AnimationEndListener listener) {
+        AnimationUtils.createMovementAnimation(mHandy, absoluteCoordinates?0:showcaseX,
+                absoluteCoordinates?0:showcaseY,
+                startX, startY,
+                endX, endY,
+                listener).start();
+    }
+
+    /**
+     * Get the ghostly gesture hand for custom gestures
+     *
+     * @return a View representing the ghostly hand
+     */
+    public View getHand() {
+        final View mHandy = ((LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.handy, null);
+        addView(mHandy);
+        AnimationUtils.hide(mHandy);
+
+        return mHandy;
+    }
+
+    /**
+     * Point to a specific point on the screen
+     * @param target The target to point to
+     * @deprecated use pointTo(Target)
+     */
+    public void pointTo(final Target target) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                mHandy = getHand();
+                Point targetPoint = target.getPoint();
+                AnimationUtils.createMovementAnimation(mHandy, targetPoint.x,
+                        targetPoint.y).start();
+            }
+        });
     }
 
     private boolean hasShot() {

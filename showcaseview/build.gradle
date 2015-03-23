@@ -27,6 +27,7 @@ buildscript {
 apply plugin: 'com.android.library'
 
 dependencies {
+    compile files('libs/nineoldandroids-2.4.0.jar')
 }
 
 android {
