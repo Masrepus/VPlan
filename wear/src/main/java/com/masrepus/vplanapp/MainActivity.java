@@ -123,7 +123,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 VplanPagerAdapter adapter = new VplanPagerAdapter(getFragmentManager(), getApplicationContext());
                 pager.setAdapter(adapter);
 
-                Log.d(getPackageName(), "Re-created pager adapter");
+                Log.d("MainActivity", "Re-created pager adapter");
             }
         };
 
@@ -175,8 +175,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(apiClient, node.getId(), path, null).await();
 
                 //check for success
-                if (!result.getStatus().isSuccess()) Log.e(getPackageName(), "ERROR: failed to send Message: " + path + " (" + result.getStatus() + ")");
-                else Log.v(getPackageName(), "Successfully sent message: " + path + " to " + node);
+                if (!result.getStatus().isSuccess()) Log.e("Wear Api", "ERROR: failed to send Message: " + path + " (" + result.getStatus() + ")");
+                else Log.v("Wear Api", "Successfully sent message: " + path + " to " + node);
             }
         }
 
@@ -193,10 +193,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(apiClient, request).await();
 
                 if (result.getStatus().isSuccess())
-                    Log.v(getPackageName(), path + " " + dataMap + "sent to: " + node.getDisplayName());
+                    Log.v("Wear Api", path + " " + dataMap + "sent to: " + node.getDisplayName());
                 else {
                     failCount++;
-                    Log.e(getPackageName(), "ERROR: failed to send DataMap! (" + failCount + ")");
+                    Log.e("Wear Api", "ERROR: failed to send DataMap! (" + failCount + ")");
 
                     //retry later
                     try {
