@@ -1,9 +1,11 @@
 package com.masrepus.vplanapp;
 
+import java.io.Serializable;
+
 /**
  * Created by samuel on 31.01.15.
  */
-public class TimetableRow {
+public class TimetableRow implements Serializable {
 
     private String lesson;
     private String subject;
