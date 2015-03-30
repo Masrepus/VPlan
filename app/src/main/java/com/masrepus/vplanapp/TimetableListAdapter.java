@@ -30,29 +30,40 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
         View rowView = convertView;
         ViewHolder view;
 
-        if (rowView == null) {
-            //get a new instance of the row layout view
-            rowView = View.inflate(getContext(), R.layout.timetable_item, null);
-
-            //hold the view objects in an object, that way they don't need to be "re- found"
-            view = new ViewHolder();
-            view.lesson = (TextView) rowView.findViewById(R.id.lesson);
-            view.subject = (TextView) rowView.findViewById(R.id.subject);
-            view.room = (TextView) rowView.findViewById(R.id.room);
-
-            rowView.setTag(view);
-        } else {
-            view = (ViewHolder) rowView.getTag();
-        }
-
         //put data to the views
-        TimetableRow item = rows.get(position);
-        view.lesson.setText(item.getLesson());
-        view.subject.setText(item.getSubject());
-        view.room.setText(item.getRoom());
 
-        //let the timetable activity handle long clicks
-        rowView.setOnLongClickListener(activity);
+        //check if this is a regular lesson row or a break row
+        TimetableRow item = rows.get(position);
+
+        if (item instanceof BreakRow) {
+            //get a new instance of the footer layout view to display the break info
+            rowView = View.inflate(getContext(), R.layout.break_view, null);
+        } else {
+
+            //if this is an empty view or a break view, re-inflate the correct layout
+            //TODO separate tags für breakrow und normale items, damit nicht immer neu inflated werden muss
+            if (rowView == null || rowView.findViewById(R.id.lesson) == null) {
+                //get a new instance of the row layout view
+                rowView = View.inflate(getContext(), R.layout.timetable_item, null);
+
+                //hold the view objects in an object, that way they don't need to be "re-found"
+                view = new ViewHolder();
+                view.lesson = (TextView) rowView.findViewById(R.id.lesson);
+                view.subject = (TextView) rowView.findViewById(R.id.subject);
+                view.room = (TextView) rowView.findViewById(R.id.room);
+
+                rowView.setTag(view);
+            } else {
+                view = (ViewHolder) rowView.getTag();
+            }
+
+            view.lesson.setText(item.getLesson());
+            view.subject.setText(item.getSubject());
+            view.room.setText(item.getRoom());
+
+            //let the timetable activity handle long clicks
+            rowView.setOnLongClickListener(activity);
+        }
 
         return rowView;
     }

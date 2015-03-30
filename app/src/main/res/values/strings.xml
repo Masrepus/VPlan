@@ -214,5 +214,7 @@
     <string name="tut_refresh_text">Klicke hier, um die Daten des Vertretungsplans zu aktualisieren.</string>
     <string name="tut_exams">Hier kannst du auf einen Blick sehen, welche Prüfungen für deine Klasse bzw. deine Kurse anstehen. \nDafür werden alle Klassen und Kurse verwendet, die du bereits in deinem Vertretungsplan-Filter gespeichert hast.</string>
     <string name="lesson_already_saved">Stunde bereits belegt</string>
+    <string name="free_lesson">Freistunde</string>
+    <string name="break_info">Pause</string>
 
 </resources>
