@@ -36,13 +36,33 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
         TimetableRow item = rows.get(position);
 
         if (item instanceof BreakRow) {
-            //get a new instance of the footer layout view to display the break info
-            rowView = View.inflate(getContext(), R.layout.break_view, null);
+
+            if (rowView == null) {
+
+                //get a new instance of the footer layout view to display the break info
+                rowView = View.inflate(getContext(), R.layout.break_view, null);
+
+                view = new ViewHolder();
+                view.isBreakItem = true;
+                rowView.setTag(view);
+            } else {
+
+                view = (ViewHolder) rowView.getTag();
+
+                if (!view.isBreakItem) {
+
+                    //get a new instance of the footer layout view to display the break info
+                    rowView = View.inflate(getContext(), R.layout.break_view, null);
+
+                    view = new ViewHolder();
+                    view.isBreakItem = true;
+                    rowView.setTag(view);
+                }
+            }
         } else {
 
             //if this is an empty view or a break view, re-inflate the correct layout
-            //TODO separate tags für breakrow und normale items, damit nicht immer neu inflated werden muss
-            if (rowView == null || rowView.findViewById(R.id.lesson) == null) {
+            if (rowView == null) {
                 //get a new instance of the row layout view
                 rowView = View.inflate(getContext(), R.layout.timetable_item, null);
 
@@ -51,10 +71,28 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
                 view.lesson = (TextView) rowView.findViewById(R.id.lesson);
                 view.subject = (TextView) rowView.findViewById(R.id.subject);
                 view.room = (TextView) rowView.findViewById(R.id.room);
+                view.isBreakItem = false;
 
                 rowView.setTag(view);
             } else {
+
                 view = (ViewHolder) rowView.getTag();
+
+                if (view.isBreakItem) {
+
+                    //re-inflate as this is a wrong item
+                    //get a new instance of the row layout view
+                    rowView = View.inflate(getContext(), R.layout.timetable_item, null);
+
+                    //hold the view objects in an object, that way they don't need to be "re-found"
+                    view = new ViewHolder();
+                    view.lesson = (TextView) rowView.findViewById(R.id.lesson);
+                    view.subject = (TextView) rowView.findViewById(R.id.subject);
+                    view.room = (TextView) rowView.findViewById(R.id.room);
+                    view.isBreakItem = false;
+
+                    rowView.setTag(view);
+                }
             }
 
             view.lesson.setText(item.getLesson());
@@ -72,5 +110,6 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
         protected TextView lesson;
         protected TextView subject;
         protected TextView room;
+        protected boolean isBreakItem;
     }
 }

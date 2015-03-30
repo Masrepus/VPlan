@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,14 +47,21 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        initAdapter();
+        //display a loading view
+        ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
+        progress.setVisibility(View.VISIBLE);
+        progress.setIndeterminate(true);
+
+        PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+        tabStrip.setVisibility(View.INVISIBLE);
+
+        new PagerAdapterLoader().execute();
     }
 
-    private void initAdapter() {
+    private void initPager(TimetablePagerAdapter adapter) {
 
         //prepare the pager
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
         pager.setAdapter(adapter);
         //scroll to today's page
         Calendar calendar = Calendar.getInstance();
@@ -72,6 +81,8 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         //set a 1 dp margin between the fragments
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
+
+        pager.setOffscreenPageLimit(5);
     }
 
     @Override
@@ -365,5 +376,30 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
         pager.setAdapter(adapter);
+    }
+
+    private class PagerAdapterLoader extends AsyncTask<Void, Void, Void> {
+
+        TimetablePagerAdapter adapter;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            //load the pager adapter in the background
+            adapter = new TimetablePagerAdapter(TimetableActivity.this, TimetableActivity.this.getSupportFragmentManager());
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
+            progress.setVisibility(View.GONE);
+            PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+            tabStrip.setVisibility(View.VISIBLE);
+
+            initPager(adapter);
+        }
     }
 }
