@@ -14,20 +14,41 @@ public class MyNumberPicker extends NumberPicker {
 
     public MyNumberPicker(Context context) {
         super(context);
+        setMinValue(1);
+        setMaxValue(10);
+        this.setDisplayedValues(new String[]{"1", "2", "3", "4", "5", "6", "8", "9", "10", "11"});
     }
 
     public MyNumberPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
         processAttributeSet(attrs);
+        setMinValue(1);
+        setMaxValue(10);
+        this.setDisplayedValues(new String[]{"1", "2", "3", "4", "5", "6", "8", "9", "10", "11"});
     }
 
     public MyNumberPicker(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         processAttributeSet(attrs);
+        setMinValue(1);
+        setMaxValue(10);
+        this.setDisplayedValues(new String[]{"1", "2", "3", "4", "5", "6", "8", "9", "10", "11"});
     }
+
     private void processAttributeSet(AttributeSet attrs) {
-        //This method reads the parameters given in the xml file and sets the properties according to it
-        this.setMinValue(attrs.getAttributeIntValue(null, "min", 0));
-        this.setMaxValue(attrs.getAttributeIntValue(null, "max", 0));
+    }
+
+    public int getLesson() {
+
+        //handle the missing 7
+        int value = getValue();
+        if (value <= 6) return value;
+        else return value + 1;
+    }
+
+    public void setLesson(int lesson) {
+
+        if (lesson <= 6) setValue(lesson);
+        else setValue(lesson - 1);
     }
 }

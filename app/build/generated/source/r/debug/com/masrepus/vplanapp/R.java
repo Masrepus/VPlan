@@ -1707,7 +1707,7 @@ containing a value of this type.
         public static final int lastUpdateFrame=0x7f0b006a;
         public static final int lastUpdateStatic=0x7f0b006b;
         public static final int lesson=0x7f0b007c;
-        public static final int lessonPicker=0x7f0b004f;
+        public static final int lessonPicker=0x7f0b0055;
         public static final int lessonPickerLayout=0x7f0b004d;
         public static final int linearLayout=0x7f0b007e;
         public static final int listMode=0x7f0b0015;
@@ -1726,8 +1726,8 @@ containing a value of this type.
         public static final int radio=0x7f0b0039;
         public static final int relativeLayout=0x7f0b0059;
         public static final int room=0x7f0b007d;
-        public static final int roomACTV=0x7f0b0055;
-        public static final int roomLayout=0x7f0b0053;
+        public static final int roomACTV=0x7f0b0053;
+        public static final int roomLayout=0x7f0b0051;
         public static final int search_badge=0x7f0b0043;
         public static final int search_bar=0x7f0b0042;
         public static final int search_button=0x7f0b0044;
@@ -1751,8 +1751,8 @@ containing a value of this type.
         public static final int status=0x7f0b0083;
         public static final int stunde=0x7f0b0082;
         public static final int subject=0x7f0b005b;
-        public static final int subjectACTV=0x7f0b0052;
-        public static final int subjectLayout=0x7f0b0050;
+        public static final int subjectACTV=0x7f0b0050;
+        public static final int subjectLayout=0x7f0b004e;
         public static final int submit_area=0x7f0b004a;
         public static final int tabMode=0x7f0b0017;
         public static final int textView=0x7f0b0065;
@@ -1761,9 +1761,9 @@ containing a value of this type.
         public static final int textView4=0x7f0b007f;
         public static final int textView5=0x7f0b0066;
         public static final int textView6=0x7f0b0062;
-        public static final int textView7=0x7f0b0051;
-        public static final int textView8=0x7f0b004e;
-        public static final int textView9=0x7f0b0054;
+        public static final int textView7=0x7f0b004f;
+        public static final int textView8=0x7f0b0054;
+        public static final int textView9=0x7f0b0052;
         public static final int textViewAppInfo=0x7f0b006f;
         public static final int textViewSettings=0x7f0b0070;
         public static final int timeChangedTextView=0x7f0b0078;

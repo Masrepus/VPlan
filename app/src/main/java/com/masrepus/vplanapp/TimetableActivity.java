@@ -246,7 +246,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
                 MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
 
-                addLesson(datasource, day, lessonPicker.getValue(), subjectACTV.getText().toString(), roomACTV.getText().toString());
+                addLesson(datasource, day, lessonPicker.getLesson(), subjectACTV.getText().toString(), roomACTV.getText().toString());
 
                 saveSubject(datasource, subjectACTV.getText().toString());
 
@@ -317,7 +317,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
         TextView lesson = (TextView) lessonView.findViewById(R.id.lesson);
-        lessonPicker.setValue(Integer.parseInt(lesson.getText().toString()));
+        lessonPicker.setLesson(Integer.parseInt(lesson.getText().toString()));
 
         //save the values in editingRow
         editingRow = new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString());
@@ -350,16 +350,21 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         //db insert
         datasource.open();
 
-        datasource.updateRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getValue()), subjectACTV.getText().toString(), roomACTV.getText().toString(), editingRow);
+        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.DAYS[day], new String[]{SQLiteHelperTimetable.COLUMN_LESSON}, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lessonPicker.getLesson() + "'");
+
+        //check if there is no entry in that lesson
+        if (c.getCount() == 0) {
+            datasource.updateRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString(), editingRow);
+
+            saveSubject(datasource, subjectACTV.getText().toString());
+
+            //refresh the timetable views
+            TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
+            pager.setAdapter(adapter);
+            pager.setCurrentItem(day);
+        } else Toast.makeText(this, getString(R.string.lesson_already_saved), Toast.LENGTH_SHORT).show();
 
         datasource.close();
-
-        saveSubject(datasource, subjectACTV.getText().toString());
-
-        //refresh the timetable views
-        TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
-        pager.setAdapter(adapter);
-        pager.setCurrentItem(day);
     }
 
     private void removeLesson(DataSource datasource, String lesson) {
