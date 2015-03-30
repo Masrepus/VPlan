@@ -68,14 +68,14 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             if (maxLesson <= 6) {
 
                 //fill the list up with free lessons until there are 6 lessons available
-                fillListUp(tempRows, 6);
+                tempRows = fillListUp(tempRows, 6);
 
             } else if (maxLesson <= 8) /*two afternoon lessons*/ {
 
                 //fill the list up until there are 8 lessons available
-                fillListUp(tempRows, 8);
+                tempRows = fillListUp(tempRows, 8);
 
-            } else fillListUp(tempRows, 10); //four afternoon lessons
+            } else tempRows = fillListUp(tempRows, 10); //four afternoon lessons
 
             //sort the rows one last time
             Collections.sort(tempRows, new Comparator<TimetableRow>() {
@@ -93,7 +93,7 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
         }
     }
 
-    private void insertBreaks(ArrayList<TimetableRow> tempRows, ArrayList<TimetableRow> rows, int maxLesson) {
+    private ArrayList<TimetableRow> insertBreaks(ArrayList<TimetableRow> tempRows, ArrayList<TimetableRow> rows, int maxLesson) {
 
         //now insert the break items
         int tempRowsId = 0;
@@ -107,27 +107,38 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             switch (lesson) {
 
                 case 6:
-                    if (maxLesson == 6) break; //don't insert a break if there are only 6 lessons
+                    if (maxLesson != 6) {
+                        rows.add(new BreakRow());
+                    }
+                    break;
                 case 9:
-                    if (maxLesson != 9) rows.add(new BreakRow());
+                    if (maxLesson != 9) {
+                        rows.add(new BreakRow());
+                    }
+                    break;
                 case 2:
                 case 4:
                     rows.add(new BreakRow());
+                    break;
             }
 
             tempRowsId++;
         }
+
+        return rows;
     }
 
-    private void fillListUp(ArrayList<TimetableRow> list, int lessonCount) {
+    private ArrayList<TimetableRow> fillListUp(ArrayList<TimetableRow> list, int maxLesson) {
 
         int lastLesson = Integer.valueOf(list.get(list.size()-1).getLesson());
 
-        while (list.size() < lessonCount) {
+        while (lastLesson < maxLesson) {
 
-            list.add(new TimetableRow(String.valueOf(lastLesson+1), activity.getString(R.string.free_lesson), ""));
+            list.add(new TimetableRow(String.valueOf(lastLesson + 1), activity.getString(R.string.free_lesson), ""));
             lastLesson++;
         }
+
+        return list;
     }
 
     private ArrayList<TimetableRow> fillGaps(ArrayList<TimetableRow> list) {
