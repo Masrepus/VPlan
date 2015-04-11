@@ -374,15 +374,15 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         //load the values
         AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
-        TextView subjectOld = (TextView) lessonView.findViewById(R.id.subject);
+        final TextView subjectOld = (TextView) lessonView.findViewById(R.id.subject);
         subjectACTV.setText(subjectOld.getText());
 
         AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
-        TextView roomOld = (TextView) lessonView.findViewById(R.id.room);
+        final TextView roomOld = (TextView) lessonView.findViewById(R.id.room);
         roomACTV.setText(roomOld.getText());
 
         MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
-        TextView lesson = (TextView) lessonView.findViewById(R.id.lesson);
+        final TextView lesson = (TextView) lessonView.findViewById(R.id.lesson);
         lessonPicker.setLesson(Integer.parseInt(lesson.getText().toString()));
 
         //save the values in editingRow
@@ -419,14 +419,14 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        saveEditedLesson(new DataSource(TimetableActivity.this));
+                        saveEditedLesson(new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
                     }
                 })
                 .setNegativeButton(R.string.cancel, this)
                 .show();
     }
 
-    private void saveEditedLesson(DataSource datasource) {
+    private void saveEditedLesson(DataSource datasource, TimetableRow oldData) {
 
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         int day = pager.getCurrentItem();
@@ -441,18 +441,29 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.DAYS[day], new String[]{SQLiteHelperTimetable.COLUMN_LESSON}, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lessonPicker.getLesson() + "'");
 
-        //check if there is no entry in that lesson
+        //check if there is an entry in that lesson
         if (c.getCount() == 0) {
             datasource.updateRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString(), editingRow);
 
             saveSubject(datasource, subjectACTV.getText().toString());
             saveRoom(datasource, roomACTV.getText().toString());
+        } else {
 
-            //refresh the timetable views
-            TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
-            pager.setAdapter(adapter);
-            pager.setCurrentItem(day);
-        } else Toast.makeText(this, getString(R.string.lesson_already_saved), Toast.LENGTH_SHORT).show();
+            //first delete the data that was in that lesson
+            datasource.deleteRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()));
+
+            //now delete this row's old data
+            datasource.deleteRowTimetable(SQLiteHelperTimetable.DAYS[day], oldData.getLesson());
+
+            //now save the new data
+            datasource.createRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString());
+
+        }
+
+        //refresh the timetable views
+        TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        pager.setCurrentItem(day);
 
         datasource.close();
     }

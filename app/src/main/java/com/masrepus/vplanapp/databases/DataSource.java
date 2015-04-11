@@ -95,9 +95,9 @@ public class DataSource {
 
     public void addRoom(String room) {
         ContentValues values = new ContentValues();
-        values.put(SQLiteHelperTimetable.COLUMN_SUBJECT, room);
+        values.put(SQLiteHelperTimetable.COLUMN_ROOM, room);
 
-        databaseTimetable.insert(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, null, values);
+        databaseTimetable.insert(SQLiteHelperTimetable.TABLE_ROOMS_ACTV, null, values);
     }
 
     /**

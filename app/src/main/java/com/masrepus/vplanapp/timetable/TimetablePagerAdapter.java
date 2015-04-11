@@ -92,6 +92,9 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
                 }
             });
 
+            //now get the current max lesson value as this might have changed
+            maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+
             insertBreaks(tempRows, rows, maxLesson);
 
             //now build a new adapter for this weekday
@@ -140,9 +143,6 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
 
         if (list.size() > 0) {
             int lastLesson = Integer.valueOf(list.get(list.size() - 1).getLesson());
-
-            //at least 6 lessons needed!
-            if (lastLesson < 6) lastLesson = 6;
 
             while (lastLesson < maxLesson) {
 
