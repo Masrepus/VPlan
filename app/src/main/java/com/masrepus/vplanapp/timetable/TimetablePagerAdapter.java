@@ -64,9 +64,12 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
                 }
             });
 
-            tempRows = fillGaps(tempRows);
+            if (tempRows.size() > 0) tempRows = fillGaps(tempRows);
 
-            int maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+            int maxLesson;
+            if (tempRows.size() > 0) maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+            else maxLesson = 6;
+
             //check if the last lesson is lesson 6
             if (maxLesson <= 6) {
 
@@ -135,12 +138,23 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
 
     private ArrayList<TimetableRow> fillListUp(ArrayList<TimetableRow> list, int maxLesson) {
 
-        int lastLesson = Integer.valueOf(list.get(list.size()-1).getLesson());
+        if (list.size() > 0) {
+            int lastLesson = Integer.valueOf(list.get(list.size() - 1).getLesson());
 
-        while (lastLesson < maxLesson) {
+            //at least 6 lessons needed!
+            if (lastLesson < 6) lastLesson = 6;
 
-            list.add(new TimetableRow(String.valueOf(lastLesson + 1), activity.getString(R.string.free_lesson), ""));
-            lastLesson++;
+            while (lastLesson < maxLesson) {
+
+                list.add(new TimetableRow(String.valueOf(lastLesson + 1), activity.getString(R.string.free_lesson), ""));
+                lastLesson++;
+            }
+        } else {
+
+            //complete fill-up needed
+            for (int i = 0; i < 6; i++) {
+                list.add(new TimetableRow(String.valueOf(i + 1), activity.getString(R.string.free_lesson), ""));
+            }
         }
 
         return list;

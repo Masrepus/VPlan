@@ -388,6 +388,30 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         //save the values in editingRow
         editingRow = new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString());
 
+        //init the actv adapters
+        DataSource datasource = new DataSource(this);
+        datasource.open();
+
+        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_SUBJECT});
+        ArrayList<String> subjects = new ArrayList<>();
+
+        while (c.moveToNext()) {
+            subjects.add(c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_SUBJECT)));
+        }
+
+        c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_ROOMS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_ROOM});
+        ArrayList<String> rooms = new ArrayList<>();
+
+        while (c.moveToNext()) {
+            rooms.add(c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_ROOM)));
+        }
+
+        datasource.close();
+
+
+        subjectACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, subjects));
+        roomACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
+
         //now init the dialog and show it
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.edit_lesson))
