@@ -5,10 +5,11 @@
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:clickable="false"
-    android:id="@+id/showHiddenItemsFrame">
+    android:id="@+id/showHiddenItemsFrame"
+    android:gravity="center">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/break_info"
@@ -18,6 +19,6 @@
         android:paddingBottom="13dp"
         android:textStyle="bold|italic"
         android:textColor="@android:color/darker_gray"
-        android:gravity="center_vertical|center_horizontal"
-        android:layout_centerInParent="true" />
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal" />
 </RelativeLayout>
