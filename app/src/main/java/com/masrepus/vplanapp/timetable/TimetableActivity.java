@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -140,14 +139,14 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 return super.onOptionsItemSelected(item);
             case R.id.action_add:
                 //add a lesson to the currently visible day
-                showAddLessonDialog();
+                showAddLessonDialog(0);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showAddLessonDialog() {
+    private void showAddLessonDialog(int lessonPreset) {
 
         //now show the user a dialog where he can add a new lesson
         dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
@@ -184,6 +183,13 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         AutoCompleteTextView roomsACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
         roomsACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
+
+        if (lessonPreset != 0) {
+
+            //preset the selected lesson in the dialog
+            MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
+            lessonPicker.setLesson(lessonPreset);
+        }
     }
 
     private void addLesson(DataSource datasource, int day, int lesson, String subject, String room) {
@@ -324,28 +330,39 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     @Override
     public boolean onLongClick(final View v) {
 
-        //show a dialog and ask the user if this lesson should be edited or deleted
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.edit_or_delete))
-                .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        TextView lesson = (TextView) v.findViewById(R.id.lesson);
-                        removeLesson(new DataSource(TimetableActivity.this), lesson.getText().toString());
-                    }
-                })
-                .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.edit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        editLesson(v);
-                    }
-                }).show();
+        //check if this is a free lesson
+        TextView subject = (TextView) v.findViewById(R.id.subject);
+        if (subject.getText().toString().contentEquals(getString(R.string.free_lesson))) {
+
+            TextView lesson = (TextView) v.findViewById(R.id.lesson);
+
+            //immediately show the add lesson dialog with this row's lesson pre-set
+            showAddLessonDialog(Integer.valueOf(lesson.getText().toString()));
+        } else {
+
+            //show a dialog and ask the user if this lesson should be edited or deleted
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.edit_or_delete))
+                    .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            TextView lesson = (TextView) v.findViewById(R.id.lesson);
+                            removeLesson(new DataSource(TimetableActivity.this), lesson.getText().toString());
+                        }
+                    })
+                    .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.edit, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            editLesson(v);
+                        }
+                    }).show();
+        }
 
         return true;
     }
