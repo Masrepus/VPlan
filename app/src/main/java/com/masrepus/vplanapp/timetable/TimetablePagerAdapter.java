@@ -76,12 +76,12 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
                 //fill the list up with free lessons until there are 6 lessons available
                 tempRows = fillListUp(tempRows, 6);
 
-            } else if (maxLesson <= 8) /*two afternoon lessons*/ {
+            } else if (maxLesson <= 9) /*two afternoon lessons*/ {
 
-                //fill the list up until there are 8 lessons available
-                tempRows = fillListUp(tempRows, 8);
+                //fill the list up until lesson 9
+                tempRows = fillListUp(tempRows, 9);
 
-            } else tempRows = fillListUp(tempRows, 10); //four afternoon lessons
+            } else tempRows = fillListUp(tempRows, 11); //four afternoon lessons
 
             //sort the rows one last time
             Collections.sort(tempRows, new Comparator<TimetableRow>() {
