@@ -59,6 +59,7 @@ import java.util.List;
 
 public class ExamsActivity extends ActionBarActivity implements View.OnClickListener {
 
+    public static final String ACTIVITY_NAME = "exams";
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
     private boolean noOldItems;
@@ -230,6 +231,8 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         editor.putBoolean(SharedPrefs.HIDE_OLD_EXAMS, noOldItems)
                 .putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         editor.apply();
+
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(listener);
 
         super.onPause();
     }

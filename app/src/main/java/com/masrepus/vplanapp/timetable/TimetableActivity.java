@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -26,7 +27,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.exams.ExamsActivity;
+import com.masrepus.vplanapp.settings.SettingsActivity;
+import com.masrepus.vplanapp.settings.SettingsPrefListener;
 import com.masrepus.vplanapp.vplan.MainActivity;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
@@ -46,6 +50,8 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
     private TimetableRow editingRow;
+    private SettingsPrefListener listener;
+    private String callingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +98,15 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     protected void onResume() {
         super.onResume();
 
+        //check if this activity has to take care of shared prefs changes
+        callingActivity = getIntent().getStringExtra(Args.CALLING_ACTIVITY);
+        if (callingActivity == null) callingActivity = "";
+
+        if (!callingActivity.contentEquals("")) {
+            listener = new SettingsPrefListener(this);
+            PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener);
+        }
+
         //set the appmode to timetable
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
@@ -109,6 +124,8 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         editor.apply();
+
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(listener);
 
         super.onPause();
     }
@@ -134,6 +151,9 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
             case R.id.action_add:
                 //add a lesson to the currently visible day
                 showAddLessonDialog(0);
+                return true;
+            case R.id.action_settings:
+                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 return true;
         }
 
@@ -265,6 +285,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     }
 
     public void onSettingsClick(View view) {
+        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
     @Override

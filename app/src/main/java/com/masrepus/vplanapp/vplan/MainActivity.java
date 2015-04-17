@@ -385,7 +385,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     startActivity(new Intent(this, ExamsActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
                     break;
                 case AppModes.TIMETABLE:
-                    startActivity(new Intent(this, TimetableActivity.class));
+                    startActivity(new Intent(this, TimetableActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
                     break;
             }
 
