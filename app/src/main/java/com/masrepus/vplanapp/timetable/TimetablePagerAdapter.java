@@ -74,14 +74,14 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             if (maxLesson <= 6) {
 
                 //fill the list up with free lessons until there are 6 lessons available
-                tempRows = fillListUp(tempRows, 6);
+                fillListUp(tempRows, 6);
 
             } else if (maxLesson <= 9) /*two afternoon lessons*/ {
 
                 //fill the list up until lesson 9
-                tempRows = fillListUp(tempRows, 9);
+                fillListUp(tempRows, 9);
 
-            } else tempRows = fillListUp(tempRows, 11); //four afternoon lessons
+            } else fillListUp(tempRows, 11); //four afternoon lessons
 
             //sort the rows one last time
             Collections.sort(tempRows, new Comparator<TimetableRow>() {
@@ -139,7 +139,7 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
         return rows;
     }
 
-    private ArrayList<TimetableRow> fillListUp(ArrayList<TimetableRow> list, int maxLesson) {
+    private void fillListUp(ArrayList<TimetableRow> list, int maxLesson) {
 
         if (list.size() > 0) {
             int lastLesson = Integer.valueOf(list.get(list.size() - 1).getLesson());
@@ -156,8 +156,6 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
                 list.add(new TimetableRow(String.valueOf(i + 1), activity.getString(R.string.free_lesson), ""));
             }
         }
-
-        return list;
     }
 
     private ArrayList<TimetableRow> fillGaps(ArrayList<TimetableRow> list) {
