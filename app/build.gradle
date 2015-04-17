@@ -8,8 +8,8 @@ android {
         applicationId "com.masrepus.vplanapp"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 13
-        versionName "2.4"
+        versionCode 14
+        versionName "2.4.1"
     }
 
     buildTypes {
