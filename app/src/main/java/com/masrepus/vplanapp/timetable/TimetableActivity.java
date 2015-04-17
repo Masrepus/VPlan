@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.PersistableBundle;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -16,10 +17,12 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +45,6 @@ import java.util.Calendar;
 public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable {
 
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
-    private View dialogView;
     private TimetableRow editingRow;
 
     @Override
@@ -55,14 +57,6 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        //display a loading view
-        ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
-        progress.setVisibility(View.VISIBLE);
-        progress.setIndeterminate(true);
-
-        PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-        tabStrip.setVisibility(View.INVISIBLE);
 
         new PagerAdapterLoader().execute();
     }
@@ -149,7 +143,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     private void showAddLessonDialog(int lessonPreset) {
 
         //now show the user a dialog where he can add a new lesson
-        dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
+        View dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.add_lesson))
                 .setView(dialogView)
@@ -280,14 +274,16 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         int day = pager.getCurrentItem();
         DataSource datasource = new DataSource(this);
 
+        AlertDialog alertDialog = (AlertDialog) dialog;
+
         //a button in the add-lesson dialog was clicked, determine which one
         switch (which) {
 
             case DialogInterface.BUTTON_POSITIVE:
                 //save the entered data
-                AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
-                AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
-                MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
+                AutoCompleteTextView subjectACTV = (AutoCompleteTextView) alertDialog.findViewById(R.id.subjectACTV);
+                AutoCompleteTextView roomACTV = (AutoCompleteTextView) alertDialog.findViewById(R.id.roomACTV);
+                MyNumberPicker lessonPicker = (MyNumberPicker) alertDialog.findViewById(R.id.lessonPicker);
 
                 addLesson(datasource, day, lessonPicker.getLesson(), subjectACTV.getText().toString(), roomACTV.getText().toString());
 
@@ -370,7 +366,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     private void editLesson(View lessonView) {
 
         //show the add lesson dialog but with the values of the lesson being edited preset
-        dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
+        View dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
 
         //load the values
         AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
@@ -419,22 +415,22 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        saveEditedLesson(new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
+                        saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
                     }
                 })
                 .setNegativeButton(R.string.cancel, this)
                 .show();
     }
 
-    private void saveEditedLesson(DataSource datasource, TimetableRow oldData) {
+    private void saveEditedLesson(AlertDialog dialog, DataSource datasource, TimetableRow oldData) {
 
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         int day = pager.getCurrentItem();
 
         //save the entered data
-        AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
-        AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
-        MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
+        AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialog.findViewById(R.id.subjectACTV);
+        AutoCompleteTextView roomACTV = (AutoCompleteTextView) dialog.findViewById(R.id.roomACTV);
+        MyNumberPicker lessonPicker = (MyNumberPicker) dialog.findViewById(R.id.lessonPicker);
 
         //db insert
         datasource.open();
@@ -499,12 +495,6 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         @Override
         protected void onPostExecute(Void aVoid) {
-
-            ProgressBar progress = (ProgressBar) findViewById(R.id.progressBar);
-            progress.setVisibility(View.GONE);
-            PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-            tabStrip.setVisibility(View.VISIBLE);
-
             initPager(adapter);
         }
     }
