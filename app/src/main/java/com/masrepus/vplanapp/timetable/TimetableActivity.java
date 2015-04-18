@@ -17,10 +17,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -63,6 +65,10 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        //activate the fab
+        ImageButton fab = (ImageButton) findViewById(R.id.fab_image_button);
+        fab.setOnClickListener(this);
 
         new PagerAdapterLoader().execute();
     }
@@ -149,8 +155,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
                 return super.onOptionsItemSelected(item);
             case R.id.action_add:
-                //add a lesson to the currently visible day
-                showAddLessonDialog(0);
+
                 return true;
             case R.id.action_settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
@@ -260,26 +265,34 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     @Override
     public void onClick(View view) {
 
-        //check the tag
-        Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
+        //check if this is the fab
+        if (view.getId() == R.id.fab_image_button) {
 
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+            //add a lesson to the currently visible day
+            showAddLessonDialog(0);
+        } else {
 
-        if (appModeTag != null) {
+            //check the tag
+            Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
 
-            switch (appModeTag) {
+            SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
 
-                case AppModes.VPLAN:
-                    //update appmode
-                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+            if (appModeTag != null) {
 
-                    startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    break;
-                case AppModes.TESTS:
-                    //update appmode
-                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TESTS).apply();
+                switch (appModeTag) {
 
-                    startActivity(new Intent(this, ExamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    case AppModes.VPLAN:
+                        //update appmode
+                        pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+
+                        startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        break;
+                    case AppModes.TESTS:
+                        //update appmode
+                        pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TESTS).apply();
+
+                        startActivity(new Intent(this, ExamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                }
             }
         }
     }
