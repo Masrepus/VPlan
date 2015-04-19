@@ -43,19 +43,23 @@ public class TimetableFragment extends Fragment {
                 if (firstVisibleItem > lastFirstVisible) {
                     //scrolling down, hide fab
                     ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
-                    Animation out = AnimationUtils.makeOutAnimation(getActivity(), true);
+                    Animation out = AnimationUtils.loadAnimation(getActivity(), R.anim.abc_fade_out);
 
-                    Animation current = fab.getAnimation();
-                    //don't restart the animation if it is already running
-                    if (current == null || !current.hasStarted() || current.hasEnded()) {
-                        //only restart if the view is not hidden already
-                        if (fab.getVisibility() == View.VISIBLE) fab.startAnimation(out);
+                    //only restart if the view is not hidden already
+                    if (fab.getVisibility() == View.VISIBLE) {
+                        fab.startAnimation(out);
+                        fab.setVisibility(View.INVISIBLE);
                     }
-                    fab.setVisibility(View.INVISIBLE);
                 } else if (firstVisibleItem < lastFirstVisible) {
                     //scrolling up, show fab
+                    //only restart if the view is still invisible
+                    Animation in = AnimationUtils.loadAnimation(getActivity(), R.anim.abc_fade_in);
                     ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
-                    fab.setVisibility(View.VISIBLE);
+
+                    if (fab.getVisibility() == View.INVISIBLE) {
+                        fab.startAnimation(in);
+                        fab.setVisibility(View.VISIBLE);
+                    }
                 }
                 lastFirstVisible = firstVisibleItem;
             }
