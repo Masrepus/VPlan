@@ -13,6 +13,7 @@ import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,7 +23,7 @@ import java.util.Set;
 /**
  * Created by samuel on 05.12.14.
  */
-public class SettingsPrefListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsPrefListener implements SharedPreferences.OnSharedPreferenceChangeListener, Serializable {
 
     private Map<String, ?> keys;
     private Context context;
