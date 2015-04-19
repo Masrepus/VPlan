@@ -32,6 +32,7 @@ public class TimetableFragment extends Fragment {
         TimetableListAdapter adapter = (TimetableListAdapter) args.getSerializable(Args.ADAPTER);
         ListView timetable = (ListView) rootView.findViewById(R.id.timetable);
         timetable.setOnScrollListener(new AbsListView.OnScrollListener() {
+
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
@@ -43,13 +44,17 @@ public class TimetableFragment extends Fragment {
                     //scrolling down, hide fab
                     ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
                     Animation out = AnimationUtils.makeOutAnimation(getActivity(), true);
-                    fab.startAnimation(out);
+
+                    Animation current = fab.getAnimation();
+                    //don't restart the animation if it is already running
+                    if (current == null || !current.hasStarted() || current.hasEnded()) {
+                        //only restart if the view is not hidden already
+                        if (fab.getVisibility() == View.VISIBLE) fab.startAnimation(out);
+                    }
                     fab.setVisibility(View.INVISIBLE);
                 } else if (firstVisibleItem < lastFirstVisible) {
                     //scrolling up, show fab
                     ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
-                    Animation in = AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in);
-                    fab.startAnimation(in);
                     fab.setVisibility(View.VISIBLE);
                 }
                 lastFirstVisible = firstVisibleItem;

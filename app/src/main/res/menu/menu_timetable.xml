@@ -4,8 +4,4 @@
     tools:context="com.masrepus.vplanapp.timetable.TimetableActivity">
     <item android:id="@+id/action_settings" android:title="@string/settings"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_add"
-        android:title="@string/add_lesson"
-        android:icon="@drawable/ic_add"
-        app:showAsAction="always" />
 </menu>

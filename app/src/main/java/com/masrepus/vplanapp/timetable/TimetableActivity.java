@@ -154,9 +154,6 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                 SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
                 return super.onOptionsItemSelected(item);
-            case R.id.action_add:
-
-                return true;
             case R.id.action_settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 return true;
