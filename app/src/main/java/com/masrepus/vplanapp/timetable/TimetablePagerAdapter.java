@@ -1,5 +1,6 @@
 package com.masrepus.vplanapp.timetable;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperTimetable;
 
@@ -67,7 +69,13 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             if (tempRows.size() > 0) tempRows = fillGaps(tempRows);
 
             int maxLesson;
-            if (tempRows.size() > 0) maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+            if (tempRows.size() > 0) {
+                maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+
+                //now save this value for the add lesson dialog
+                SharedPreferences pref = activity.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                pref.edit().putInt(SharedPrefs.MAX_LESSON + i, maxLesson).apply();
+            }
             else maxLesson = 6;
 
             //check if the last lesson is lesson 6

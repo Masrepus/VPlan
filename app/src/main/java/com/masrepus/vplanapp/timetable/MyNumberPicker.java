@@ -49,6 +49,7 @@ public class MyNumberPicker extends NumberPicker {
     public void setLesson(int lesson) {
 
         if (lesson <= 6) setValue(lesson);
+        else if (lesson == 7) setValue(7);
         else setValue(lesson - 1);
     }
 }

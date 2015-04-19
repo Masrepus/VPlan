@@ -200,11 +200,19 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         AutoCompleteTextView roomsACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
         roomsACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
 
+        MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
         if (lessonPreset != 0) {
 
             //preset the selected lesson in the dialog
-            MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
             lessonPicker.setLesson(lessonPreset);
+        } else {
+
+            //set the lesson to the last saved lesson + 1
+            SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            int day = pager.getCurrentItem();
+            int lesson = pref.getInt(SharedPrefs.MAX_LESSON + day, 1) + 1;
+            lessonPicker.setLesson(lesson);
         }
     }
 
