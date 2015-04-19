@@ -739,6 +739,10 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             //now distribute the contents of availableFiles into a new list for the selection spinner
             for (Element row : availableFiles) {
+
+                //don't download more than 5 files
+                if (position > 4) break;
+
                 String url;
                 String tag;
 
