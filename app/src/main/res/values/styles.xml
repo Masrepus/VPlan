@@ -10,7 +10,7 @@
     <color name="yellow_dark">#e7ce28</color>
     <color name="yellow_focused">@color/yellow</color>
     <color name="blue">#274595</color>
-    <color name="blue_focused">#5e6d95</color>
+    <color name="blue_focused">#2745d4</color>
     
     <style name="ShowcaseTheme" parent="ShowcaseView.Light">
         <item name="sv_backgroundColor">#ccffffff</item>

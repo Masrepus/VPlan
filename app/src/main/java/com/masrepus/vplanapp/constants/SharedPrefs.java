@@ -21,4 +21,5 @@ public class SharedPrefs {
     public static final String SELECTED_VPLAN_ITEM = "selectedVplanItem";
     public static final String TUT_SHOWN_PREFIX = "tutShown";
     public static final String TUT_RUNNING = "tutRunning";
+    public static final String MAX_LESSON = "maxLesson";
 }

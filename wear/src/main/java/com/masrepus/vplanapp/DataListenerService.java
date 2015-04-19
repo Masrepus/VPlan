@@ -134,6 +134,8 @@ public class DataListenerService extends WearableListenerService {
             }
         }
 
+        datasource.close();
+
         Log.v("DataListenerService", "Data saved in db: " + dataMap.size() + " days");
     }
 }

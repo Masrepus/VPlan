@@ -80,6 +80,7 @@
     <string name="vplan">Substitution Plan</string>
     <string name="title_activity_timetable">Timetable</string>
     <string name="room">Room</string>
+    <string name="add_lesson">Add lesson</string>
     <string name="filter">Filter</string>
     <string name="filter_explanations">In order to filter the substitution plan, you first have to go to the settings and add classes/courses to your filter.</string>
     <string name="msg_start_tutorial">Would you like to start a short tutorial about the features of the SGP App?</string>
@@ -94,5 +95,12 @@
     <string name="tut_exams">Here you can see the upcoming tests for your classes/courses. \nThe classes and courses you have already got in your filter for the substitution plan are used for this.</string>
     <string name="tut_refresh_text">Click here to refresh the substitution plan data.</string>
     <string name="tut_refresh_title">Refresh data</string>
+   <string name="break_info">break</string>
+   <string name="delete">Delete</string>
+   <string name="edit">Edit</string>
+   <string name="edit_lesson">Edit lesson</string>
+   <string name="edit_or_delete">Do you want to edit or delete this lesson?</string>
+    <string name="free_lesson">Free lesson</string>
+    <string name="lesson_already_saved">Lesson already in use</string>
 
 </resources>
