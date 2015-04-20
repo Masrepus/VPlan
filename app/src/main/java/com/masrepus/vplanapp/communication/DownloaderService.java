@@ -84,13 +84,13 @@ public class DownloaderService extends Service {
         //get the current filter
         switch (lastRequestedVplanMode) {
             case VplanModes.UINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), null));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), new ArrayList<String>()));
                 break;
             case VplanModes.MINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), null));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), new ArrayList<String>()));
                 break;
             case VplanModes.OINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), null));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), new ArrayList<String>()));
                 break;
         }
 
