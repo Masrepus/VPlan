@@ -39,6 +39,7 @@ import com.masrepus.vplanapp.vplan.MainActivity;
 import com.masrepus.vplanapp.vplan.Row;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DownloaderService extends Service {
@@ -84,13 +85,13 @@ public class DownloaderService extends Service {
         //get the current filter
         switch (lastRequestedVplanMode) {
             case VplanModes.UINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), new ArrayList<String>()));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), new HashSet<String>()));
                 break;
             case VplanModes.MINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), new ArrayList<String>()));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), new HashSet<String>()));
                 break;
             case VplanModes.OINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), new ArrayList<String>()));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), new HashSet<String>()));
                 break;
         }
 
