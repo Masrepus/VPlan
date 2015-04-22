@@ -469,7 +469,7 @@ public class DownloaderService extends Service {
                 builder.setProgress(100, 0, true);
                 builder.setOngoing(true);
                 builder.addAction(R.drawable.ic_cancel, getString(R.string.cancel), cancelPending);
-                notificationId = 2;
+                notificationId = Args.NOTIF_ONGOING;
             } else {
                 //display a progressbar if still downloading
                 if (downloaded_files == total_downloads) {
@@ -481,13 +481,13 @@ public class DownloaderService extends Service {
                                 .setOngoing(false)
                                 .addAction(android.R.drawable.stat_notify_sync_noanim, getString(R.string.retry), retryPending)
                                 .setAutoCancel(true);
-                        notificationId = 1;
+                        notificationId = Args.NOTIF_NORMAL;
                     } else {
                         builder.setProgress(0, 0, false);
                         builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
                         builder.setOngoing(false);
                         builder.setAutoCancel(true);
-                        notificationId = 1;
+                        notificationId = Args.NOTIF_NORMAL;
                     }
                 } else {
                     builder.setProgress(total_downloads, downloaded_files, false);
@@ -495,14 +495,14 @@ public class DownloaderService extends Service {
                     if (!error) {
                         builder.setOngoing(true)
                                 .addAction(R.drawable.ic_cancel, getString(R.string.cancel), cancelPending);
-                        notificationId = 2;
+                        notificationId = Args.NOTIF_ONGOING;
                     } else {
                         builder.setProgress(0, 0, false)
                                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                                 .setOngoing(false)
                                 .addAction(android.R.drawable.stat_notify_sync_noanim, getString(R.string.retry), retryPending)
                                 .setAutoCancel(true);
-                        notificationId = 1;
+                        notificationId = Args.NOTIF_NORMAL;
                     }
                 }
             }
@@ -516,7 +516,7 @@ public class DownloaderService extends Service {
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
             //when parsing is completed cancel the ongoing notification
-            if (notificationId == 1) manager.cancel(2);
+            if (notificationId == Args.NOTIF_NORMAL) manager.cancel(Args.NOTIF_ONGOING);
             manager.notify(notificationId, builder.build());
         }
 
@@ -527,6 +527,9 @@ public class DownloaderService extends Service {
 
             //only stop the service when all the levels are finished downloading or if there was an error
             if (!success) {
+                //show the error notification
+                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                Log.d("DownloaderService", "stopSelf()");
                 stopSelf();
                 return;
             }
@@ -552,8 +555,13 @@ public class DownloaderService extends Service {
         @Override
         protected void onCancelled(Boolean success) {
             context.unregisterReceiver(cancelReceiver);
+
+            //remove the notifications
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            manager.cancel(notificationId);
+            manager.cancel(Args.NOTIF_ONGOING);
+            manager.cancel(Args.NOTIF_NORMAL);
+
+            Log.d("DownloaderService", "stopSelf()");
             stopSelf();
         }
 
