@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/ThemeYellow" >
         <activity
-            android:name=".MainActivity"
+            android:name=".vplan.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,27 +25,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:label="@string/settings" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".vplan.MainActivity" />
         </activity>
 
         <service
-            android:name=".DownloaderService"
+            android:name=".communication.DownloaderService"
             android:enabled="true"
             android:exported="false" >
         </service>
 
-        <receiver android:name=".BootReceiver" >
+        <receiver android:name=".communication.BootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <activity
-            android:name=".ExamsActivity"
+            android:name=".exams.ExamsActivity"
             android:label="@string/title_activity_exams" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,19 +55,24 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".vplan.MainActivity" />
         </activity>
         <activity
-            android:name=".TimetableActivity"
+            android:name=".timetable.TimetableActivity"
             android:label="@string/title_activity_timetable"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".vplan.MainActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.masrepus.vplanapp.MainActivity" />
+                android:value=".vplan.MainActivity" />
         </activity>
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <service android:name=".DataListenerService">
+        <service android:name=".communication.DataListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>

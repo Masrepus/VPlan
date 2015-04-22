@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clickable="false"
+    android:id="@+id/showHiddenItemsFrame"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/break_info"
+        android:id="@+id/breakTV"
+        android:layout_gravity="center_horizontal|bottom"
+        android:paddingTop="13dp"
+        android:paddingBottom="13dp"
+        android:textStyle="bold|italic"
+        android:textColor="@android:color/darker_gray"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal" />
+</RelativeLayout>
