@@ -15,11 +15,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
@@ -170,8 +173,16 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         builder.setTitle(getString(R.string.add_lesson))
                 .setView(dialogView)
                 .setPositiveButton(R.string.ok, this)
-                .setNegativeButton(R.string.cancel, this)
-                .show();
+                .setNegativeButton(R.string.cancel, this);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        //put the dialog to the complete top of the screen so that the actv dropdowns can be seen better
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.TOP;
+        window.setAttributes(wlp);
 
         //init the actv adapters
         DataSource datasource = new DataSource(this);
@@ -457,8 +468,17 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                         saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
                     }
                 })
-                .setNegativeButton(R.string.cancel, this)
-                .show();
+                .setNegativeButton(R.string.cancel, this);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        //put the dialog to the complete top of the screen so that the actv dropdowns can be seen better
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.TOP;
+        window.setAttributes(wlp);
     }
 
     private void saveEditedLesson(AlertDialog dialog, DataSource datasource, TimetableRow oldData) {
