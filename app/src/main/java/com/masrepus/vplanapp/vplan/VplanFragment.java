@@ -1,6 +1,7 @@
 package com.masrepus.vplanapp.vplan;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,7 +31,18 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Bundle args = getArguments();
-        requestedVplanMode = args.getInt(Args.VPLAN_MODE);
+
+        //args could be corrupted if ram was cleared while in background => restart the activity
+        try {
+            requestedVplanMode = args.getInt(Args.VPLAN_MODE);
+        } catch (Exception e) {
+
+            //restart, something is wrong here
+            getActivity().finish();
+            startActivity(new Intent(getActivity(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+            return View.inflate(getActivity(), R.layout.vplan_loading_dummy, null);
+        }
+
         int listSize = args.getInt(Args.LIST_SIZE);
         int hiddenItemsCount = args.getInt(Args.HIDDEN_ITEMS_COUNT);
         int listSizeBeforeFilter = args.getInt(Args.LIST_SIZE_ORIGINAL);

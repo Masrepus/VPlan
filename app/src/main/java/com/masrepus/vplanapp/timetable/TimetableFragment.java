@@ -1,5 +1,6 @@
 package com.masrepus.vplanapp.timetable;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.vplan.MainActivity;
 
 /**
  * Created by samuel on 31.01.15.
@@ -29,7 +31,18 @@ public class TimetableFragment extends Fragment {
         Bundle args = getArguments();
 
         //get the listview adapter from args and attach it to the listview
-        TimetableListAdapter adapter = (TimetableListAdapter) args.getSerializable(Args.ADAPTER);
+        //args could be corrupted if ram was cleared while in background => restart the activity
+        TimetableListAdapter adapter;
+        try {
+            adapter = (TimetableListAdapter) args.getSerializable(Args.ADAPTER);
+        } catch (Exception e) {
+
+            //restart, something is wrong here
+            getActivity().finish();
+            startActivity(new Intent(getActivity(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+            return View.inflate(getActivity(), R.layout.vplan_loading_dummy, null);
+        }
+
         ListView timetable = (ListView) rootView.findViewById(R.id.timetable);
         timetable.setOnScrollListener(new AbsListView.OnScrollListener() {
 
