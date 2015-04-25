@@ -19,4 +19,6 @@ public class Args {
     public static final String ACTION_TUTORIAL = "tutorial";
     public static final String TUT_GENERAL = "general";
     public static final String TUT_FILTER = "filter";
+    public static final int NOTIF_ONGOING = 1;
+    public static final int NOTIF_NORMAL = 2;
 }

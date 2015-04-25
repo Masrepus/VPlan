@@ -15,11 +15,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
@@ -29,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
@@ -47,6 +51,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import io.fabric.sdk.android.Fabric;
+
 
 public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable {
 
@@ -59,6 +65,9 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.timetable_activity);
+
+        //init crashlytics
+        Fabric.with(this, new Crashlytics());
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -170,8 +179,16 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         builder.setTitle(getString(R.string.add_lesson))
                 .setView(dialogView)
                 .setPositiveButton(R.string.ok, this)
-                .setNegativeButton(R.string.cancel, this)
-                .show();
+                .setNegativeButton(R.string.cancel, this);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        //put the dialog to the complete top of the screen so that the actv dropdowns can be seen better
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.TOP;
+        window.setAttributes(wlp);
 
         //init the actv adapters
         DataSource datasource = new DataSource(this);
@@ -457,8 +474,17 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
                         saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
                     }
                 })
-                .setNegativeButton(R.string.cancel, this)
-                .show();
+                .setNegativeButton(R.string.cancel, this);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        //put the dialog to the complete top of the screen so that the actv dropdowns can be seen better
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.TOP;
+        window.setAttributes(wlp);
     }
 
     private void saveEditedLesson(AlertDialog dialog, DataSource datasource, TimetableRow oldData) {
