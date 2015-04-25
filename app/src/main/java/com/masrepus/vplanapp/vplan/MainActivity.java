@@ -47,6 +47,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
@@ -77,6 +78,7 @@ import com.masrepus.vplanapp.drawer.DrawerListBuilder;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
 
+import io.fabric.sdk.android.Fabric;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -121,6 +123,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        Fabric.with(this, new Crashlytics());
 
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
