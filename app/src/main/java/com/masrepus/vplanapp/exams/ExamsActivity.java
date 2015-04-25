@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.masrepus.vplanapp.communication.AsyncDownloader;
@@ -56,6 +57,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
+
 
 public class ExamsActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -73,6 +76,9 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exams_activity);
+
+        //init crashlytics
+        Fabric.with(this, new Crashlytics());
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

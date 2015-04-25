@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
@@ -50,6 +51,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import io.fabric.sdk.android.Fabric;
+
 
 public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable {
 
@@ -62,6 +65,9 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.timetable_activity);
+
+        //init crashlytics
+        Fabric.with(this, new Crashlytics());
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

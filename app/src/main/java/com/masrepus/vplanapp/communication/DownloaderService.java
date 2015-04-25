@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -42,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.fabric.sdk.android.Fabric;
+
 public class DownloaderService extends Service {
 
     int vplanMode;
@@ -66,6 +69,9 @@ public class DownloaderService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        //init crashlytics
+        Fabric.with(this, new Crashlytics());
 
         Log.d("DownloaderService", "Starting bg download service");
 
