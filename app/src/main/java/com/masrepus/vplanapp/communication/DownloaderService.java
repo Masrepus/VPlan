@@ -136,6 +136,7 @@ public class DownloaderService extends Service {
         datasource.open();
         Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
         int count = c.getCount();
+        if (count > 5) count = 5; //max 5 items
 
         for (int i = 0; i < count; i++) {
             dataMap.putDataMap(String.valueOf(i), fillDataMap(i));

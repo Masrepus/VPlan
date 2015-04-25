@@ -61,10 +61,9 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.communication.AsyncDownloader;
 import com.masrepus.vplanapp.communication.DownloaderService;
-import com.masrepus.vplanapp.exams.ExamsActivity;
-import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.DataKeys;
@@ -75,10 +74,10 @@ import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
 import com.masrepus.vplanapp.drawer.DrawerListAdapter;
 import com.masrepus.vplanapp.drawer.DrawerListBuilder;
+import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
 
-import io.fabric.sdk.android.Fabric;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -87,6 +86,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks {
 
@@ -124,6 +125,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        //init crashlytics
         Fabric.with(this, new Crashlytics());
 
         //get the state of the filter from shared prefs
@@ -136,6 +138,17 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 currentVPlanLink = sharedPreferences.getString(SharedPrefs.CURR_VPLAN_LINK, "");
             }
         });
+
+        datasource.open();
+        //delete the urls in linktable if this the first time running after the update(resolve crash)
+        if (18 > pref.getInt(SharedPrefs.LAST_VERSION_RUN, 0)) {
+            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+        }
+        try {
+            //save the current version code in shared prefs
+            editor.putInt(SharedPrefs.LAST_VERSION_RUN, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+        } catch (PackageManager.NameNotFoundException ignored) {}
+
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
         appMode = pref.getInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
@@ -157,7 +170,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         refreshFilters();
 
         //activate adapter for viewPager
-        datasource.open();
         if (!datasource.hasData(SQLiteHelperVplan.TABLE_LINKS)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
             welcome.setVisibility(View.VISIBLE);
@@ -351,7 +363,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             final List<View> views = toolbar.getTouchables();
-            ViewTarget target = new ViewTarget(views.get(views.size()-2)); //overflow
+            ViewTarget target = new ViewTarget(views.get(views.size() - 2)); //overflow
 
             showcase.setTarget(target);
             showcase.setContentTitle(getString(R.string.filter));
@@ -464,6 +476,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         datasource.open();
         Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
         int count = c.getCount();
+        if (count > 5) count = 5; //max 5 items!
 
         for (int i = 0; i < count; i++) {
             dataMap.putDataMap(String.valueOf(i), fillDataMap(i));
@@ -1344,6 +1357,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 //if we are in tutorial mode, resume
                 SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                 if (pref.getBoolean(SharedPrefs.TUT_RUNNING, false)) overflowTutorial();
+            } else {
+                stopProgressBar();
+
+                resetRefreshAnimation();
+
+                //notify about error
+                Toast.makeText(getApplicationContext(), getString(R.string.download_error_title), Toast.LENGTH_SHORT).show();
             }
         }
     }
