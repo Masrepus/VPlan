@@ -36,6 +36,7 @@ import com.masrepus.vplanapp.communication.AsyncDownloader;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -79,6 +80,7 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
+        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.TESTS));
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

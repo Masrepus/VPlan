@@ -66,6 +66,7 @@ import com.masrepus.vplanapp.communication.AsyncDownloader;
 import com.masrepus.vplanapp.communication.DownloaderService;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -100,7 +101,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int appMode;
     private int requestedVplanMode;
     private int requestedVplanId;
-    private boolean isOnlineRequested;
     private DataSource datasource;
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
@@ -109,8 +109,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int selectedVplanItem;
     private int selectedAppmodeItem;
     private GoogleApiClient apiClient;
-    private ArrayList<DataMap> dataMaps;
-    private BroadcastReceiver updateRequestReceiver;
     private ShowcaseView showcase;
     private boolean tutorialMode;
 
@@ -127,6 +125,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
+        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.VPLAN));
 
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -150,6 +149,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         } catch (PackageManager.NameNotFoundException ignored) {}
 
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
+        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         appMode = pref.getInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
@@ -228,6 +228,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                     //if we are in tutorial mode continue giving instructions
                     if (tutorialMode) {
+
+                        //if showcase is null, init it
+                        if (showcase == null) {
+                            showcase = new ShowcaseView.Builder(MainActivity.this)
+                                    .setStyle(R.style.ShowcaseTheme)
+                                    .build();
+                            showcase.setButtonPosition(getRightParam(getResources()));
+                        }
                         showcase.setTarget(Target.NONE);
                         showcase.setContentTitle(getString(R.string.tut_drawer_title));
                         showcase.setContentText(getString(R.string.tut_drawer_text));
@@ -425,6 +433,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     //change requested vplan mode and save it in shared prefs
                     requestedVplanMode = vplanMode;
                     getSharedPreferences(SharedPrefs.PREFS_NAME, 0).edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
+                    Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
 
                     //select the right filter
                     switch (requestedVplanMode) {
@@ -877,8 +886,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //disable the tutorial mode
                         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                         pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
+                        tutorialMode = false;
                         dialog.dismiss();
                     }
                 })
@@ -958,9 +969,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         refreshItem = item;
 
-        //request full parsing process
-        isOnlineRequested = true;
-
         //get data and put it into db, viewpager adapter is automatically refreshed
         new BgDownloader().execute(this);
     }
@@ -975,7 +983,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode);
+        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
+        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(appMode));
         editor.apply();
 
         super.onPause();

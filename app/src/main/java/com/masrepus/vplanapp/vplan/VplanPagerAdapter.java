@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.masrepus.vplanapp.constants.Args;
@@ -25,7 +26,7 @@ import java.util.Set;
 /**
  * Created by samuel on 19.08.14.
  */
-public class VplanPagerAdapter extends FragmentStatePagerAdapter {
+public class VplanPagerAdapter extends FragmentPagerAdapter {
 
     private int count;
     private Context context;

@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.settings.SettingsPrefListener;
@@ -68,6 +69,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
+        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.TIMETABLE));
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
