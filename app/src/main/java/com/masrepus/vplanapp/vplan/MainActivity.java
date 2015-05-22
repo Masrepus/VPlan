@@ -101,7 +101,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int appMode;
     private int requestedVplanMode;
     private int requestedVplanId;
-    private boolean isOnlineRequested;
     private DataSource datasource;
     private MenuItem refreshItem;
     private ActionBarDrawerToggle drawerToggle;
@@ -110,8 +109,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private int selectedVplanItem;
     private int selectedAppmodeItem;
     private GoogleApiClient apiClient;
-    private ArrayList<DataMap> dataMaps;
-    private BroadcastReceiver updateRequestReceiver;
     private ShowcaseView showcase;
     private boolean tutorialMode;
 
@@ -971,9 +968,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         item.setActionView(iv);
 
         refreshItem = item;
-
-        //request full parsing process
-        isOnlineRequested = true;
 
         //get data and put it into db, viewpager adapter is automatically refreshed
         new BgDownloader().execute(this);
