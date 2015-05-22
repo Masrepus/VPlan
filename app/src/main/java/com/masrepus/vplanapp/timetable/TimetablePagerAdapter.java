@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.masrepus.vplanapp.R;
@@ -22,7 +23,7 @@ import java.util.Comparator;
 /**
  * Created by samuel on 31.01.15.
  */
-public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
+public class TimetablePagerAdapter extends FragmentPagerAdapter {
 
     private ArrayList<TimetableListAdapter> adapters = new ArrayList<>();
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
