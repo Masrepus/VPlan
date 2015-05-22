@@ -228,6 +228,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
                     //if we are in tutorial mode continue giving instructions
                     if (tutorialMode) {
+
+                        //if showcase is null, init it
+                        if (showcase == null) {
+                            showcase = new ShowcaseView.Builder(MainActivity.this)
+                                    .setStyle(R.style.ShowcaseTheme)
+                                    .build();
+                            showcase.setButtonPosition(getRightParam(getResources()));
+                        }
                         showcase.setTarget(Target.NONE);
                         showcase.setContentTitle(getString(R.string.tut_drawer_title));
                         showcase.setContentText(getString(R.string.tut_drawer_text));
@@ -877,8 +885,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //disable the tutorial mode
                         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                         pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
+                        tutorialMode = false;
                         dialog.dismiss();
                     }
                 })
