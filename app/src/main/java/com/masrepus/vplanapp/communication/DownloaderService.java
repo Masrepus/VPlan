@@ -30,6 +30,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -87,6 +88,7 @@ public class DownloaderService extends Service {
         } else notifyWear = false;
 
         lastRequestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
+        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
 
         //get the current filter
         switch (lastRequestedVplanMode) {
@@ -116,6 +118,7 @@ public class DownloaderService extends Service {
 
         //now save the current vplan mode in shared prefs
         editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
+        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
         editor.apply();
 
         new BgDownloader().execute(this);
@@ -553,6 +556,7 @@ public class DownloaderService extends Service {
 
                 //update shared prefs as well
                 editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
+                Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
                 editor.apply();
 
                 new BgDownloader().execute(context);

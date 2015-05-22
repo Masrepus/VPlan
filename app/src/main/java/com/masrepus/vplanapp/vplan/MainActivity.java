@@ -66,6 +66,7 @@ import com.masrepus.vplanapp.communication.AsyncDownloader;
 import com.masrepus.vplanapp.communication.DownloaderService;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
+import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -127,6 +128,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
+        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.VPLAN));
 
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -150,6 +152,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         } catch (PackageManager.NameNotFoundException ignored) {}
 
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
+        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         appMode = pref.getInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
@@ -433,6 +436,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     //change requested vplan mode and save it in shared prefs
                     requestedVplanMode = vplanMode;
                     getSharedPreferences(SharedPrefs.PREFS_NAME, 0).edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
+                    Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
 
                     //select the right filter
                     switch (requestedVplanMode) {
@@ -985,7 +989,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode);
+        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
+        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(appMode));
         editor.apply();
 
         super.onPause();
