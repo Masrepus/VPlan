@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -61,7 +62,7 @@ import java.util.List;
 import io.fabric.sdk.android.Fabric;
 
 
-public class ExamsActivity extends ActionBarActivity implements View.OnClickListener {
+public class ExamsActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String ACTIVITY_NAME = "exams";
     private ArrayList<ExamsRow> examsList;

@@ -55,7 +55,7 @@ public class TimetableFragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem > lastFirstVisible) {
                     //scrolling down, hide fab
-                    ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
+                    ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab);
                     Animation out = AnimationUtils.loadAnimation(getActivity(), R.anim.abc_fade_out);
 
                     //only restart if the view is not hidden already
@@ -67,7 +67,7 @@ public class TimetableFragment extends Fragment {
                     //scrolling up, show fab
                     //only restart if the view is still invisible
                     Animation in = AnimationUtils.loadAnimation(getActivity(), R.anim.abc_fade_in);
-                    ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
+                    ImageButton fab = (ImageButton) getActivity().findViewById(R.id.fab);
 
                     if (fab.getVisibility() == View.INVISIBLE) {
                         fab.startAnimation(in);

@@ -9,10 +9,12 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -55,7 +57,7 @@ import java.util.Calendar;
 import io.fabric.sdk.android.Fabric;
 
 
-public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable {
+public class TimetableActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable {
 
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
     private TimetableRow editingRow;
@@ -78,7 +80,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //activate the fab
-        ImageButton fab = (ImageButton) findViewById(R.id.fab_image_button);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
         new PagerAdapterLoader().execute();
@@ -130,7 +132,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         editor.putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE);
         editor.apply();
 
-        prepareDrawer();
+        //prepareDrawer();
     }
 
     @Override
@@ -290,7 +292,7 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
     public void onClick(View view) {
 
         //check if this is the fab
-        if (view.getId() == R.id.fab_image_button) {
+        if (view.getId() == R.id.fab) {
 
             //add a lesson to the currently visible day
             showAddLessonDialog(0);
