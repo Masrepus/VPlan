@@ -57,7 +57,8 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/fab_ic_add"
-                app:fabSize="normal" />
+                app:fabSize="normal"
+                app:elevation="5dp"/>
 
 
         </RelativeLayout>

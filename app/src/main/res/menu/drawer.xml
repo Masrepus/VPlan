@@ -8,15 +8,18 @@
                 <item
                     android:id="@+id/vplan_appmode_item"
                     android:title="@string/vplan"
-                    android:checkable="true" />
+                    android:checkable="true"
+                    android:icon="@drawable/ic_substitutions"/>
                 <item
                     android:id="@+id/exams_appmode_item"
                     android:title="@string/exams"
-                    android:checkable="true" />
+                    android:checkable="true"
+                    android:icon="@drawable/ic_exams"/>
                 <item
                     android:id="@+id/timetable_appmode_item"
                     android:title="@string/timetable"
-                    android:checkable="true" />
+                    android:checkable="true"
+                    android:icon="@drawable/ic_timetable"/>
             </group>
         </menu>
     </item>
@@ -28,7 +31,8 @@
                 <item
                     android:id="@+id/unterstufe_item"
                     android:title="@string/unterstufe"
-                    android:checkable="true" />
+                    android:checkable="true"
+                    />
                 <item
                     android:id="@+id/mittelstufe_item"
                     android:title="@string/mittelstufe"
