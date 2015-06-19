@@ -2312,27 +2312,28 @@ containing a value of this type.
         public static final int common_signin_btn_text_pressed_dark=0x7f02005b;
         public static final int common_signin_btn_text_pressed_light=0x7f02005c;
         public static final int divider=0x7f02005d;
-        public static final int drawer_shadow=0x7f02005e;
-        public static final int fab=0x7f02005f;
-        public static final int fab_background=0x7f020060;
-        public static final int fab_ic_add=0x7f020061;
-        public static final int hand=0x7f020062;
-        public static final int ic_action_help=0x7f020063;
-        public static final int ic_add=0x7f020064;
-        public static final int ic_cancel=0x7f020065;
-        public static final int ic_drawer=0x7f020066;
-        public static final int ic_launcher_v2=0x7f020067;
-        public static final int ic_plusone_medium_off_client=0x7f020068;
-        public static final int ic_plusone_small_off_client=0x7f020069;
-        public static final int ic_plusone_standard_off_client=0x7f02006a;
-        public static final int ic_plusone_tall_off_client=0x7f02006b;
-        public static final int ic_refresh=0x7f02006c;
-        public static final int ic_settings=0x7f02006d;
-        public static final int ic_website=0x7f02006e;
-        public static final int notification_template_icon_bg=0x7f020072;
-        public static final int section_header=0x7f02006f;
-        public static final int snackbar_background=0x7f020070;
-        public static final int yellow_selector=0x7f020071;
+        public static final int fab=0x7f02005e;
+        public static final int fab_background=0x7f02005f;
+        public static final int fab_ic_add=0x7f020060;
+        public static final int hand=0x7f020061;
+        public static final int ic_add=0x7f020062;
+        public static final int ic_cancel=0x7f020063;
+        public static final int ic_exams=0x7f020064;
+        public static final int ic_help=0x7f020065;
+        public static final int ic_launcher_v2=0x7f020066;
+        public static final int ic_plusone_medium_off_client=0x7f020067;
+        public static final int ic_plusone_small_off_client=0x7f020068;
+        public static final int ic_plusone_standard_off_client=0x7f020069;
+        public static final int ic_plusone_tall_off_client=0x7f02006a;
+        public static final int ic_refresh=0x7f02006b;
+        public static final int ic_settings=0x7f02006c;
+        public static final int ic_substitutions=0x7f02006d;
+        public static final int ic_timetable=0x7f02006e;
+        public static final int ic_website=0x7f02006f;
+        public static final int notification_template_icon_bg=0x7f020073;
+        public static final int section_header=0x7f020070;
+        public static final int snackbar_background=0x7f020071;
+        public static final int yellow_selector=0x7f020072;
     }
     public static final class id {
         public static final int TAG_APPMODE=0x7f0b0000;
@@ -3221,7 +3222,8 @@ containing a value of this type.
         public static final int sectionHeader=0x7f0d0134;
     }
     public static final class xml {
-        public static final int settings=0x7f050000;
+        public static final int backupscheme=0x7f050000;
+        public static final int settings=0x7f050001;
     }
     public static final class styleable {
         /** Attributes that can be used with a ActionBar.

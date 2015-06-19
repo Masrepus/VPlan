@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -920,7 +921,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onClick(View v) {
                 DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                layout.openDrawer(Gravity.START);
+                layout.openDrawer(GravityCompat.START);
             }
         });
         showcase.setBlocksTouches(false);
@@ -1275,18 +1276,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         @Override
         protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
 
-            //check whether disabling of welcome tv and activation of tabstrip must be done
-            if (vplanPagerAdapter.hasData()) {
-
-                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-                welcome.setVisibility(View.GONE);
-
-                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-                tabStrip.setVisibility(View.VISIBLE);
-            }
-
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
             pager.setAdapter(vplanPagerAdapter);
+            vplanPagerAdapter.notifyDataSetChanged();
+
+            //check whether disabling of welcome tv and activation of tabstrip must be done
+            TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+            PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+            if (vplanPagerAdapter.hasData()) {
+                welcome.setVisibility(View.GONE);
+                tabStrip.setVisibility(View.VISIBLE);
+            } else {
+                welcome.setVisibility(View.VISIBLE);
+                tabStrip.setVisibility(View.GONE);
+            }
 
             //set a 1 dp margin between the fragments
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
