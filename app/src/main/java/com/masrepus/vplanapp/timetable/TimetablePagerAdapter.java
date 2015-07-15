@@ -23,7 +23,7 @@ import java.util.Comparator;
 /**
  * Created by samuel on 31.01.15.
  */
-public class TimetablePagerAdapter extends FragmentPagerAdapter {
+public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
 
     private ArrayList<TimetableListAdapter> adapters = new ArrayList<>();
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");

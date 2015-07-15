@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Created by samuel on 19.08.14.
  */
-public class VplanPagerAdapter extends FragmentPagerAdapter {
+public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
     private int count;
     private Context context;
