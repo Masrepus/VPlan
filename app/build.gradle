@@ -35,14 +35,14 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.+'
-    compile 'com.android.support:appcompat-v7:21.0.+'
+    compile 'com.android.support:support-v4:22.2.+'
+    compile 'com.android.support:appcompat-v7:22.2.+'
     compile 'com.android.support:cardview-v7:21.0.+'
     compile 'com.google.android.gms:play-services-wearable:+'
     compile files('libs/jsoup-1.7.3.jar')
     compile project(':showcaseview')
     wearApp project(':wear')
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.4@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
         transitive = true;
     }
 }
