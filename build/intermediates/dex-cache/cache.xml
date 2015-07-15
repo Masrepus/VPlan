@@ -2,6 +2,13 @@
 <items version="2" >
 
     <item
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/22.2.0/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="97f7e239e86ef994de894818fdd8a71d2e89d6aa">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-6184ec7464a9aa7ae369d570b1ecc0aa5c767f5c.jar" />
+    </item>
+    <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/7.3.0/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -9,11 +16,11 @@
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/release/classes-37d3be13459e7b2bfbc5f1ebbdaa26bccb652dc1.jar" />
     </item>
     <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.crashlytics.sdk.android/crashlytics/2.2.4/classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/libs/jsoup-1.7.3.jar"
         jumboMode="false"
-        revision="21.1.2"
-        sha1="d0d81ee0db83fd6c59100ee80c6c2b051b6a9cee">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-3c401e76786a784216faef879cb2e1ba5d9e820c.jar" />
+        revision="20.0.0"
+        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/jsoup-1.7.3-7f8897dd58f4a731086925bed69a43b3ffa5bf16.jar" />
     </item>
     <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.google.android.support/wearable/1.1.0/classes.jar"
@@ -23,74 +30,11 @@
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/release/classes-39b8439881afb4e16584bfefb0622449887aea9a.jar" />
     </item>
     <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.crashlytics.sdk.android/beta/1.1.2/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="0d6546c1c73cb64a6907f694e6c4bf4b50fefa70">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-53f6aae2d5aed2f58ad28cb21d94ff14181b7bd8.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="00b0b7233e1ec64acebfac40d4983d32d4712426">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-b777f32dff50a23f6443c01b2bcb6fa9d66a2d71.jar" />
-    </item>
-    <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/21.0.3/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="4b8945fc23a7461c6fdde15753456d64b0a9358b">
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/release/classes-9183c38418dc1dff9a3b5b7465e25cc699fea753.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/VPlan/showcaseview/unspecified/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="a752ff5c046b9ca68139bba9ae1a257837f1360e">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-e8bb607818a69ae872de9a5a2df032a4a759c759.jar" />
-    </item>
-    <item
-        jar="/home/samuel/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.0.0/support-annotations-22.0.0.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/release/support-annotations-22.0.0-8110f3abfcc6d240b5598cfcaa82a2ec3e4e48d0.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/libs/jsoup-1.7.3.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/jsoup-1.7.3-7f8897dd58f4a731086925bed69a43b3ffa5bf16.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/io.fabric.sdk.android/fabric/1.3.1/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="62753ea30b9fd44e248c50952a36c4b6a4b3eb73">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-a23ef7673697beb310a98e6c9b63fde95b013dee.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-e1c16cd5e6f229af8c034f39c6c6cfcd982adaa5.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="00b0b7233e1ec64acebfac40d4983d32d4712426">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-b777f32dff50a23f6443c01b2bcb6fa9d66a2d71.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/libs/jsoup-1.7.3.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/jsoup-1.7.3-7f8897dd58f4a731086925bed69a43b3ffa5bf16.jar" />
     </item>
     <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/VPlan/showcaseview/unspecified/libs/nineoldandroids-2.4.0.jar"
@@ -100,11 +44,25 @@
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/nineoldandroids-2.4.0-804ffb28518efc173cc129417649b99ab59af707.jar" />
     </item>
     <item
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/VPlan/showcaseview/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="a752ff5c046b9ca68139bba9ae1a257837f1360e">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-e8bb607818a69ae872de9a5a2df032a4a759c759.jar" />
+    </item>
+    <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/libs/internal_impl-22.0.0.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/release/internal_impl-22.0.0-ba5cb0b273e9f4a603ec2ce94b4dacb376a94a87.jar" />
+    </item>
+    <item
+        jar="/home/samuel/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.0.0/support-annotations-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/release/support-annotations-22.0.0-8110f3abfcc6d240b5598cfcaa82a2ec3e4e48d0.jar" />
     </item>
     <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.0.0/classes.jar"
@@ -121,18 +79,11 @@
         <dex dex="/home/samuel/AndroidstudioProjects/VPlan/wear/build/intermediates/pre-dexed/release/classes-6403cc2fdb605da36c2fd8f4d78eb255cce3e1a7.jar" />
     </item>
     <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.crashlytics.sdk.android/answers/1.2.0/classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/libs/jsoup-1.7.3.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="5bba805ab6e6eed90593bb115e78880d7accafed">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-52c1acecd92e489bb4d6554a04ee3bec9627e32d.jar" />
-    </item>
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes-e1c16cd5e6f229af8c034f39c6c6cfcd982adaa5.jar" />
+        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/jsoup-1.7.3-7f8897dd58f4a731086925bed69a43b3ffa5bf16.jar" />
     </item>
     <item
         jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wearable/7.3.0/classes.jar"
