@@ -17,6 +17,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -542,6 +544,10 @@ public class DownloaderService extends Service {
                 stopSelf();
                 return;
             }
+
+            //notify answers
+            Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_BG_DOWNLOAD)
+            .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode)));
 
             if (downloaded_levels == levels.length) {
 

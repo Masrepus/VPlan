@@ -21,4 +21,5 @@ public class Args {
     public static final String TUT_FILTER = "filter";
     public static final int NOTIF_ONGOING = 1;
     public static final int NOTIF_NORMAL = 2;
+    public static final String WEAR_APP_OPENED = "wearAppOpened";
 }

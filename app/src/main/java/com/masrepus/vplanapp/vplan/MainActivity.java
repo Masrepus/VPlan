@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,13 +24,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +47,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
@@ -805,6 +804,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_refresh:
+
+                //notify answers
+                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
+                .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
+                .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
+
                 refresh(item);
                 return true;
             /*case R.id.tester:
