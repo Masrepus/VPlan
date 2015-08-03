@@ -30,6 +30,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.masrepus.vplanapp.communication.AsyncDownloader;
@@ -261,6 +263,10 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
                 return super.onOptionsItemSelected(item);
             case R.id.action_refresh:
+
+                //notify answers
+                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_EXAMS));
+
                 refresh(item);
                 return true;
             case R.id.action_settings:
