@@ -537,8 +537,7 @@ public class DownloaderService extends Service {
 
             //only stop the service when all the levels are finished downloading or if there was an error
             if (!success) {
-                //show the error notification
-                publishProgress(ProgressCode.ERR_NO_INTERNET_OR_NO_CREDS);
+                //just stop
                 Log.d("DownloaderService", "stopSelf()");
                 stopSelf();
                 return;
