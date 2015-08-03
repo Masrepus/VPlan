@@ -42,7 +42,7 @@ dependencies {
     compile files('libs/jsoup-1.7.3.jar')
     compile project(':showcaseview')
     wearApp project(':wear')
-    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
         transitive = true;
     }
 }
