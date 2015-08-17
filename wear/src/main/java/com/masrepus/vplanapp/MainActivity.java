@@ -42,6 +42,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         connectApiClient();
 
+        //notify the phone that the wear app has been opened
+        new SendToDataLayerThread(Args.WEAR_APP_OPENED).start();
+
         initTodayVplan();
 
         //create a new pager adapter and assign it to the pager

@@ -57,7 +57,7 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
     public static final String DATABASE_UINFO = "uinfo.db";
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public SQLiteHelperVplan(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);

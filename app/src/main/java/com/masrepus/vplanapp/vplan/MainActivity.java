@@ -49,6 +49,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
@@ -804,6 +806,12 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_refresh:
+
+                //notify answers
+                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
+                .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
+                .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
+
                 refresh(item);
                 return true;
             /*case R.id.tester:

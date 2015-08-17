@@ -7,6 +7,11 @@ public class CrashlyticsKeys {
 
     public static final String KEY_VPLAN_MODE = "vplanMode";
     public static final String KEY_APP_MODE = "appMode";
+    public static final String EVENT_BG_DOWNLOAD = "Hintergrundupdate";
+    public static final String EVENT_REFRESH_VPLAN = "man. Aktualisierung (Vertretungen)";
+    public static final String EVENT_REFRESH_EXAMS = "Aktualisierung (Tests)";
+    public static final String KEY_USES_FILTER = "Filter";
+    public static final String EVENT_WEAR_APP_OPENED = "Wear-App geöffnet";
 
     public static String parseVplanMode(int vplanmode) {
 
