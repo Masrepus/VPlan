@@ -1035,13 +1035,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences mPref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         //get the keys used in settings or skip if not available
         ArrayList<String> usedKeys = new ArrayList<>(mPref.getStringSet(SharedPrefs.USED_SETTINGS_KEYS, new HashSet<String>()));
-        //find the differences between used keys and keys present in sharedPrefs file
-        ArrayList<String> differences = new ArrayList<>(CollectionTools.nonOverLap(usedKeys, keys.keySet()));
-        //the old keys are those contained in differences and also keys.keySet
-        ArrayList<String> oldKeys = new ArrayList<>(CollectionTools.intersect(keys.keySet(), differences));
 
-        //now show the prefs with the old keys from settings pref in a dialog
-        new AlertDialog.Builder(this).setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, oldKeys.toArray(new String[oldKeys.size()])), null).show();
+        if (usedKeys.size() > 0) {
+            //find the differences between used keys and keys present in sharedPrefs file
+            ArrayList<String> differences = new ArrayList<>(CollectionTools.nonOverLap(usedKeys, keys.keySet()));
+            //the old keys are those contained in differences and also keys.keySet
+            ArrayList<String> oldKeys = new ArrayList<>(CollectionTools.intersect(keys.keySet(), differences));
+
+            //remove username, pwd and update keys from the list if present
+            oldKeys.remove(getString(R.string.key_uname));
+            oldKeys.remove(getString(R.string.key_pwd));
+            oldKeys.remove(getString(R.string.pref_key_bg_updates));
+            oldKeys.remove(getString(R.string.pref_key_upd_int));
+            oldKeys.remove(getString(R.string.pref_key_bg_upd_levels));
+
+            //now delete those old keys from settings prefs
+            SharedPreferences.Editor editor = pref.edit();
+            for (String oldKey : oldKeys) {
+                editor.remove(oldKey);
+                editor.apply();
+            }
+        }
 
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
@@ -1103,9 +1117,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 break;
         }
 
-        //save the filters in shared prefs
-        pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
+        //save the filters in main shared prefs
+        SharedPreferences.Editor editor = mPref.edit();
         Set<String> unterstufeSet = new HashSet<>(filterUnterstufe);
         Set<String> mittelstufeSet = new HashSet<>(filterMittelstufe);
         Set<String> oberstufeSet = new HashSet<>(filterOberstufe);
