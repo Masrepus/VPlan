@@ -141,7 +141,7 @@
     <string name="pref_key_gesch_q11" translatable="false">pref_key_gesch_q11</string>
     <string name="pref_key_gesch_q12" translatable="false">pref_key_gesch_q12</string>
     <string name="pref_key_inf_q12" translatable="false">pref_key_info_q12</string>
-    <string name="pref_key_info_q11" translatable="false">pref_key_info_q11</string>
+    <string name="pref_key_inf_q11" translatable="false">pref_key_info_q11</string>
     <string name="pref_key_ku_q11" translatable="false">pref_key_ku_q12</string>
     <string name="pref_key_ku_q12" translatable="false">key_ku_q12</string>
     <string name="pref_key_lat_q11" translatable="false">pref_key_lat_q11</string>
@@ -149,7 +149,7 @@
     <string name="pref_key_mathe_q11" translatable="false">pref_key_mathe_q11</string>
     <string name="pref_key_mathe_q12" translatable="false">pref_key_mathe_q12</string>
     <string name="pref_key_mu_q12" translatable="false">pref_key_musik_q12</string>
-    <string name="pref_key_musik_q11" translatable="false">pref_key_musik_q11</string>
+    <string name="pref_key_mu_q11" translatable="false">pref_key_musik_q11</string>
     <string name="pref_key_orc" translatable="false">pref_key_orc</string>
     <string name="pref_key_phas_q12" translatable="false">pref_key_phas_q12</string>
     <string name="pref_key_phb_q11" translatable="false">pref_key_phb_q11</string>
@@ -229,5 +229,6 @@
     <string name="pref_key_orc_q12" translatable="false">pref_key_orc_q12</string>
     <string name="pref_key_psy_q12" translatable="false">pref_key_psy_q12</string>
     <string name="pref_key_ssp_q12" translatable="false">pref_key_ssp_q12</string>
+    <string name="pref_key_spo_q12">pref_key_spo_q12</string>
 
 </resources>

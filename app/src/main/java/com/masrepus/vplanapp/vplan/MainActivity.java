@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -25,12 +25,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +39,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -64,6 +64,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.masrepus.vplanapp.CollectionTools;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.communication.AsyncDownloader;
 import com.masrepus.vplanapp.communication.DownloaderService;
@@ -86,6 +87,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +95,7 @@ import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener {
 
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final String ACTIVITY_NAME = "MainActivity";
@@ -109,8 +111,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     private ActionBarDrawerToggle drawerToggle;
     private Map<String, ?> keys;
     private String currentVPlanLink;
-    private int selectedVplanItem;
-    private int selectedAppmodeItem;
     private GoogleApiClient apiClient;
     private ShowcaseView showcase;
     private boolean tutorialMode;
@@ -161,15 +161,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             filterWarning.setText(R.string.filter_enabled);
         }
 
-        //display current app info in appinfo textview
-        TextView appInfo = (TextView) findViewById(R.id.textViewAppInfo);
-        try {
-            appInfo.setText("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            appInfo.setText("Fehler");
-        }
-
         refreshFilters();
 
         //activate adapter for viewPager
@@ -182,11 +173,24 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         new PagerAdapterLoader().execute(this);
 
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-        tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
+        tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue, getTheme()));
 
         //initialise navigation drawer
-        TextView settings = (TextView) findViewById(R.id.textViewSettings);
-        settings.setText(getString(R.string.settings).toUpperCase());
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.setNavigationItemSelectedListener(this);
+        drawer.getMenu().getItem(0).getSubMenu().getItem(0).setChecked(true);
+
+        //display current app info in appinfo nav item
+        MenuItem appInfo = drawer.getMenu().getItem(3).getSubMenu().getItem(1);
+        try {
+            appInfo.setTitle("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            appInfo.setTitle("Fehler");
+        }
+
+        //check the current vplanmode item
+        drawer.getMenu().getItem(1).getSubMenu().getItem(requestedVplanMode - 1).setChecked(true);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -276,35 +280,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
 
         //display last update timestamp
-        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
-        TextView tv = (TextView) findViewById(R.id.lastUpdate);
-        tv.setVisibility(View.VISIBLE);
-        tv.setText(lastUpdate);
-
-        //prepare vplan mode listview
-        ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
-
-        //build the entries array
-        String[] appModes = getResources().getStringArray(R.array.appmodes);
-        String[] entries = DrawerListBuilder.addArrays(appModes, getResources().getStringArray(R.array.vplan_modes));
-
-        //build the item list
-        DrawerListBuilder listBuilder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), entries, 0, appModes.length);
-
-        DrawerListAdapter modesAdapter = new DrawerListAdapter(this, this, listBuilder.getItems());
-
-        vplanModesLV.setAdapter(modesAdapter);
-
-        //restore last selected vplan item
-        editor.putInt(SharedPrefs.SELECTED_VPLAN_ITEM, 1 + appModes.length + requestedVplanMode); //for uinfo and two appmodes, this must return 4
-        editor.apply();
-
-
-        //restore last selected appmode item
-        editor.putInt(SharedPrefs.SELECTED_APPMODE_ITEM, 1 + appMode);
-        editor.apply();
-
-        modesAdapter.notifyDataSetChanged();
+        String lastUpdate = getString(R.string.last_update) + " " + pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
+        drawer.getMenu().getItem(3).getSubMenu().getItem(0).setTitle(lastUpdate);
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -396,82 +373,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     }
 
     @Override
-    public void onClick(View view) {
-
-        //check whether this is an appmode item
-        Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
-
-        if (appModeTag != null) {
-
-            //update the current appmode
-            appMode = appModeTag;
-
-            switch (appModeTag) {
-
-                case AppModes.TESTS:
-                    startActivity(new Intent(this, ExamsActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
-                    break;
-                case AppModes.TIMETABLE:
-                    startActivity(new Intent(this, TimetableActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
-                    break;
-            }
-
-        } else {
-            //check whether this is a vplan mode item or not
-            Integer vplanMode = (Integer) view.getTag(R.id.TAG_VPLAN_MODE);
-            Integer position = (Integer) view.getTag(R.id.TAG_POSITION);
-            if (vplanMode != null) {
-
-                //check whether there was a change in the selection
-                if (requestedVplanMode != vplanMode) {
-
-                    selectedVplanItem = position;
-                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                    pref.edit().putInt(SharedPrefs.SELECTED_VPLAN_ITEM, selectedVplanItem).apply();
-
-                    ListView vplanModes = (ListView) findViewById(R.id.vplanModeList);
-                    DrawerListAdapter modesAdapter = (DrawerListAdapter) vplanModes.getAdapter();
-                    modesAdapter.notifyDataSetChanged();
-
-                    //change requested vplan mode and save it in shared prefs
-                    requestedVplanMode = vplanMode;
-                    getSharedPreferences(SharedPrefs.PREFS_NAME, 0).edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
-                    Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
-
-                    //select the right filter
-                    switch (requestedVplanMode) {
-
-                        case VplanModes.UINFO:
-                            filterCurrent = filterUnterstufe;
-                            break;
-                        case VplanModes.MINFO:
-                            filterCurrent = filterMittelstufe;
-                            break;
-                        case VplanModes.OINFO:
-                            filterCurrent = filterOberstufe;
-                            break;
-                    }
-
-                    //collapse the drawer
-                    DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    drawerLayout.closeDrawers();
-
-                    //recreate the pageradapter
-                    ViewPager pager = (ViewPager) findViewById(R.id.pager);
-                    pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
-
-                    //now start the adapter loading in a separate thread
-                    new PagerAdapterLoader().execute(this);
-
-                    //load the right last-update timestamp
-                    String lastUpdate = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
-                    TextView tv = (TextView) findViewById(R.id.lastUpdate);
-                    tv.setVisibility(View.VISIBLE);
-                    tv.setText(lastUpdate);
-                } //else just ignore the click
-            }
-        }
-    }
+    public void onClick(View view) {}
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -664,7 +566,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
         appMode = AppModes.VPLAN;
-        selectedAppmodeItem = 1 + appMode;
 
         //set the appmode to vplan
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -710,10 +611,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
         appMode = AppModes.VPLAN;
-
-        ListView vplanModesLV = (ListView) findViewById(R.id.vplanModeList);
-        DrawerListAdapter adapter = (DrawerListAdapter) vplanModesLV.getAdapter();
-        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -1028,8 +925,33 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         String[] minfoKeys = {getString(R.string.key_grade8), getString(R.string.key_grade9), getString(R.string.key_grade10)};
 
-        //iterate through all shared prefs stringsets
+        //iterate through all shared prefs stringsets and delete the still existing old keys
         int mode;
+
+        SharedPreferences mPref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        //get the keys used in settings or skip if not available
+        ArrayList<String> usedKeys = new ArrayList<>(mPref.getStringSet(SharedPrefs.USED_SETTINGS_KEYS, new HashSet<String>()));
+
+        if (usedKeys.size() > 0) {
+            //find the differences between used keys and keys present in sharedPrefs file
+            ArrayList<String> differences = new ArrayList<>(CollectionTools.nonOverLap(usedKeys, keys.keySet()));
+            //the old keys are those contained in differences and also keys.keySet
+            ArrayList<String> oldKeys = new ArrayList<>(CollectionTools.intersect(keys.keySet(), differences));
+
+            //remove username, pwd and update keys from the list if present
+            oldKeys.remove(getString(R.string.key_uname));
+            oldKeys.remove(getString(R.string.key_pwd));
+            oldKeys.remove(getString(R.string.pref_key_bg_updates));
+            oldKeys.remove(getString(R.string.pref_key_upd_int));
+            oldKeys.remove(getString(R.string.pref_key_bg_upd_levels));
+
+            //now delete those old keys from settings prefs
+            SharedPreferences.Editor editor = pref.edit();
+            for (String oldKey : oldKeys) {
+                editor.remove(oldKey);
+                editor.apply();
+            }
+        }
 
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
@@ -1091,9 +1013,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 break;
         }
 
-        //save the filters in shared prefs
-        pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
+        //save the filters in main shared prefs
+        SharedPreferences.Editor editor = mPref.edit();
         Set<String> unterstufeSet = new HashSet<>(filterUnterstufe);
         Set<String> mittelstufeSet = new HashSet<>(filterMittelstufe);
         Set<String> oberstufeSet = new HashSet<>(filterOberstufe);
@@ -1245,6 +1166,79 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+        menuItem.setChecked(false);
+
+        switch (menuItem.getItemId()) {
+
+            case R.id.exams_appmode_item:
+                startActivity(new Intent(this, ExamsActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
+                break;
+            case R.id.timetable_appmode_item:
+                startActivity(new Intent(this, TimetableActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
+                break;
+            case R.id.unterstufe_item:
+                changeVplanMode(VplanModes.UINFO);
+                break;
+            case R.id.mittelstufe_item:
+                changeVplanMode(VplanModes.MINFO);
+                break;
+            case R.id.oberstufe_item:
+                changeVplanMode(VplanModes.OINFO);
+                break;
+            case R.id.settings_item:
+                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+                break;
+        }
+        return true;
+    }
+
+    private void changeVplanMode(int vplanMode) {
+
+        //check whether there was a change in the selection
+        if (requestedVplanMode != vplanMode) {
+
+            SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+            //change requested vplan mode and save it in shared prefs
+            requestedVplanMode = vplanMode;
+            pref.edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
+            Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
+
+            //select the right filter
+            switch (requestedVplanMode) {
+
+                case VplanModes.UINFO:
+                    filterCurrent = filterUnterstufe;
+                    break;
+                case VplanModes.MINFO:
+                    filterCurrent = filterMittelstufe;
+                    break;
+                case VplanModes.OINFO:
+                    filterCurrent = filterOberstufe;
+                    break;
+            }
+
+            //collapse the drawer
+            DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawerLayout.closeDrawers();
+
+            //recreate the pageradapter
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+
+            //now start the adapter loading in a separate thread
+            new PagerAdapterLoader().execute(this);
+
+            //load the right last-update timestamp
+            String lastUpdate = getString(R.string.last_update) + " " + getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
+            NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+            drawer.getMenu().getItem(3).getSubMenu().getItem(0).setTitle(lastUpdate);
+        } //else just ignore the click
+    }
+
     /**
      * PagerAdapter that only displays one dummy fragment containing a progressbar
      */
@@ -1283,18 +1277,20 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         @Override
         protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
 
-            //check whether disabling of welcome tv and activation of tabstrip must be done
-            if (vplanPagerAdapter.hasData()) {
-
-                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-                welcome.setVisibility(View.GONE);
-
-                PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-                tabStrip.setVisibility(View.VISIBLE);
-            }
-
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
             pager.setAdapter(vplanPagerAdapter);
+            vplanPagerAdapter.notifyDataSetChanged();
+
+            //check whether disabling of welcome tv and activation of tabstrip must be done
+            TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+            PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
+            if (vplanPagerAdapter.hasData()) {
+                welcome.setVisibility(View.GONE);
+                tabStrip.setVisibility(View.VISIBLE);
+            } else {
+                welcome.setVisibility(View.VISIBLE);
+                tabStrip.setVisibility(View.GONE);
+            }
 
             //set a 1 dp margin between the fragments
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();

@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.masrepus.vplanapp.CollectionTools;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -215,7 +216,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
                 //now save the differences in the hiddenItems list
                 dataLists.set(id, list);
-                hiddenItems.set(id, new ArrayList<>(nonOverLap(tempList, list)));
+                hiddenItems.set(id, new ArrayList<>(CollectionTools.nonOverLap(tempList, list)));
                 listSizesBeforeFilter[id] = tempList.size();
 
             } else {
@@ -330,29 +331,5 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         return title;
-    }
-
-    private Collection<Row> union(Collection<Row> coll1, Collection<Row> coll2) {
-        Set<Row> union = new HashSet<>(coll1);
-        union.addAll(new HashSet<>(coll2));
-        return union;
-    }
-
-    private Collection<Row> intersect(Collection<Row> coll1, Collection<Row> coll2) {
-        Set<Row> intersection = new HashSet<>(coll1);
-        intersection.retainAll(new HashSet<>(coll2));
-
-        return intersection;
-    }
-
-    /**
-     * Finds out the differences between two collections
-     *
-     * @return returns a collection containing the items that are different
-     */
-    private Collection<Row> nonOverLap(Collection<Row> coll1, Collection<Row> coll2) {
-        Collection<Row> result = union(coll1, coll2);
-        result.removeAll(intersect(coll1, coll2));
-        return result;
     }
 }

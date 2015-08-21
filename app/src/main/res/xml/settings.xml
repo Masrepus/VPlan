@@ -93,7 +93,7 @@
                     android:entryValues="@array/q_11_geo" />
                 <MultiSelectListPreference
                     android:title="@string/musik"
-                    android:key="@string/pref_key_musik_q11"
+                    android:key="@string/pref_key_mu_q11"
                     android:entries="@array/q_11_mu"
                     android:entryValues="@array/q_11_mu" />
                 <MultiSelectListPreference
@@ -118,7 +118,7 @@
                     android:entryValues="@array/q_11_ch" />
                 <MultiSelectListPreference
                     android:title="@string/inf"
-                    android:key="@string/pref_key_info_q11"
+                    android:key="@string/pref_key_inf_q11"
                     android:entries="@array/q_11_inf"
                     android:entryValues="@array/q_11_inf" />
                 <MultiSelectListPreference
@@ -314,7 +314,7 @@
                     android:entryValues="@array/q_12_sk" />
                 <MultiSelectListPreference
                     android:title="@string/spo"
-                    android:key="pref_key_spo_q12"
+                    android:key="@string/pref_key_spo_q12"
                     android:entries="@array/q_12_spo"
                     android:entryValues="@array/q_12_spo" />
                 <MultiSelectListPreference

@@ -12,7 +12,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.design.widget.NavigationView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,7 +64,7 @@ import java.util.List;
 import io.fabric.sdk.android.Fabric;
 
 
-public class ExamsActivity extends ActionBarActivity implements View.OnClickListener {
+public class ExamsActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     public static final String ACTIVITY_NAME = "exams";
     private ArrayList<ExamsRow> examsList;
@@ -99,6 +100,15 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         FrameLayout hiddenItemsFL = (FrameLayout) findViewById(R.id.frameLayout2);
         if (noOldItems) hiddenItemsFL.setVisibility(View.VISIBLE);
         else hiddenItemsFL.setVisibility(View.GONE);
+
+        //init the drawer
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.setNavigationItemSelectedListener(this);
+        drawer.getMenu().getItem(0).getSubMenu().getItem(1).setChecked(true);
+
+        //display last update timestamp
+        String lastUpdate = getString(R.string.last_update) + " " + pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.TESTS, "");
+        drawer.getMenu().getItem(1).getSubMenu().getItem(0).setTitle(lastUpdate);
 
         refreshAdapter();
 
@@ -160,48 +170,10 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
 
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
+
         //set the appmode to exams
         editor.putInt(SharedPrefs.APPMODE, AppModes.TESTS);
         editor.apply();
-
-        prepareDrawer();
-    }
-
-    private void prepareDrawer() {
-
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-
-        //initialise the drawer list
-        DrawerListBuilder builder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), getResources().getStringArray(R.array.appmodes), 0);
-        DrawerListAdapter adapter = new DrawerListAdapter(this, this, builder.getItems());
-        ListView drawerLV = (ListView) findViewById(R.id.vplanModeList);
-        drawerLV.setAdapter(adapter);
-
-        //save the current appmode item that is selected (tests)
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(SharedPrefs.SELECTED_APPMODE_ITEM, 1 + AppModes.TESTS);
-        editor.apply();
-
-        adapter.notifyDataSetChanged();
-
-        //display last update timestamp
-        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.TESTS, "");
-        TextView tv = (TextView) findViewById(R.id.lastUpdate);
-        tv.setVisibility(View.VISIBLE);
-        tv.setText(lastUpdate);
-
-        //display current app info in appinfo textview
-        TextView appInfo = (TextView) findViewById(R.id.textViewAppInfo);
-        try {
-            appInfo.setText("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            appInfo.setText("Fehler");
-        }
-
-        //init the settings item
-        TextView settings = (TextView) findViewById(R.id.textViewSettings);
-        settings.setText(getString(R.string.settings).toUpperCase());
     }
 
     public void refreshAdapter() {
@@ -245,10 +217,6 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(listener);
 
         super.onPause();
-    }
-
-    public void onSettingsClick(View v) {
-        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
     @Override
@@ -448,36 +416,39 @@ public class ExamsActivity extends ActionBarActivity implements View.OnClickList
     }
 
     @Override
-    public void onClick(View view) {
-
-        //check the tag
-        Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
-
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-
-        if (appModeTag != null) {
-
-            switch (appModeTag) {
-
-                case AppModes.VPLAN:
-                    //update appmode
-                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
-
-                    startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    break;
-                case AppModes.TIMETABLE:
-                    //update appmode
-                    pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE).apply();
-
-                    startActivity(new Intent(this, TimetableActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        }
-    }
+    public void onClick(View view) {}
 
     public void displayLastUpdate(String lastUpdate) {
 
         TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
         lastUpdateTv.setText(lastUpdate);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        switch (menuItem.getItemId()) {
+
+            case R.id.vplan_appmode_item:
+                //update appmode
+                pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+
+                startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                break;
+            case R.id.timetable_appmode_item:
+                //update appmode
+                pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE).apply();
+
+                startActivity(new Intent(this, TimetableActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                break;
+            case R.id.settings_item:
+                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+                break;
+        }
+
+        return true;
     }
 
     private class ExamsListAdapter extends ArrayAdapter<ExamsRow> {

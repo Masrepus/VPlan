@@ -24,7 +24,7 @@ import com.masrepus.vplanapp.databases.SQLiteHelperTests;
 import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
 import com.masrepus.vplanapp.vplan.MainActivity;
 
-import org.apache.http.HttpStatus;
+
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -48,6 +48,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     protected static final int UINFO = VplanModes.UINFO;
     protected static final int MINFO = VplanModes.MINFO;
     protected static final int OINFO = VplanModes.OINFO;
+    protected static final int UNAUTHORIZED = 401;
     protected ProgressCode progress;
     protected int downloaded_files;
     protected int total_downloads;
@@ -293,7 +294,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             if (e instanceof HttpStatusException) {
                 switch (((HttpStatusException)e).getStatusCode()) {
 
-                    case HttpStatus.SC_UNAUTHORIZED:
+                    case UNAUTHORIZED:
                         publishProgress(ProgressCode.ERR_NO_CREDS);
                         break;
                     default:
@@ -370,7 +371,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             if (e instanceof HttpStatusException) {
                 switch (((HttpStatusException)e).getStatusCode()) {
 
-                    case HttpStatus.SC_UNAUTHORIZED:
+                    case UNAUTHORIZED:
                         publishProgress(ProgressCode.ERR_NO_CREDS);
                         break;
                     default:
@@ -421,7 +422,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                 switch (exception.getStatusCode()) {
 
-                    case HttpStatus.SC_UNAUTHORIZED:
+                    case UNAUTHORIZED:
                         publishProgress(ProgressCode.ERR_NO_CREDS);
                         break;
                     default:
@@ -491,7 +492,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                 switch (exception.getStatusCode()) {
 
-                    case HttpStatus.SC_UNAUTHORIZED:
+                    case UNAUTHORIZED:
                         publishProgress(ProgressCode.ERR_NO_CREDS);
                         break;
                     default:
@@ -912,7 +913,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                     switch (exception.getStatusCode()) {
 
-                        case HttpStatus.SC_UNAUTHORIZED:
+                        case UNAUTHORIZED:
                             publishProgress(ProgressCode.ERR_NO_CREDS);
                             break;
                         default:
