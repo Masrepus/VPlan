@@ -950,6 +950,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             for (String oldKey : oldKeys) {
                 editor.remove(oldKey);
                 editor.apply();
+
+                //report this to answers to double check that the right keys are being deleted
+                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_DELETED_OLD_DATA).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, oldKey));
             }
         }
 
