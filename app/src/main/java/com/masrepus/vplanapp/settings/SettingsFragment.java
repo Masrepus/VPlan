@@ -10,7 +10,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 
 import com.masrepus.vplanapp.R;
+import com.masrepus.vplanapp.constants.SharedPrefs;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,7 +21,8 @@ import java.util.Set;
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    SharedPreferences preferences;
+    private SharedPreferences preferences;
+    private ArrayList<String> keys = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         preferences.registerOnSharedPreferenceChangeListener(this);
 
         initSummary(getPreferenceScreen());
+
+        //write the list of used keys to mPref prefs
+        SharedPreferences pref = getActivity().getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.putStringSet(SharedPrefs.USED_SETTINGS_KEYS, new HashSet<>(keys));
+        editor.apply();
     }
 
     @Override
@@ -75,6 +86,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             //get the values that were saved in this preference item and join them with commas
             //treat bg update levels separately
+            //note each multiselectlistpreference's key in order to find old unused entries in the shared prefs file
+            keys.add(multiPref.getKey());
+
             Set<String> values = preferences.getStringSet(multiPref.getKey(), null);
 
             StringBuilder builder = new StringBuilder();
