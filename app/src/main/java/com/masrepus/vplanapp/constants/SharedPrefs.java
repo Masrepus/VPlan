@@ -23,4 +23,5 @@ public class SharedPrefs {
     public static final String TUT_RUNNING = "tutRunning";
     public static final String MAX_LESSON = "maxLesson";
     public static final String LAST_VERSION_RUN = "lastVersionRun";
+    public static final String USED_SETTINGS_KEYS = "usedSettingsKeys";
 }

@@ -40,6 +40,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -64,6 +65,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.masrepus.vplanapp.CollectionTools;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.communication.AsyncDownloader;
 import com.masrepus.vplanapp.communication.DownloaderService;
@@ -86,6 +88,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1028,8 +1031,19 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
         String[] minfoKeys = {getString(R.string.key_grade8), getString(R.string.key_grade9), getString(R.string.key_grade10)};
 
-        //iterate through all shared prefs stringsets
+        //iterate through all shared prefs stringsets and delete the still existing old keys
         int mode;
+
+        SharedPreferences mPref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        //get the keys used in settings or skip if not available
+        ArrayList<String> usedKeys = new ArrayList<>(mPref.getStringSet(SharedPrefs.USED_SETTINGS_KEYS, new HashSet<String>()));
+        //find the differences between used keys and keys present in sharedPrefs file
+        ArrayList<String> differences = new ArrayList<>(CollectionTools.nonOverLap(usedKeys, keys.keySet()));
+        //the old keys are those contained in differences and also keys.keySet
+        ArrayList<String> oldKeys = new ArrayList<>(CollectionTools.intersect(keys.keySet(), differences));
+
+        //now show the prefs with the old keys from settings pref in a dialog
+        new AlertDialog.Builder(this).setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, oldKeys.toArray(new String[oldKeys.size()])), null).show();
 
         for (Map.Entry<String, ?> entry : keys.entrySet()) {
 
