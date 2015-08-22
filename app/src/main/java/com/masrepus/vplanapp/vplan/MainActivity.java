@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         new PagerAdapterLoader().execute(this);
 
         PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-        tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue, getTheme()));
+        tabStrip.setTabIndicatorColor(getColor(getResources(), R.color.blue, getTheme()));
 
         //initialise navigation drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
@@ -294,6 +295,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (tutorialMode) {
             askAboutTutorial();
+        }
+    }
+
+    private int getColor(Resources res, int id, Resources.Theme theme) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return res.getColor(id, theme);
+        } else {
+            return res.getColor(id);
         }
     }
 
