@@ -1182,8 +1182,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
 
-        menuItem.setChecked(false);
-
         switch (menuItem.getItemId()) {
 
             case R.id.exams_appmode_item:
