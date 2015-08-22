@@ -30,7 +30,6 @@
                 android:id="@+id/progressBar"
                 android:indeterminateBehavior="cycle"
                 android:visibility="gone"
-                android:layout_alignParentTop="true"
                 android:layout_below="@id/toolbar"/>
 
             <FrameLayout

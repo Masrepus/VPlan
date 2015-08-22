@@ -104,11 +104,11 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //init the drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
         drawer.setNavigationItemSelectedListener(this);
-        drawer.getMenu().getItem(0).getSubMenu().getItem(1).setChecked(true);
+        drawer.getMenu().findItem(R.id.exams_appmode_item).setChecked(true);
 
         //display last update timestamp
         String lastUpdate = getString(R.string.last_update) + " " + pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.TESTS, "");
-        drawer.getMenu().getItem(1).getSubMenu().getItem(0).setTitle(lastUpdate);
+        drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
 
         refreshAdapter();
 
@@ -174,6 +174,12 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //set the appmode to exams
         editor.putInt(SharedPrefs.APPMODE, AppModes.TESTS);
         editor.apply();
+
+        //refresh the drawer
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.getMenu().findItem(R.id.vplan_appmode_item).setChecked(false);
+        drawer.getMenu().findItem(R.id.exams_appmode_item).setChecked(true);
+        drawer.getMenu().findItem(R.id.timetable_appmode_item).setChecked(false);
     }
 
     public void refreshAdapter() {
@@ -420,27 +426,29 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
     public void displayLastUpdate(String lastUpdate) {
 
-        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
-        lastUpdateTv.setText(lastUpdate);
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
 
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        Menu menu = drawer.getMenu();
 
         switch (menuItem.getItemId()) {
 
             case R.id.vplan_appmode_item:
                 //update appmode
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
-
+                menu.findItem(R.id.exams_appmode_item).setChecked(false);
                 startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.timetable_appmode_item:
                 //update appmode
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE).apply();
-
+                menu.findItem(R.id.exams_appmode_item).setChecked(false);
                 startActivity(new Intent(this, TimetableActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.settings_item:

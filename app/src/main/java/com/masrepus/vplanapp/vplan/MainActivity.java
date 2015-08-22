@@ -179,19 +179,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //initialise navigation drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
         drawer.setNavigationItemSelectedListener(this);
-        drawer.getMenu().getItem(0).getSubMenu().getItem(0).setChecked(true);
+        drawer.getMenu().findItem(R.id.vplan_appmode_item).setChecked(true);
+
+        //check the current vplanmode item
+        switch (requestedVplanMode) {
+
+            case VplanModes.UINFO:
+                drawer.getMenu().findItem(R.id.unterstufe_item).setChecked(true);
+                break;
+            case VplanModes.MINFO:
+                drawer.getMenu().findItem(R.id.mittelstufe_item).setChecked(true);
+                break;
+            case VplanModes.OINFO:
+                drawer.getMenu().findItem(R.id.oberstufe_item).setChecked(true);
+                break;
+        }
 
         //display current app info in appinfo nav item
-        MenuItem appInfo = drawer.getMenu().getItem(3).getSubMenu().getItem(1);
+        MenuItem appInfo = drawer.getMenu().findItem(R.id.appInfo);
         try {
             appInfo.setTitle("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             appInfo.setTitle("Fehler");
         }
-
-        //check the current vplanmode item
-        drawer.getMenu().getItem(1).getSubMenu().getItem(requestedVplanMode - 1).setChecked(true);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -282,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         //display last update timestamp
         String lastUpdate = getString(R.string.last_update) + " " + pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
-        drawer.getMenu().getItem(3).getSubMenu().getItem(0).setTitle(lastUpdate);
+        drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
 
         //register change listener for settings sharedPrefs
         SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -576,6 +587,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setCurrentItem(getTodayVplanId());
         appMode = AppModes.VPLAN;
+
+        //refresh the drawer
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.getMenu().findItem(R.id.vplan_appmode_item).setChecked(true);
+        drawer.getMenu().findItem(R.id.exams_appmode_item).setChecked(false);
+        drawer.getMenu().findItem(R.id.timetable_appmode_item).setChecked(false);
 
         //set the appmode to vplan
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -1152,8 +1169,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void displayLastUpdate(String lastUpdate) {
 
-        TextView lastUpdateTv = (TextView) findViewById(R.id.lastUpdate);
-        lastUpdateTv.setText(lastUpdate);
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
     }
 
     public void resetRefreshAnimation() {
@@ -1182,22 +1199,33 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
 
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        Menu menu = drawer.getMenu();
+
         switch (menuItem.getItemId()) {
 
             case R.id.exams_appmode_item:
+                menu.findItem(R.id.vplan_appmode_item).setChecked(false);
                 startActivity(new Intent(this, ExamsActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
                 break;
             case R.id.timetable_appmode_item:
+                menu.findItem(R.id.vplan_appmode_item).setChecked(false);
                 startActivity(new Intent(this, TimetableActivity.class).putExtra(Args.CALLING_ACTIVITY, ACTIVITY_NAME));
                 break;
             case R.id.unterstufe_item:
                 changeVplanMode(VplanModes.UINFO);
+                menu.findItem(R.id.mittelstufe_item).setChecked(false);
+                menu.findItem(R.id.oberstufe_item).setChecked(false);
                 break;
             case R.id.mittelstufe_item:
                 changeVplanMode(VplanModes.MINFO);
+                menu.findItem(R.id.unterstufe_item).setChecked(false);
+                menu.findItem(R.id.oberstufe_item).setChecked(false);
                 break;
             case R.id.oberstufe_item:
                 changeVplanMode(VplanModes.OINFO);
+                menu.findItem(R.id.mittelstufe_item).setChecked(false);
+                menu.findItem(R.id.unterstufe_item).setChecked(false);
                 break;
             case R.id.settings_item:
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
@@ -1246,7 +1274,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //load the right last-update timestamp
             String lastUpdate = getString(R.string.last_update) + " " + getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
             NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
-            drawer.getMenu().getItem(3).getSubMenu().getItem(0).setTitle(lastUpdate);
+            drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
         } //else just ignore the click
     }
 

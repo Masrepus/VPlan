@@ -88,7 +88,7 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         //init the drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
         drawer.setNavigationItemSelectedListener(this);
-        drawer.getMenu().getItem(0).getSubMenu().getItem(2).setChecked(true);
+        drawer.getMenu().findItem(R.id.timetable_appmode_item).setChecked(true);
 
         new PagerAdapterLoader().execute();
     }
@@ -139,7 +139,11 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         editor.putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE);
         editor.apply();
 
-        //prepareDrawer();
+        //refresh the drawer
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.getMenu().findItem(R.id.vplan_appmode_item).setChecked(false);
+        drawer.getMenu().findItem(R.id.exams_appmode_item).setChecked(false);
+        drawer.getMenu().findItem(R.id.timetable_appmode_item).setChecked(true);
     }
 
     @Override
