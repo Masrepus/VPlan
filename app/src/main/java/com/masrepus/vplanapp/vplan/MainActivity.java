@@ -40,10 +40,8 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -78,8 +76,6 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
-import com.masrepus.vplanapp.drawer.DrawerListAdapter;
-import com.masrepus.vplanapp.drawer.DrawerListBuilder;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
@@ -88,7 +84,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +145,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         try {
             //save the current version code in shared prefs
             editor.putInt(SharedPrefs.LAST_VERSION_RUN, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
-        } catch (PackageManager.NameNotFoundException ignored) {}
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
 
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
         Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
@@ -394,7 +390,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    public void onClick(View view) {}
+    public void onClick(View view) {
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -733,8 +730,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 //notify answers
                 Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
-                .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
-                .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
+                        .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
+                        .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
 
                 refresh(item);
                 return true;
@@ -751,38 +748,38 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 return true;
             case R.id.action_activate_filter:
-                //tell the user how the filter works if the current filter is still empty
-                if (filterCurrent.isEmpty()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(getString(R.string.filter))
-                            .setMessage(getString(R.string.filter_explanations))
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).show();
-                } else {
-                    //display the grey status bar for the filter or disable it
-                    FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
-                    TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
-                    if (item.isChecked()) {
-                        item.setChecked(false);
-                        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
-                        editor.apply();
-                        fl.setVisibility(View.GONE);
+                //display the grey status bar for the filter or disable it
+                FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
+                TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
+                    editor.apply();
+                    fl.setVisibility(View.GONE);
 
-                        //sync this new dataset to wear
-                        sendDataToWatch();
+                    //sync this new dataset to wear
+                    sendDataToWatch();
+                } else {
+                    //tell the user how the filter works if the current filter is still empty
+                    if (filterCurrent.isEmpty()) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle(getString(R.string.filter))
+                                .setMessage(getString(R.string.filter_explanations))
+                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
+                                    }
+                                })
+                                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
                     } else {
                         item.setChecked(true);
                         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -796,9 +793,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         //sync to wear
                         sendDataToWatch();
                     }
-                    //refresh adapter for viewPager
-                    new PagerAdapterLoader().execute(this);
                 }
+                //refresh adapter for viewPager
+                new PagerAdapterLoader().execute(this);
                 return true;
             case R.id.action_help:
                 SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
