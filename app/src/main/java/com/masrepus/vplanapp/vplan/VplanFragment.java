@@ -30,6 +30,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        super.onCreateView(inflater, container, savedInstanceState);
         Bundle args = getArguments();
 
         //args could be corrupted if ram was cleared while in background => restart the activity

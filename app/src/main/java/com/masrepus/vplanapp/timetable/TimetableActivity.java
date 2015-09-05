@@ -9,10 +9,14 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -55,7 +59,7 @@ import java.util.Calendar;
 import io.fabric.sdk.android.Fabric;
 
 
-public class TimetableActivity extends ActionBarActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable {
+public class TimetableActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener, View.OnLongClickListener, Serializable, OnNavigationItemSelectedListener {
 
     private SimpleDateFormat weekdays = new SimpleDateFormat("EEEE");
     private TimetableRow editingRow;
@@ -78,8 +82,13 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //activate the fab
-        ImageButton fab = (ImageButton) findViewById(R.id.fab_image_button);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
+
+        //init the drawer
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.setNavigationItemSelectedListener(this);
+        drawer.getMenu().findItem(R.id.timetable_appmode_item).setChecked(true);
 
         new PagerAdapterLoader().execute();
     }
@@ -130,7 +139,11 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         editor.putInt(SharedPrefs.APPMODE, AppModes.TIMETABLE);
         editor.apply();
 
-        prepareDrawer();
+        //refresh the drawer
+        NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+        drawer.getMenu().findItem(R.id.vplan_appmode_item).setChecked(false);
+        drawer.getMenu().findItem(R.id.exams_appmode_item).setChecked(false);
+        drawer.getMenu().findItem(R.id.timetable_appmode_item).setChecked(true);
     }
 
     @Override
@@ -249,80 +262,15 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
         datasource.close();
     }
 
-    private void prepareDrawer() {
-
-        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-
-        //initialise the drawer list
-        DrawerListBuilder builder = new DrawerListBuilder(this, getResources().getStringArray(R.array.sectionHeaders), getResources().getStringArray(R.array.appmodes), 0);
-        DrawerListAdapter adapter = new DrawerListAdapter(this, this, builder.getItems());
-        ListView drawerLV = (ListView) findViewById(R.id.vplanModeList);
-        drawerLV.setAdapter(adapter);
-
-        //save the current appmode item that is selected (tests)
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(SharedPrefs.SELECTED_APPMODE_ITEM, 1 + AppModes.TIMETABLE);
-        editor.apply();
-
-        adapter.notifyDataSetChanged();
-
-        //display last update timestamp
-        String lastUpdate = pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + AppModes.TESTS, "");
-        TextView tv = (TextView) findViewById(R.id.lastUpdate);
-        tv.setVisibility(View.VISIBLE);
-        tv.setText(lastUpdate);
-
-        //display current app info in appinfo textview
-        TextView appInfo = (TextView) findViewById(R.id.textViewAppInfo);
-        try {
-            appInfo.setText("v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + " by Samuel Hopstock");
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            appInfo.setText("Fehler");
-        }
-
-        //init the settings item
-        TextView settings = (TextView) findViewById(R.id.textViewSettings);
-        settings.setText(getString(R.string.settings).toUpperCase());
-    }
-
     @Override
     public void onClick(View view) {
 
         //check if this is the fab
-        if (view.getId() == R.id.fab_image_button) {
+        if (view.getId() == R.id.fab) {
 
             //add a lesson to the currently visible day
             showAddLessonDialog(0);
-        } else {
-
-            //check the tag
-            Integer appModeTag = (Integer) view.getTag(R.id.TAG_APPMODE);
-
-            SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-
-            if (appModeTag != null) {
-
-                switch (appModeTag) {
-
-                    case AppModes.VPLAN:
-                        //update appmode
-                        pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
-
-                        startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                        break;
-                    case AppModes.TESTS:
-                        //update appmode
-                        pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TESTS).apply();
-
-                        startActivity(new Intent(this, ExamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                }
-            }
         }
-    }
-
-    public void onSettingsClick(View view) {
-        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
     @Override
@@ -545,6 +493,32 @@ public class TimetableActivity extends ActionBarActivity implements View.OnClick
 
         TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
         pager.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+
+        switch (menuItem.getItemId()) {
+
+            case R.id.vplan_appmode_item:
+                //update appmode
+                pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
+
+                startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                break;
+            case R.id.exams_appmode_item:
+                //update appmode
+                pref.edit().putInt(SharedPrefs.APPMODE, AppModes.TESTS).apply();
+
+                startActivity(new Intent(this, ExamsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                break;
+            case R.id.settings_item:
+                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+                break;
+        }
+        return true;
     }
 
     private class PagerAdapterLoader extends AsyncTask<Void, Void, Void> {

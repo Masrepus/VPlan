@@ -11,6 +11,7 @@
     <color name="yellow_focused">@color/yellow</color>
     <color name="blue">#274595</color>
     <color name="blue_focused">#2745d4</color>
+    <color name="yellow_translucent">#aaf7dd2b</color>
     
     <style name="ShowcaseTheme" parent="ShowcaseView.Light">
         <item name="sv_backgroundColor">#ccffffff</item>

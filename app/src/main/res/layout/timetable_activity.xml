@@ -1,147 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:animateLayoutChanges="true">
+    android:layout_height="match_parent">
 
-    <include
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/toolbar"
-        android:layout_alignParentTop="true"
-        android:id="@+id/toolbar" />
-
-    <android.support.v4.widget.DrawerLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:layout_below="@id/toolbar"
-        android:id="@+id/drawer_layout">
+        android:animateLayoutChanges="true">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
 
         <RelativeLayout
+            android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/background">
+            android:layout_below="@id/toolbar">
 
             <android.support.v4.view.ViewPager
-                android:layout_height="match_parent"
+                android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:id="@+id/pager" >
+                android:layout_height="match_parent">
+
                 <android.support.v4.view.PagerTabStrip
                     android:id="@+id/pager_title_strip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp" />
-                </android.support.v4.view.ViewPager>
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp" />
+            </android.support.v4.view.ViewPager>
 
             <ProgressBar
+                android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyleLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/progressBar"
                 android:layout_centerInParent="true"
-                android:visibility="gone"
-                android:indeterminate="true" />
+                android:indeterminate="true"
+                android:visibility="gone" />
 
-            <ImageButton
-                android:id="@+id/fab_image_button"
-                android:layout_width="76dp"
-                android:layout_height="76dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_marginBottom="16dp"
                 android:layout_marginRight="16dp"
-                android:background="@drawable/fab"
                 android:src="@drawable/fab_ic_add"
-                android:tint="@android:color/white"/>
-        </RelativeLayout>
+                app:fabSize="normal"
+                app:borderWidth="0dp" />
 
-        <RelativeLayout
-            android:id="@+id/drawer_left"
-            android:layout_width="250dp"
-            android:layout_height="match_parent"
-            android:showDividers="middle"
-            android:layout_gravity="start"
-            android:orientation="vertical"
-            android:background="@android:color/background_light">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:id="@+id/lastUpdateFrame">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/lastUpdateStatic"
-                    android:textStyle="bold|italic"
-                    android:text="@string/last_update"
-                    android:layout_gravity="center"
-                    android:paddingTop="10dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/lastUpdate"
-                    android:textStyle="bold|italic"
-                    android:paddingBottom="10dp"
-                    android:text="@string/last_update"
-                    android:layout_gravity="center" />
-            </LinearLayout>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/vplanModeList"
-                android:choiceMode="singleChoice"
-                android:layout_above="@+id/settings_frame"
-                android:divider="@null"
-                android:listSelector="@drawable/yellow_selector"
-                android:layout_below="@+id/lastUpdateFrame"
-                android:requiresFadingEdge="vertical" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="16dp"
-                android:layout_above="@+id/textViewAppInfo"
-                android:id="@+id/settings_frame"
-                android:paddingBottom="10dp"
-                android:clickable="true"
-                android:onClick="onSettingsClick">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/settings"
-                    android:id="@+id/textViewSettings"
-                    android:layout_gravity="left|center_vertical"
-                    android:drawableLeft="@drawable/ic_settings"
-                    android:drawablePadding="5dp"
-                    android:gravity="center_vertical|center_horizontal" />
-            </FrameLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewAppInfo"
-                android:textAppearance="@android:style/TextAppearance.Holo.Small"
-                android:textColor="@android:color/darker_gray"
-                android:layout_alignParentBottom="true"
-                android:paddingLeft="16dp"
-                android:paddingBottom="5dp" />
 
         </RelativeLayout>
-    </android.support.v4.widget.DrawerLayout>
-</RelativeLayout>
+    </RelativeLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/drawer_left"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@android:color/background_light"
+        android:showDividers="middle"
+        app:menu="@menu/drawer"
+        app:itemTextColor="@color/text_selector"
+        app:itemIconTint="@color/icon_selector"
+        app:itemBackground="@drawable/yellow_selector">
+    </android.support.design.widget.NavigationView>
+</android.support.v4.widget.DrawerLayout>

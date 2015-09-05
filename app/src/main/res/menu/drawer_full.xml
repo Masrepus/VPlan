@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/subheader_appmodes"
+        android:title="@string/appmodes_header">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/vplan_appmode_item"
+                    android:title="@string/vplan"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_substitutions" />
+                <item
+                    android:id="@+id/exams_appmode_item"
+                    android:title="@string/exams"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_exams" />
+                <item
+                    android:id="@+id/timetable_appmode_item"
+                    android:title="@string/timetable"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_timetable" />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/subheader_vplanmodes"
+        android:title="@string/levels">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/unterstufe_item"
+                    android:title="@string/unterstufe"
+                    android:checkable="true" />
+                <item
+                    android:id="@+id/mittelstufe_item"
+                    android:title="@string/mittelstufe"
+                    android:checkable="true" />
+                <item
+                    android:id="@+id/oberstufe_item"
+                    android:title="@string/oberstufe"
+                    android:checkable="true" />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/settings_item"
+        android:title="@string/settings"
+        android:icon="@drawable/ic_settings" />
+    <item android:title="">
+        <menu>
+            <group android:checkableBehavior="none">
+                <item
+                    android:id="@+id/lastUpdate"
+                    android:title="" />
+                <item
+                    android:id="@+id/appInfo"
+                    android:title="" />
+            </group>
+        </menu>
+    </item>
+</menu>
