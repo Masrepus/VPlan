@@ -25,6 +25,13 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
             + TABLE_LINKS + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_TAG
             + " text, " + COLUMN_URL + " text);";
+    public static final String TABLE_ANNOUNCEMENTS = "announcements";
+    public static final String COLUMN_ANNOUNCEMENT = "announcement";
+    //announcement table
+    public static final String ANNOUNCEMENTS_CREATE = "create table "
+            + TABLE_ANNOUNCEMENTS + "(" + COLUMN_ID
+            + " integer primary key autoincrement, " + COLUMN_ANNOUNCEMENT
+            + " text);";
     public static final String TABLE_VPLAN_1 = "vplantable1";
     //VPlantable 1
     private static final String VPLAN_1_CREATE = "create table "
@@ -57,7 +64,7 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
     public static final String DATABASE_UINFO = "uinfo.db";
     public static final String DATABASE_MINFO = "minfo.db";
     public static final String DATABASE_OINFO = "oinfo.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     public SQLiteHelperVplan(Context context, String dbName) {
         super(context, dbName, null, DATABASE_VERSION);
@@ -76,6 +83,7 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
         database.execSQL(VPLAN_3_CREATE);
         database.execSQL(VPLAN_4_CREATE);
         database.execSQL(LINK_CREATE);
+        database.execSQL(ANNOUNCEMENTS_CREATE);
     }
 
     /**
@@ -93,6 +101,7 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_3);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPLAN_4);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LINKS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANNOUNCEMENTS);
         onCreate(db);
     }
 
@@ -123,6 +132,10 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
         if (tableName.contentEquals(TABLE_LINKS)) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_LINKS);
             db.execSQL(LINK_CREATE);
+        }
+        if (tableName.contentEquals(TABLE_ANNOUNCEMENTS)) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANNOUNCEMENTS);
+            db.execSQL(ANNOUNCEMENTS_CREATE);
         }
     }
 
