@@ -1,4 +1,4 @@
-package com.masrepus.vplanapp.communication;
+package com.masrepus.vplanapp.network;
 
 /**
  * Created by samuel on 30.09.14.
