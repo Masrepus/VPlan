@@ -21,7 +21,6 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/background_light"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:layout_marginTop="6dp"
@@ -79,7 +78,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/timeChangedTextView"
-                android:layout_toRightOf="@+id/nodataTV"
                 android:layout_gravity="center"
                 android:textStyle="italic" />
         </FrameLayout>

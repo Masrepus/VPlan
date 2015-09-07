@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
@@ -16,12 +17,25 @@
             android:id="@+id/background"
             android:animateLayoutChanges="true">
 
-            <include
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/toolbar"
-                layout="@layout/view_toolbar"
-                android:layout_alignParentTop="true" />
+                android:id="@+id/toolbarLayout">
+
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/toolbar"
+                    layout="@layout/view_toolbar"
+                    android:layout_alignParentTop="true" />
+
+                <com.masrepus.vplanapp.vplan.SlidingTabLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tabs"
+                    android:background="@color/yellow"
+                    android:layout_below="@id/toolbar"/>
+            </RelativeLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -33,7 +47,7 @@
                 android:background="@color/blue"
                 android:clickable="true"
                 android:onClick="onFilterInfoClick"
-                android:layout_below="@id/toolbar">
+                android:layout_below="@id/toolbarLayout">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -72,22 +86,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/frameLayout">
-
-                <android.support.v4.view.PagerTabStrip
-                    android:id="@+id/pager_title_strip"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:visibility="gone" />
             </android.support.v4.view.ViewPager>
 
 
         </RelativeLayout>
 
         <android.support.design.widget.NavigationView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/drawer_left"
             android:layout_width="250dp"
             android:layout_height="match_parent"

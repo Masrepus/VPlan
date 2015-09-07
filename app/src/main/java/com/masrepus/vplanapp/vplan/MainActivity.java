@@ -169,9 +169,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         new PagerAdapterLoader().execute(this);
 
-        PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-        tabStrip.setTabIndicatorColor(getColor(getResources(), R.color.blue, getTheme()));
-
         //initialise navigation drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
         drawer.setNavigationItemSelectedListener(this);
@@ -1309,16 +1306,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             pager.setAdapter(vplanPagerAdapter);
             vplanPagerAdapter.notifyDataSetChanged();
 
-            //check whether disabling of welcome tv and activation of tabstrip must be done
-            TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-            PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-            if (vplanPagerAdapter.hasData()) {
-                welcome.setVisibility(View.GONE);
-                tabStrip.setVisibility(View.VISIBLE);
-            } else {
-                welcome.setVisibility(View.VISIBLE);
-                tabStrip.setVisibility(View.GONE);
-            }
+            //init the tab layout
+            SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+                @Override
+                public int getIndicatorColor(int position) {
+                    return getColor(getResources(), R.color.blue, getTheme());
+                }
+            });
+            tabs.setViewPager(pager);
 
             //set a 1 dp margin between the fragments
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
