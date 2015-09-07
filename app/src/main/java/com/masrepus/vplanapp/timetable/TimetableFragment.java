@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
-import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.masrepus.vplanapp.R;
@@ -28,7 +27,7 @@ public class TimetableFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.timetable_fragment, null);
+        View rootView = inflater.inflate(R.layout.fragment_timetable, null);
         Bundle args = getArguments();
 
         //get the listview adapter from args and attach it to the listview
@@ -41,7 +40,7 @@ public class TimetableFragment extends Fragment {
             //restart, something is wrong here
             getActivity().finish();
             startActivity(new Intent(getActivity(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
-            return View.inflate(getActivity(), R.layout.vplan_loading_dummy, null);
+            return View.inflate(getActivity(), R.layout.view_card_loading, null);
         }
 
         ListView timetable = (ListView) rootView.findViewById(R.id.timetable);

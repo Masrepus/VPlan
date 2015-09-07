@@ -25,7 +25,7 @@ public class VplanListAdapter extends ArrayAdapter implements Serializable {
      * @param list     a Row ArrayList that has to be parsed into a listview
      */
     public VplanListAdapter(Activity activity, ArrayList<Row> list) {
-        super(activity, R.layout.vplan_list, list);
+        super(activity, R.layout.view_card_vplan, list);
         this.list = list;
     }
 
@@ -39,7 +39,7 @@ public class VplanListAdapter extends ArrayAdapter implements Serializable {
 
         if (rowView == null) {
             //get a new instance of the row layout view
-            rowView = View.inflate(getContext(), R.layout.vplanlist_element, null);
+            rowView = View.inflate(getContext(), R.layout.list_item_vplan, null);
 
             //hold the view objects in an object, that way they don't need to be "re- found"
             view = new ViewHolder();

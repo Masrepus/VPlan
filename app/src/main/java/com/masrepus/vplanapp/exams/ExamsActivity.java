@@ -76,7 +76,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.exams_activity);
+        setContentView(R.layout.activity_exams);
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
@@ -191,7 +191,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         });
 
         ListView listView = (ListView) findViewById(R.id.examsList);
-        ExamsListAdapter adapter = new ExamsListAdapter(this, R.layout.exam_list_element, examsList);
+        ExamsListAdapter adapter = new ExamsListAdapter(this, R.layout.list_item_exam, examsList);
         listView.setAdapter(adapter);
     }
 
@@ -360,7 +360,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
         //rotate the refresh button
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
+        ImageView iv = (ImageView) inflater.inflate(R.layout.view_action_refresh, null);
 
         Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
         rotation.setRepeatCount(Animation.INFINITE);
@@ -478,7 +478,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
                 //check for an existing viewholder
                 if (convertView == null) {
                     view = new ViewHolder();
-                    convertView = View.inflate(context, R.layout.exam_list_element, null);
+                    convertView = View.inflate(context, R.layout.list_item_exam, null);
                     view.date = (TextView) convertView.findViewById(R.id.date);
                     view.subject = (TextView) convertView.findViewById(R.id.subject);
                     view.type = (TextView) convertView.findViewById(R.id.type);

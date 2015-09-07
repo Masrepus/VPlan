@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         datasource = new DataSource(this);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
@@ -615,14 +615,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     /**
-     * Called when the settings textview in the drawer is clicked
-     */
-    public void onSettingsClick(View v) {
-        //open settings
-        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
-    }
-
-    /**
      * Called when SettingsActivity returns a result, which is when it is destroyed
      *
      * @param requestCode is always 0
@@ -890,7 +882,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void refresh(MenuItem item) {
         //rotate the refresh button
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
+        ImageView iv = (ImageView) inflater.inflate(R.layout.view_action_refresh, null);
 
         Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
         rotation.setRepeatCount(Animation.INFINITE);
