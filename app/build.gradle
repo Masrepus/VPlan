@@ -24,7 +24,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 24
-        versionName "3.5.1"
+        versionName "3.7.2"
     }
 
     buildTypes {
