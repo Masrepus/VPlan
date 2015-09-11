@@ -65,6 +65,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.CollectionTools;
 import com.masrepus.vplanapp.R;
+import com.masrepus.vplanapp.constants.Tutorial;
 import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.network.DownloaderService;
 import com.masrepus.vplanapp.constants.AppModes;
@@ -1295,6 +1296,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 //when infoFab is clicked show the announcements in a dialog
                 infoFab.setOnClickListener(new InfoFabManager(announcements));
+
+                //display a single-shot tutorial information about announcements
+                showcase = new ShowcaseView.Builder(this)
+                        .setTarget(new ViewTarget(infoFab))
+                        .setContentTitle(getString(R.string.title_announcements))
+                        .setContentText(getString(R.string.message_tut_announcements))
+                        .setStyle(R.style.ShowcaseTheme)
+                        .singleShot(Tutorial.SHOT_ANNOUNCEMENTS)
+                        .hideOnTouchOutside()
+                        .build();
+                showcase.hideButton();
             }
         } catch (Exception e) {
 
@@ -1324,6 +1336,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         @Override
         public void onClick(View v) {
             builder.show();
+            if (showcase != null) showcase.hide();
         }
     }
 

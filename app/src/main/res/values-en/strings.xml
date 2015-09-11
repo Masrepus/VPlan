@@ -85,7 +85,7 @@
     <string name="filter_explanations">In order to filter the substitution plan, you first have to go to the settings and add classes/courses to your filter.</string>
     <string name="msg_start_tutorial">Would you like to start a short tutorial about the features of the SGP App?</string>
     <string name="next">Next</string>
-    <string name="tut_drawer_text">Here you can switch between different views: substitution plan and exams. \nInside a view you can change between Ober-, Mittel- and Unterstufe.</string>
+    <string name="tut_drawer_text">Here you can switch between different views: substitution plan, exams and timetable. \nInside a view (the timetable being an exception) you can change between Ober-, Mittel- and Unterstufe.</string>
     <string name="tut_drawer_title">Slide-out menu</string>
     <string name="tut_start_text">Click on the home/back button in the upper left corner or swipe from the left screen edge to the right in order to open the slide-out menu.</string>
     <string name="tut_start_title">Tutorial</string>
@@ -102,5 +102,8 @@
    <string name="edit_or_delete">Do you want to edit or delete this lesson?</string>
     <string name="free_lesson">Free lesson</string>
     <string name="lesson_already_saved">Lesson already in use</string>
+    <string name="announcements">Announcements</string>
+    <string name="message_tut_announcements">There are additional announcements available for today's substitution plan. Click on the info button for details.</string>
+    <string name="title_announcements">Announcements</string>
 
 </resources>
