@@ -1,4 +1,4 @@
-package com.masrepus.vplanapp.communication;
+package com.masrepus.vplanapp.network;
 
 import android.content.Intent;
 import android.util.Log;

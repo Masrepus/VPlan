@@ -41,7 +41,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             //restart, something is wrong here
             getActivity().finish();
             startActivity(new Intent(getActivity(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
-            return View.inflate(getActivity(), R.layout.vplan_loading_dummy, null);
+            return View.inflate(getActivity(), R.layout.view_card_loading, null);
         }
 
         int listSize = args.getInt(Args.LIST_SIZE);
@@ -57,18 +57,18 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
         if (args.getBoolean(Args.VPLAN_LOADING_DUMMY)) {
 
             return inflater.inflate(
-                    R.layout.vplan_loading_dummy, container, false);
+                    R.layout.view_card_loading, container, false);
         } else {
 
             //The last two args ensure LayoutParams are inflated properly
             View rootView = inflater.inflate(
-                    R.layout.vplan_list, container, false);
+                    R.layout.view_card_vplan, container, false);
 
             //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
             if (listSizeBeforeFilter > 0) {
                 if (listSize == 0) {
                     rootView = inflater.inflate(
-                            R.layout.no_data_vplan_list, container, false);
+                            R.layout.view_card_no_data_vplan, container, false);
                     TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
                     String currTimePublished = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(args.getInt(Args.REQUESTED_VPLAN_ID)), "");
                     timePublishedTV.setText(currTimePublished);
@@ -102,7 +102,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             } else {
 
                 rootView = inflater.inflate(
-                        R.layout.no_data_vplan_list, container, false);
+                        R.layout.view_card_no_data_vplan, container, false);
 
                 displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
 
@@ -131,8 +131,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
     private void addHiddenItemsCountFooter(ListView listView, int hiddenItemsCount) {
 
-        //display a footer view that can be clicked in order to show hidden items, but only if there are any
-        View listFooter = LayoutInflater.from(getActivity()).inflate(R.layout.vplan_list_footer, null);
+        //display a footer view that can be clicked in order to show hidden items; if there are no hidden items add an empty footer for a bottom padding
+        View listFooter = LayoutInflater.from(getActivity()).inflate(R.layout.list_footer_vplan, null);
 
         String msgMode;
         if (hiddenItemsCount > 0) {
@@ -144,6 +144,10 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
             hiddenItemsTV.setText(String.valueOf(hiddenItemsCount) + " " + msgMode);
             listFooter.setOnClickListener(this);
+            listView.addFooterView(listFooter);
+        } else {
+            TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
+            hiddenItemsTV.setText("");
             listView.addFooterView(listFooter);
         }
     }

@@ -203,7 +203,7 @@
     <string name="next">Weiter</string>
     <string name="tut_start_title">Tutorial</string>
     <string name="tut_start_text">Klicke zum Öffnen des seitlichen Menüs auf den Home/Zurück Button in der linken oberen Ecke oder wische vom linken Bildschirmrand nach rechts.</string>
-    <string name="tut_drawer_text">Hier kann zwischen den verschiedenen Ansichten gewechselt werden: Vertretungsplan und Prüfungen.\nInnerhalb einer Ansicht kann zwischen Ober-, Mittel- und Unterstufe gewechselt werden</string>
+    <string name="tut_drawer_text">Hier kann zwischen den verschiedenen Ansichten gewechselt werden: Vertretungsplan, Prüfungen und Stundenplan.\nInnerhalb einer Ansicht (außer im Stundenplan) kann zwischen Ober-, Mittel- und Unterstufe gewechselt werden</string>
     <string name="tut_drawer_title">Seitliches Menü</string>
     <string name="filter">Filter</string>
     <string name="filter_explanations">Um den Vertretungsplan filtern zu können, müssen zuerst in den Einstellungen Klassen bzw. Kurse zu deinem Filter hinzugefügt werden.</string>
@@ -230,5 +230,8 @@
     <string name="pref_key_psy_q12" translatable="false">pref_key_psy_q12</string>
     <string name="pref_key_ssp_q12" translatable="false">pref_key_ssp_q12</string>
     <string name="pref_key_spo_q12" translatable="false">pref_key_spo_q12</string>
+    <string name="announcements">Mitteilungen</string>
+    <string name="title_announcements">Mitteilungen</string>
+    <string name="message_tut_announcements">Für den heutigen Vertretungsplan sind zusätzliche Benachrichtigungen verfügbar. Klicke auf den Info-Button, um die Mitteilungen zu lesen.</string>
 
 </resources>

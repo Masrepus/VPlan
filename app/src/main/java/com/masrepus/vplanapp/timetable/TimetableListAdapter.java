@@ -19,7 +19,7 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
     private TimetableActivity activity;
 
     public TimetableListAdapter(TimetableActivity activity, ArrayList<TimetableRow> rows) {
-        super(activity, R.layout.timetable_item, rows);
+        super(activity, R.layout.list_item_timetable, rows);
         this.rows = rows;
         this.activity = activity;
     }
@@ -40,7 +40,7 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
             if (rowView == null) {
 
                 //get a new instance of the footer layout view to display the break info
-                rowView = View.inflate(getContext(), R.layout.break_view, null);
+                rowView = View.inflate(getContext(), R.layout.list_item_break, null);
 
                 view = new ViewHolder();
                 view.isBreakItem = true;
@@ -52,7 +52,7 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
                 if (!view.isBreakItem) {
 
                     //get a new instance of the footer layout view to display the break info
-                    rowView = View.inflate(getContext(), R.layout.break_view, null);
+                    rowView = View.inflate(getContext(), R.layout.list_item_break, null);
 
                     view = new ViewHolder();
                     view.isBreakItem = true;
@@ -64,7 +64,7 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
             //if this is an empty view or a break view, re-inflate the correct layout
             if (rowView == null) {
                 //get a new instance of the row layout view
-                rowView = View.inflate(getContext(), R.layout.timetable_item, null);
+                rowView = View.inflate(getContext(), R.layout.list_item_timetable, null);
 
                 //hold the view objects in an object, that way they don't need to be "re-found"
                 view = new ViewHolder();
@@ -82,7 +82,7 @@ public class TimetableListAdapter extends ArrayAdapter implements Serializable {
 
                     //re-inflate as this is a wrong item
                     //get a new instance of the row layout view
-                    rowView = View.inflate(getContext(), R.layout.timetable_item, null);
+                    rowView = View.inflate(getContext(), R.layout.list_item_timetable, null);
 
                     //hold the view objects in an object, that way they don't need to be "re-found"
                     view = new ViewHolder();

@@ -14,13 +14,13 @@ public class SettingsActivity extends ActionBarActivity {
 
     /**
      * Called when the Activity is first created.
-     * Takes care of displaying the settings content as a SettingsFragment
+     * Takes care of displaying the activity_settings content as a SettingsFragment
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings);
+        setContentView(R.layout.activity_settings);
 
         //set actionbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

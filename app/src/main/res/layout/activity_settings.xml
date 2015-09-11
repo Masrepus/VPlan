@@ -7,7 +7,7 @@
     <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        layout="@layout/toolbar"
+        layout="@layout/view_toolbar"
         android:layout_gravity="top"
         android:id="@+id/toolbar" />
 

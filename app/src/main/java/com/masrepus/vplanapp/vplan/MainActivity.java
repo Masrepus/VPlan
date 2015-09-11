@@ -18,16 +18,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ActionMenuPresenter;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,10 +41,8 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -67,8 +66,9 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.CollectionTools;
 import com.masrepus.vplanapp.R;
-import com.masrepus.vplanapp.communication.AsyncDownloader;
-import com.masrepus.vplanapp.communication.DownloaderService;
+import com.masrepus.vplanapp.constants.Tutorial;
+import com.masrepus.vplanapp.network.AsyncDownloader;
+import com.masrepus.vplanapp.network.DownloaderService;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.CrashlyticsKeys;
@@ -78,8 +78,6 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
-import com.masrepus.vplanapp.drawer.DrawerListAdapter;
-import com.masrepus.vplanapp.drawer.DrawerListBuilder;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
@@ -88,7 +86,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +93,7 @@ import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final String ACTIVITY_NAME = "MainActivity";
@@ -125,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         datasource = new DataSource(this);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
@@ -150,7 +147,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         try {
             //save the current version code in shared prefs
             editor.putInt(SharedPrefs.LAST_VERSION_RUN, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
-        } catch (PackageManager.NameNotFoundException ignored) {}
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
 
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
         Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
@@ -172,9 +170,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         datasource.close();
 
         new PagerAdapterLoader().execute(this);
-
-        PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-        tabStrip.setTabIndicatorColor(getColor(getResources(), R.color.blue, getTheme()));
 
         //initialise navigation drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
@@ -253,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             showcase = new ShowcaseView.Builder(MainActivity.this)
                                     .setStyle(R.style.ShowcaseTheme)
                                     .build();
-                            showcase.setButtonPosition(getRightParam(getResources()));
                         }
+                        showcase.setButtonPosition(getRightParam(getResources()));
                         showcase.setTarget(Target.NONE);
                         showcase.setContentTitle(getString(R.string.tut_drawer_title));
                         showcase.setContentText(getString(R.string.tut_drawer_text));
@@ -372,17 +367,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             final List<View> views = toolbar.getTouchables();
-            ViewTarget target = new ViewTarget(views.get(views.size() - 2)); //overflow
+            ViewTarget target = new ViewTarget(views.get(views.size() - 1)); //overflow
 
             showcase.setTarget(target);
             showcase.setContentTitle(getString(R.string.filter));
             showcase.setContentText(getString(R.string.tut_filter_no_menubutton));
             showcase.setShouldCentreText(false);
+            showcase.setHideOnTouchOutside(true);
             showcase.overrideButtonClick(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     showcase.hide();
-                    views.get(views.size() - 2).performClick();
+                    views.get(views.size() - 1).performClick();
                 }
             });
         }
@@ -394,7 +390,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    public void onClick(View view) {}
+    public void onClick(View view) {
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -618,14 +615,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     /**
-     * Called when the settings textview in the drawer is clicked
-     */
-    public void onSettingsClick(View v) {
-        //open settings
-        startActivityForResult(new Intent(this, SettingsActivity.class), 0);
-    }
-
-    /**
      * Called when SettingsActivity returns a result, which is when it is destroyed
      *
      * @param requestCode is always 0
@@ -733,8 +722,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 //notify answers
                 Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
-                .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
-                .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
+                        .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
+                        .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
 
                 refresh(item);
                 return true;
@@ -751,38 +740,38 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 return true;
             case R.id.action_activate_filter:
-                //tell the user how the filter works if the current filter is still empty
-                if (filterCurrent.isEmpty()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(getString(R.string.filter))
-                            .setMessage(getString(R.string.filter_explanations))
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            }).show();
-                } else {
-                    //display the grey status bar for the filter or disable it
-                    FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
-                    TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
-                    if (item.isChecked()) {
-                        item.setChecked(false);
-                        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
-                        editor.apply();
-                        fl.setVisibility(View.GONE);
+                //display the grey status bar for the filter or disable it
+                FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
+                TextView filterWarning = (TextView) findViewById(R.id.filterWarning);
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
+                    editor.apply();
+                    fl.setVisibility(View.GONE);
 
-                        //sync this new dataset to wear
-                        sendDataToWatch();
+                    //sync this new dataset to wear
+                    sendDataToWatch();
+                } else {
+                    //tell the user how the filter works if the current filter is still empty
+                    if (filterCurrent.isEmpty()) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle(getString(R.string.filter))
+                                .setMessage(getString(R.string.filter_explanations))
+                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
+                                    }
+                                })
+                                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
                     } else {
                         item.setChecked(true);
                         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -796,9 +785,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         //sync to wear
                         sendDataToWatch();
                     }
-                    //refresh adapter for viewPager
-                    new PagerAdapterLoader().execute(this);
                 }
+                //refresh adapter for viewPager
+                new PagerAdapterLoader().execute(this);
                 return true;
             case R.id.action_help:
                 SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -852,7 +841,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onClick(View v) {
                 DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                layout.openDrawer(GravityCompat.START);
+                layout.openDrawer(findViewById(R.id.drawer_left));
             }
         });
         showcase.setBlocksTouches(false);
@@ -893,7 +882,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void refresh(MenuItem item) {
         //rotate the refresh button
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_action_view, null);
+        ImageView iv = (ImageView) inflater.inflate(R.layout.view_action_refresh, null);
 
         Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
         rotation.setRepeatCount(Animation.INFINITE);
@@ -1278,6 +1267,81 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } //else just ignore the click
     }
 
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        refreshInfoFab(position);
+    }
+
+    private void refreshInfoFab(int position) {
+
+        //check if this vplan has announcements
+        String announcements;
+        datasource.open();
+
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS, new String[]{SQLiteHelperVplan.COLUMN_ANNOUNCEMENT});
+        try {
+            c.moveToPosition(position);
+            announcements = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_ANNOUNCEMENT));
+
+            datasource.close();
+
+            //if there are announcements activate the info fab
+            FloatingActionButton infoFab = (FloatingActionButton) findViewById(R.id.infoFab);
+            if (announcements.isEmpty()) infoFab.hide();
+            else {
+                infoFab.show();
+
+                //when infoFab is clicked show the announcements in a dialog
+                infoFab.setOnClickListener(new InfoFabManager(announcements));
+
+                //display a single-shot tutorial information about announcements
+                showcase = new ShowcaseView.Builder(this)
+                        .setTarget(new ViewTarget(infoFab))
+                        .setContentTitle(getString(R.string.title_announcements))
+                        .setContentText(getString(R.string.message_tut_announcements))
+                        .setStyle(R.style.ShowcaseTheme)
+                        .singleShot(Tutorial.SHOT_ANNOUNCEMENTS)
+                        .hideOnTouchOutside()
+                        .build();
+                showcase.hideButton();
+            }
+        } catch (Exception e) {
+
+            //probably there was no data for the requested vplan, so just hide the fab
+            FloatingActionButton infoFab = (FloatingActionButton) findViewById(R.id.infoFab);
+            infoFab.hide();
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    private class InfoFabManager implements View.OnClickListener {
+
+        private AlertDialog.Builder builder;
+
+        public InfoFabManager(String announcements) {
+
+            //init the dialog immediately
+            builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle(R.string.announcements)
+                    .setMessage(announcements);
+        }
+
+        @Override
+        public void onClick(View v) {
+            builder.show();
+            if (showcase != null) showcase.hide();
+        }
+    }
+
     /**
      * PagerAdapter that only displays one dummy fragment containing a progressbar
      */
@@ -1320,21 +1384,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             pager.setAdapter(vplanPagerAdapter);
             vplanPagerAdapter.notifyDataSetChanged();
 
-            //check whether disabling of welcome tv and activation of tabstrip must be done
-            TextView welcome = (TextView) findViewById(R.id.welcome_textView);
-            PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-            if (vplanPagerAdapter.hasData()) {
-                welcome.setVisibility(View.GONE);
-                tabStrip.setVisibility(View.VISIBLE);
-            } else {
-                welcome.setVisibility(View.VISIBLE);
-                tabStrip.setVisibility(View.GONE);
-            }
+            //init the tab layout
+            SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+                @Override
+                public int getIndicatorColor(int position) {
+                    return getColor(getResources(), R.color.blue, getTheme());
+                }
+            });
+            tabs.setViewPager(pager);
+
+            pager.addOnPageChangeListener(MainActivity.this);
 
             //set a 1 dp margin between the fragments
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
             pager.setCurrentItem(getTodayVplanId(), false);
+
+            refreshInfoFab(0);
 
             //sync wear
             sendDataToWatch();

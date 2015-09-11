@@ -1,4 +1,4 @@
-package com.masrepus.vplanapp.communication;
+package com.masrepus.vplanapp.network;
 
 /**
  * Created by samuel on 30.09.14.
@@ -111,6 +111,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         this.context = context[0];
         datasource = new DataSource(this.context);
 
+        //clear the announcements table
+        datasource.open();
+        datasource.newTable(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS);
+        datasource.close();
+
         SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
@@ -220,9 +225,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         boolean success = false;
 
-        //download new data and then refresh pager adapter
+        //download new data
 
         publishProgress(ProgressCode.STARTED);
+
+        //download current vplan url's
         success = updateAvailableFilesList();
 
         total_downloads = 0;
@@ -234,6 +241,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         datasource.open();
 
+        //look up the current url's
         Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_URL});
 
         total_downloads = c.getCount();
@@ -456,6 +464,18 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             headerCurrentDate = null;
         }
 
+        //check for announcements
+        String announcements;
+        try {
+            announcements = doc.select("#Mitteilungen + p").text();
+        } catch (Exception e) {
+            announcements = "";
+        }
+
+        //save the current announcements
+        datasource.open();
+        datasource.createRowAnnouncements(requestedVplanId, announcements);
+        datasource.close();
 
         //get timePublished timestamp
         try {
@@ -826,9 +846,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             String uname = pref.getString(this.context.getString(R.string.key_uname), "");
             String pwd = pref.getString(this.context.getString(R.string.key_pwd), "");
 
-            vplanBase = "http://" + uname + ":" + pwd + "@" + this.context.getString(R.string.vplan_base_cred);
+            vplanBase = "http://masrepus.site90.net/";//TODO "http://" + uname + ":" + pwd + "@" + this.context.getString(R.string.vplan_base_cred);
         } else {
-            vplanBase = this.context.getString(R.string.vplan_base_url);
+            vplanBase = "http://masrepus.site90.net/";//TODO this.context.getString(R.string.vplan_base_url);
         }
 
         String url = "";
@@ -845,7 +865,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 url = "http://www.schyren-gymnasium.de/export/";
                 break;
             case VplanModes.FILES_ONLY:
-                return "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
+                return "http://masrepus.site90.net/pw/mrekursiv.php";//TODO "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
         }
 
         if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {
@@ -925,6 +945,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             }
 
             if (doc != null) {
+
+                //parse!
 
                 //tempContent contains all found tables
                 Elements tempContent = doc.select("table[class=hyphenate]");

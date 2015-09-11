@@ -4,17 +4,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,17 +19,11 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,8 +39,6 @@ import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperTimetable;
-import com.masrepus.vplanapp.drawer.DrawerListAdapter;
-import com.masrepus.vplanapp.drawer.DrawerListBuilder;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -69,13 +58,13 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.timetable_activity);
+        setContentView(R.layout.activity_timetable);
 
         //init crashlytics
         Fabric.with(this, new Crashlytics());
         Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.TIMETABLE));
 
-        //activate the toolbar
+        //activate the view_toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -189,7 +178,7 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
     private void showAddLessonDialog(int lessonPreset) {
 
         //now show the user a dialog where he can add a new lesson
-        View dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
+        View dialogView = View.inflate(this, R.layout.dialog_add_lesson, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.add_lesson))
                 .setView(dialogView)
@@ -372,7 +361,7 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
     private void editLesson(View lessonView) {
 
         //show the add lesson dialog but with the values of the lesson being edited preset
-        View dialogView = View.inflate(this, R.layout.add_lesson_dialog, null);
+        View dialogView = View.inflate(this, R.layout.dialog_add_lesson, null);
 
         //load the values
         AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);

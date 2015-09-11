@@ -156,6 +156,27 @@ public class DataSource {
         }
     }
 
+    public void createRowAnnouncements(Integer id, String announcement) {
+
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelperVplan.COLUMN_ID, id);
+        values.put(SQLiteHelperVplan.COLUMN_ANNOUNCEMENT, announcement);
+
+        //find out which db is currently in use
+        SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+        switch (pref.getInt(SharedPrefs.VPLAN_MODE, 0)) {
+            case VplanModes.UINFO:
+                databaseUinfo.insert(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS, null, values);
+                break;
+            case VplanModes.MINFO:
+                databaseMinfo.insert(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS, null, values);
+                break;
+            case VplanModes.OINFO:
+                databaseOinfo.insert(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS, null, values);
+                break;
+        }
+    }
+
     public void createRowTests(String tablename, String grade, String date, String subject, String type) {
 
         ContentValues values = new ContentValues();

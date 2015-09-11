@@ -34,12 +34,12 @@
         </activity>
 
         <service
-            android:name=".communication.DownloaderService"
+            android:name=".network.DownloaderService"
             android:enabled="true"
             android:exported="false" >
         </service>
 
-        <receiver android:name=".communication.BootReceiver" >
+        <receiver android:name=".network.BootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -73,7 +73,7 @@
         </activity>
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <service android:name=".communication.DataListenerService">
+        <service android:name=".network.DataListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>

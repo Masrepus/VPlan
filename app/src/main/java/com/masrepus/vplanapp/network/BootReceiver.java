@@ -1,4 +1,4 @@
-package com.masrepus.vplanapp.communication;
+package com.masrepus.vplanapp.network;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

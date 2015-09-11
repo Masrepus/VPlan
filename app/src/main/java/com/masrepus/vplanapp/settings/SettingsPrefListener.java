@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import com.masrepus.vplanapp.communication.DownloaderService;
+import com.masrepus.vplanapp.network.DownloaderService;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -35,7 +35,7 @@ public class SettingsPrefListener implements SharedPreferences.OnSharedPreferenc
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
-        //settings have been changed, so update the filter array if the classes to filter have been changed
+        //activity_settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
     }
 
