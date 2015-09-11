@@ -28,6 +28,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ActionMenuPresenter;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -247,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             showcase = new ShowcaseView.Builder(MainActivity.this)
                                     .setStyle(R.style.ShowcaseTheme)
                                     .build();
-                            showcase.setButtonPosition(getRightParam(getResources()));
                         }
+                        showcase.setButtonPosition(getRightParam(getResources()));
                         showcase.setTarget(Target.NONE);
                         showcase.setContentTitle(getString(R.string.tut_drawer_title));
                         showcase.setContentText(getString(R.string.tut_drawer_text));
@@ -366,17 +367,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             final List<View> views = toolbar.getTouchables();
-            ViewTarget target = new ViewTarget(views.get(views.size() - 2)); //overflow
+            ViewTarget target = new ViewTarget(views.get(views.size() - 1)); //overflow
 
             showcase.setTarget(target);
             showcase.setContentTitle(getString(R.string.filter));
             showcase.setContentText(getString(R.string.tut_filter_no_menubutton));
             showcase.setShouldCentreText(false);
+            showcase.setHideOnTouchOutside(true);
             showcase.overrideButtonClick(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     showcase.hide();
-                    views.get(views.size() - 2).performClick();
+                    views.get(views.size() - 1).performClick();
                 }
             });
         }
@@ -839,7 +841,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onClick(View v) {
                 DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                layout.openDrawer(GravityCompat.START);
+                layout.openDrawer(findViewById(R.id.drawer_left));
             }
         });
         showcase.setBlocksTouches(false);

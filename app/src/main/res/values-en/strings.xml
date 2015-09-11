@@ -103,7 +103,7 @@
     <string name="free_lesson">Free lesson</string>
     <string name="lesson_already_saved">Lesson already in use</string>
     <string name="announcements">Announcements</string>
-    <string name="message_tut_announcements">There are additional announcements available for today's substitution plan. Click on the info button for details.</string>
+    <string name="message_tut_announcements">There are additional announcements available for today\'s substitution plan. Click on the info button for details.</string>
     <string name="title_announcements">Announcements</string>
 
 </resources>
