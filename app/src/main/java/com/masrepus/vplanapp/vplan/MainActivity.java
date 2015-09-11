@@ -18,12 +18,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -91,7 +91,7 @@ import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
     public static final java.text.DateFormat standardFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm");
     public static final String ACTIVITY_NAME = "MainActivity";
@@ -1264,6 +1264,69 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } //else just ignore the click
     }
 
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        refreshInfoFab(position);
+    }
+
+    private void refreshInfoFab(int position) {
+
+        //check if this vplan has announcements
+        String announcements;
+        datasource.open();
+
+        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS, new String[]{SQLiteHelperVplan.COLUMN_ANNOUNCEMENT});
+        try {
+            c.moveToPosition(position);
+            announcements = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_ANNOUNCEMENT));
+
+            datasource.close();
+
+            //if there are announcements activate the info fab
+            FloatingActionButton infoFab = (FloatingActionButton) findViewById(R.id.infoFab);
+            if (announcements.isEmpty()) infoFab.hide();
+            else {
+                infoFab.show();
+
+                //when infoFab is clicked show the announcements in a dialog
+                infoFab.setOnClickListener(new InfoFabManager(announcements));
+            }
+        } catch (Exception e) {
+
+            //probably there was no data for the requested vplan, so just hide the fab
+            FloatingActionButton infoFab = (FloatingActionButton) findViewById(R.id.infoFab);
+            infoFab.hide();
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    private class InfoFabManager implements View.OnClickListener {
+
+        private AlertDialog.Builder builder;
+
+        public InfoFabManager(String announcements) {
+
+            //init the dialog immediately
+            builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle(R.string.announcements)
+                    .setMessage(announcements);
+        }
+
+        @Override
+        public void onClick(View v) {
+            builder.show();
+        }
+    }
+
     /**
      * PagerAdapter that only displays one dummy fragment containing a progressbar
      */
@@ -1316,10 +1379,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
             tabs.setViewPager(pager);
 
+            pager.addOnPageChangeListener(MainActivity.this);
+
             //set a 1 dp margin between the fragments
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
             pager.setCurrentItem(getTodayVplanId(), false);
+
+            refreshInfoFab(0);
 
             //sync wear
             sendDataToWatch();

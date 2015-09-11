@@ -131,7 +131,7 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
 
     private void addHiddenItemsCountFooter(ListView listView, int hiddenItemsCount) {
 
-        //display a footer view that can be clicked in order to show hidden items, but only if there are any
+        //display a footer view that can be clicked in order to show hidden items; if there are no hidden items add an empty footer for a bottom padding
         View listFooter = LayoutInflater.from(getActivity()).inflate(R.layout.list_footer_vplan, null);
 
         String msgMode;
@@ -144,6 +144,10 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
             TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
             hiddenItemsTV.setText(String.valueOf(hiddenItemsCount) + " " + msgMode);
             listFooter.setOnClickListener(this);
+            listView.addFooterView(listFooter);
+        } else {
+            TextView hiddenItemsTV = (TextView) listFooter.findViewById(R.id.hiddenItemsTV);
+            hiddenItemsTV.setText("");
             listView.addFooterView(listFooter);
         }
     }

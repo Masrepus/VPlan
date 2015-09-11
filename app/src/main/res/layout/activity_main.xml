@@ -85,10 +85,21 @@
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/frameLayout">
+                android:layout_below="@+id/progressBar">
             </android.support.v4.view.ViewPager>
 
-
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/infoFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/ic_info"
+                app:fabSize="mini"
+                app:borderWidth="0dp" />
         </RelativeLayout>
 
         <android.support.design.widget.NavigationView
@@ -101,7 +112,8 @@
             app:menu="@menu/drawer_full"
             app:itemTextColor="@color/text_selector"
             app:itemIconTint="@color/icon_selector"
-            app:itemBackground="@drawable/yellow_selector">
+            app:itemBackground="@drawable/yellow_selector"
+            android:visibility="gone">
         </android.support.design.widget.NavigationView>
 
     </android.support.v4.widget.DrawerLayout>

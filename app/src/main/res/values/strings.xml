@@ -230,5 +230,6 @@
     <string name="pref_key_psy_q12" translatable="false">pref_key_psy_q12</string>
     <string name="pref_key_ssp_q12" translatable="false">pref_key_ssp_q12</string>
     <string name="pref_key_spo_q12" translatable="false">pref_key_spo_q12</string>
+    <string name="announcements">Mitteilungen</string>
 
 </resources>
