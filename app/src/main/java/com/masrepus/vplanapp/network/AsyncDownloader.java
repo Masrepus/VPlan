@@ -846,9 +846,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             String uname = pref.getString(this.context.getString(R.string.key_uname), "");
             String pwd = pref.getString(this.context.getString(R.string.key_pwd), "");
 
-            vplanBase = "http://masrepus.site90.net/";//TODO "http://" + uname + ":" + pwd + "@" + this.context.getString(R.string.vplan_base_cred);
+            vplanBase = "http://" + uname + ":" + pwd + "@" + this.context.getString(R.string.vplan_base_cred);
         } else {
-            vplanBase = "http://masrepus.site90.net/";//TODO this.context.getString(R.string.vplan_base_url);
+            vplanBase = this.context.getString(R.string.vplan_base_url);
         }
 
         String url = "";
@@ -865,7 +865,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 url = "http://www.schyren-gymnasium.de/export/";
                 break;
             case VplanModes.FILES_ONLY:
-                return "http://masrepus.site90.net/pw/mrekursiv.php";//TODO "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
+                return "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
         }
 
         if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {

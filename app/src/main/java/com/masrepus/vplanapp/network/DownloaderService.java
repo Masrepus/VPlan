@@ -547,7 +547,7 @@ public class DownloaderService extends Service {
 
             //notify answers
             Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_BG_DOWNLOAD)
-            .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode)));
+                    .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode)));
 
             if (downloaded_levels == levels.length) {
 
@@ -557,7 +557,11 @@ public class DownloaderService extends Service {
                 stopSelf();
             } else {
                 //parse the next vplan level
-                vplanMode = parseVplanMode(levels[downloaded_levels]);
+                try {
+                    vplanMode = parseVplanMode(levels[downloaded_levels]);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    stopSelf();
+                }
 
                 //update shared prefs as well
                 editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
