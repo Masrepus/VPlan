@@ -1392,6 +1392,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     return getColor(getResources(), R.color.blue, getTheme());
                 }
             });
+            tabs.setDistributeEvenly(true);
             tabs.setViewPager(pager);
 
             pager.addOnPageChangeListener(MainActivity.this);

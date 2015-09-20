@@ -27,7 +27,7 @@ public class TimetableFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_timetable, null);
+        View rootView = inflater.inflate(R.layout.view_card_timetable, null);
         Bundle args = getArguments();
 
         //get the listview adapter from args and attach it to the listview
