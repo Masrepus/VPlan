@@ -235,9 +235,11 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
 
         AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
         subjectACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, subjects));
+        subjectACTV.setThreshold(1);
 
         AutoCompleteTextView roomsACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
         roomsACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
+        roomsACTV.setThreshold(1);
 
         MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
         if (lessonPreset != 0) {
