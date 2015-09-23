@@ -721,9 +721,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.action_refresh:
 
                 //notify answers
-                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
-                        .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode))
-                        .putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, filterCurrent.isEmpty() ? "inaktiv" : "aktiv"));
+                CustomEvent event = new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
+                        .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
+                if (!filterCurrent.isEmpty()) event.putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, "aktiv");
+                Answers.getInstance().logCustom(event);
 
                 refresh(item);
                 return true;
@@ -1392,6 +1393,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     return getColor(getResources(), R.color.blue, getTheme());
                 }
             });
+            tabs.setDistributeEvenly(true);
             tabs.setViewPager(pager);
 
             pager.addOnPageChangeListener(MainActivity.this);

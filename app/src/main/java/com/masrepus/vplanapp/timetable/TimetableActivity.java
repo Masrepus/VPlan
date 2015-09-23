@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -39,6 +41,7 @@ import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperTimetable;
+import com.masrepus.vplanapp.vplan.SlidingTabLayout;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -97,16 +100,31 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         }
         pager.setCurrentItem(todayPosition);
 
-        //prepare the title strip
-        PagerTabStrip tabStrip = (PagerTabStrip) findViewById(R.id.pager_title_strip);
-        tabStrip.setTabIndicatorColor(getResources().getColor(R.color.blue));
-
+        //init the tabs
+        SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getColor(getResources(), R.color.blue, getTheme());
+            }
+        });
+        tabs.setDistributeEvenly(true);
+        tabs.setViewPager(pager);
 
         //set a 1 dp margin between the fragments
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         pager.setPageMargin(Math.round(1 * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)));
 
         pager.setOffscreenPageLimit(5);
+    }
+
+    private int getColor(Resources res, int id, Resources.Theme theme) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return res.getColor(id, theme);
+        } else {
+            return res.getColor(id);
+        }
     }
 
     @Override
@@ -217,9 +235,11 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
 
         AutoCompleteTextView subjectACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.subjectACTV);
         subjectACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, subjects));
+        subjectACTV.setThreshold(1);
 
         AutoCompleteTextView roomsACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
         roomsACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
+        roomsACTV.setThreshold(1);
 
         MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
         if (lessonPreset != 0) {

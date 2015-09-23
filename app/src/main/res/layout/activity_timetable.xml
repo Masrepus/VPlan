@@ -18,24 +18,23 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true" />
 
+        <com.masrepus.vplanapp.vplan.SlidingTabLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tabs"
+            android:background="@color/yellow"
+            android:layout_below="@id/toolbar"/>
+
         <RelativeLayout
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar">
+            android:layout_below="@id/tabs">
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-                <android.support.v4.view.PagerTabStrip
-                    android:id="@+id/pager_title_strip"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp" />
             </android.support.v4.view.ViewPager>
 
             <ProgressBar
