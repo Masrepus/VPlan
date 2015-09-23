@@ -10,4 +10,5 @@
     <item type="id" name="TAG_DATE"/>
     <item type="id" name="TAG_SUBJECT"/>
     <item type="id" name="TAG_TYPE_FULL"/>
+    <item type="id" name="TAG_CALENDAR_ID"/>
 </resources>

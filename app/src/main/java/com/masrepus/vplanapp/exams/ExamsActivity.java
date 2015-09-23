@@ -1,19 +1,27 @@
 package com.masrepus.vplanapp.exams;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,20 +29,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
-import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
@@ -44,6 +56,7 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelperTests;
+import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.settings.SettingsPrefListener;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
@@ -57,6 +70,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -64,6 +78,7 @@ import io.fabric.sdk.android.Fabric;
 public class ExamsActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     public static final String ACTIVITY_NAME = "exams";
+    private static final int REQUEST_CALENDAR = 0;
     private ArrayList<ExamsRow> examsList;
     private MenuItem refreshItem;
     private boolean noOldItems;
@@ -72,6 +87,9 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
     private ShowcaseView showcase;
     private boolean tutorialMode;
+    private ArrayList<CalendarItem> calIds;
+    private AlertDialog reminderDialog;
+    private int timespanFactor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,8 +301,256 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
                 pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "ExamsActivity", true).apply();
                 tutorialMode = true;
                 showTutorial();
+                return true;
+            case R.id.action_add_to_calendar:
+                checkCalendarPermission();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkCalendarPermission() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+
+            //should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_CALENDAR) || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CALENDAR)) {
+
+                final Activity activity = this;
+
+                //explain to the user that we need this permission in order to add calendar events
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.perm_rationale_calendar)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR}, REQUEST_CALENDAR);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+                return;
+            }
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR}, REQUEST_CALENDAR);
+        } else selectCalendar();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        switch (requestCode) {
+
+            case REQUEST_CALENDAR:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    //permission granted! now continue with inserting the exams into the calendar
+                    selectCalendar();
+                } else {
+
+                    //permission denied; tell the user that he can't continue like that
+                    Toast.makeText(this, R.string.perm_rationale_calendar, Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
+    }
+
+    private void addToCalendar(CalendarItem calendar, int minutes) {
+
+        TimeZone tz = TimeZone.getDefault();
+        ArrayList<Exam> exams = getExams();
+        int saved = 0;
+
+        //now insert each exam to the calendar
+        for (Exam exam : exams) {
+
+            //calendar insert
+            ContentResolver cr = getContentResolver();
+            ContentValues values = new ContentValues();
+            values.put(CalendarContract.Events.DTSTART, exam.getTimeInMillis());
+            values.put(CalendarContract.Events.DTEND, exam.getTimeInMillis());
+            values.put(CalendarContract.Events.TITLE, exam.getTitle());
+            values.put(CalendarContract.Events.CALENDAR_ID, calendar.getId());
+            values.put(CalendarContract.Events.ALL_DAY, 1);
+            values.put(CalendarContract.Events.EVENT_TIMEZONE, tz.getID());
+            if (minutes > 0) values.put(CalendarContract.Events.HAS_ALARM, 1);
+            else values.put(CalendarContract.Events.HAS_ALARM, 0);
+
+            Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+
+            //log the event id
+            if (uri != null) {
+                Long id = new Long(uri.getLastPathSegment());
+                Log.d(ACTIVITY_NAME, "Exam " + exam.getTitle() + " added to calendar " + calendar.getName() + " with ID " + id);
+
+                //now add a reminder if the user requested this
+                if (minutes > 0) {
+                    values.clear();
+                    values.put(CalendarContract.Reminders.EVENT_ID, id);
+                    values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+                    values.put(CalendarContract.Reminders.MINUTES, minutes);
+                    cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+
+                    Log.d(ACTIVITY_NAME, "Reminder added to exam with ID " + id + " for " + minutes + " minutes before start");
+                }
+                saved++;
+            }
+        }
+
+        //check success and notify the user
+        if (saved == exams.size()) Toast.makeText(this, getString(R.string.cal_insert_success), Toast.LENGTH_LONG).show();
+        else if (saved < exams.size()) Toast.makeText(this, (exams.size() - saved) + getString(R.string.cal_insert_error), Toast.LENGTH_LONG).show();
+    }
+
+    private ArrayList<Exam> getExams() {
+
+        DataSource datasource = new DataSource(this);
+        datasource.open();
+
+        ArrayList<Exam> exams = new ArrayList<>();
+
+        //get the data from both test tables
+        Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        String dateString, grade, type, subject;
+        Date date;
+
+        //parse the dates and add them to the exams list
+        while (c.moveToNext()) {
+
+            try {
+                dateString = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
+                grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
+                type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
+                subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
+
+                date = format.parse(dateString);
+
+                //grade + type + subject goes to the title
+                exams.add(new Exam(date.getTime(), grade + ": " + type + " in " + subject));
+            } catch (ParseException ignored) {
+            }
+        }
+
+        //now oinfo
+        c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
+
+        while (c.moveToNext()) {
+
+            try {
+                dateString = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
+                grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
+                type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
+                subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
+
+                date = format.parse(dateString);
+
+                //grade + type + subject goes to the title
+                exams.add(new Exam(date.getTime(), grade + ": " + type + " in " + subject));
+            } catch (ParseException ignored) {
+            }
+        }
+
+        datasource.close();
+
+        return exams;
+    }
+
+    private void selectCalendar() {
+
+        //query for all available calendars
+        Uri uri = CalendarContract.Calendars.CONTENT_URI;
+        String[] projection = new String[]{
+                CalendarContract.Calendars._ID,
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+        };
+
+        Cursor calendarCursor = managedQuery(uri, projection, null, null, null);
+        calIds = new ArrayList<>();
+
+        //save the calendar ids to an arraylist
+        while (calendarCursor.moveToNext()) {
+
+            int id = calendarCursor.getInt(calendarCursor.getColumnIndex(CalendarContract.Calendars._ID));
+            String name = calendarCursor.getString(calendarCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME));
+            calIds.add(new CalendarItem(id, name));
+        }
+
+        calendarCursor.moveToFirst();
+
+        //ask the user to choose the calendar into which the exams should be saved
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.choose_calendar_title)
+                .setCursor(calendarCursor, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int position) {
+                        showReminderDialog(calIds.get(position));
+                    }
+                }, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
+        builder.show();
+    }
+
+    private void showReminderDialog(final CalendarItem calendar) {
+
+        //show a dialog where the user can choose to set a default reminder time for exams
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.title_add_reminder)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText timeET = (EditText) reminderDialog.findViewById(R.id.timeEditText);
+                        int time = Integer.parseInt(timeET.getText().toString());
+
+                        //multiply the contents of the edit text by timespanFactor
+                        time = time * timespanFactor;
+                        addToCalendar(calendar, time);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        addToCalendar(calendar, -1);
+                        dialog.dismiss();
+                    }
+                })
+                .setNeutralButton(R.string.cancel, null);
+        reminderDialog = builder.create();
+        reminderDialog.setView(View.inflate(this, R.layout.dialog_add_calendar_reminder, null));
+
+        reminderDialog.show();
+
+        //populate the spinner
+        Spinner timespanSpinner = (Spinner) reminderDialog.findViewById(R.id.timespanSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item_simple, R.id.itemTV, new String[]{getString(R.string.min_before), getString(R.string.hours_before), getString(R.string.days_before)});
+        timespanSpinner.setAdapter(adapter);
+        timespanSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        timespanFactor = 1;
+                        break;
+                    case 1:
+                        timespanFactor = 60;
+                        break;
+                    case 2:
+                        timespanFactor = 1440; //1440 minutes in a day
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                timespanFactor = 1;
+            }
+        });
     }
 
     private ArrayList<ExamsRow> initData() {
@@ -419,7 +685,8 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onClick(View view) {}
+    public void onClick(View view) {
+    }
 
     public void displayLastUpdate(String lastUpdate) {
 
@@ -454,6 +721,25 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         }
 
         return true;
+    }
+
+    private class CalendarItem {
+
+        private int id;
+        private String name;
+
+        public CalendarItem(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     private class ExamsListAdapter extends ArrayAdapter<ExamsRow> {
@@ -589,6 +875,25 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
                     showAlert(context, R.string.nothing_to_download, R.string.nothing_to_download_msg, 2);
             }
+        }
+    }
+
+    private class Exam {
+
+        private long timeInMillis;
+        private String title;
+
+        public Exam(long timeInMillis, String title) {
+            this.timeInMillis = timeInMillis;
+            this.title = title;
+        }
+
+        public long getTimeInMillis() {
+            return timeInMillis;
+        }
+
+        public String getTitle() {
+            return title;
         }
     }
 }

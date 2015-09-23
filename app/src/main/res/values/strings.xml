@@ -233,5 +233,18 @@
     <string name="announcements">Mitteilungen</string>
     <string name="title_announcements">Mitteilungen</string>
     <string name="message_tut_announcements">Für den heutigen Vertretungsplan sind zusätzliche Benachrichtigungen verfügbar. Klicke auf den Info-Button, um die Mitteilungen zu lesen.</string>
+    <string name="add_exams_to_calendar">Prüfungen im Kalender speichern</string>
+    <string name="perm_rationale_calendar">Um Prüfungen im Kalender speichern zu können, muss der App der Zugriff auf den Kalender erlaubt werden.</string>
+    <string name="choose_calendar_title">Bitte wähle den zu verwendenden Kalender aus</string>
+    <string name="err_calendar_save">Speichern nicht möglich</string>
+    <string name="cal_insert_success">Alle Prüfungen erfolgreich im Kalender gespeichert!</string>
+    <string name="cal_insert_error">" Prüfungen konnten nicht im Kalender gespeichert werden"</string>
+    <string name="checkbox_add_reminder">Erinnerung zu Kalendereinträgen hinzufügen</string>
+    <string name="title_add_reminder">Erinnerung hinzufügen?</string>
+    <string name="no">Nein</string>
+    <string name="yes">Ja</string>
+    <string name="min_before">Minuten vorher</string>
+    <string name="hours_before">Stunden vorher</string>
+    <string name="days_before">Tage vorher</string>
 
 </resources>
