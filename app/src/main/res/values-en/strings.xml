@@ -105,5 +105,16 @@
     <string name="announcements">Announcements</string>
     <string name="message_tut_announcements">There are additional announcements available for today\'s substitution plan. Click on the info button for details.</string>
     <string name="title_announcements">Announcements</string>
+    <string name="add_exams_to_calendar">Save exams to calendar</string>
+    <string name="cal_insert_error">" exams could not be saved to your calendar" </string>
+    <string name="cal_insert_success">All exams have been saved successfully!</string>
+    <string name="choose_calendar_title">Please select the calendar to use</string>
+    <string name="days_before">days before</string>
+    <string name="min_before">minutes before</string>
+    <string name="no">No</string>
+    <string name="perm_rationale_calendar">This app needs to have permission to access the calendar in order to be able to save exams there.</string>
+    <string name="title_add_reminder">Add a reminder?</string>
+    <string name="yes">Yes</string>
+    <string name="hours_before">hours before</string>
 
 </resources>
