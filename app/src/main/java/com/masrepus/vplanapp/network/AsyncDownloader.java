@@ -395,9 +395,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         Element list = doc.select("li").first();
         Element table = list.child(0);
 
-        //get the last updated timestamp
-        String lastUpdate = list.textNodes().get(2).text();
-
         Elements tableRows = table.child(0).children();
         parseOinfoTestData(tableRows);
 

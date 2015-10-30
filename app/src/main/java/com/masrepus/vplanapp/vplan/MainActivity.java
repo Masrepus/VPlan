@@ -625,6 +625,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(null);
         pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
         appMode = AppModes.VPLAN;
     }
@@ -1150,6 +1151,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void activatePagerAdapter() {
 
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(null);
         pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
         pager.setOffscreenPageLimit(4);
 
@@ -1256,6 +1258,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             //recreate the pageradapter
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(null);
             pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
 
             //now start the adapter loading in a separate thread
@@ -1382,6 +1385,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         protected void onPostExecute(VplanPagerAdapter vplanPagerAdapter) {
 
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            pager.setAdapter(null);
             pager.setAdapter(vplanPagerAdapter);
             vplanPagerAdapter.notifyDataSetChanged();
 
