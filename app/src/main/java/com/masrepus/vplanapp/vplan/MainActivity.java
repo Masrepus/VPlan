@@ -41,6 +41,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -956,12 +957,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //the old keys are those contained in differences and also keys.keySet
             ArrayList<String> oldKeys = new ArrayList<>(CollectionTools.intersect(keys.keySet(), differences));
 
-            //remove username, pwd and update keys from the list if present
+            //remove username, pwd, custom classes and update keys from the list if present
             oldKeys.remove(getString(R.string.key_uname));
             oldKeys.remove(getString(R.string.key_pwd));
             oldKeys.remove(getString(R.string.pref_key_bg_updates));
             oldKeys.remove(getString(R.string.pref_key_upd_int));
             oldKeys.remove(getString(R.string.pref_key_bg_upd_levels));
+            oldKeys.remove(SharedPrefs.CUSTOM_CLASSES);
 
             //now delete those old keys from settings prefs
             SharedPreferences.Editor editor = pref.edit();
@@ -1110,7 +1112,60 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } else {
             builder.setItems(filterCurrent.toArray(new String[filterCurrent.size()]), null);
         }
+
+        //add an add class/course button for custom elements
+        builder.setPositiveButton(getString(R.string.add_missing_class), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+
+                //show a dialog where the user can enter a custom class
+                View dialogView = View.inflate(MainActivity.this, R.layout.dialog_add_class, null);
+                AlertDialog.Builder childBuilder = new AlertDialog.Builder(MainActivity.this);
+                childBuilder.setNegativeButton(R.string.cancel, null)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                saveClass((AlertDialog) dialog);
+                                dialog.dismiss();
+                                refreshFilters();
+                                //refresh the adapter
+                                new PagerAdapterLoader().execute(MainActivity.this);
+                            }
+                        });
+                AlertDialog childDialog = childBuilder.create();
+                childDialog.setView(dialogView);
+                childDialog.show();
+            }
+        });
         builder.show();
+    }
+
+    public void saveClass(AlertDialog dialog) {
+
+        //get the entered class
+        String customClass = ((EditText)dialog.findViewById(R.id.classEditText)).getText().toString();
+        if (customClass.isEmpty()) {
+            Toast.makeText(MainActivity.this, R.string.input_empty, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        //remove leading Q if needed
+        if (customClass.charAt(0) == 'Q' && customClass.length() > 1) customClass = customClass.substring(1);
+
+        //add the saved class to sharedprefs
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = pref.edit();
+
+        //get currently saved custom classes and add the one the user wants to save
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
+        customClasses.add(customClass);
+
+        editor.putStringSet(SharedPrefs.CUSTOM_CLASSES, customClasses);
+        editor.apply();
+
+        //notify answers that a custom class was added
+        Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_CUSTOM_CLASS).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, customClass));
     }
 
     public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
