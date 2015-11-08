@@ -196,7 +196,7 @@
         <item>1Phb</item>
     </string-array>
     <string-array name="q_12_ph_as">
-        <item>2Phpas</item>
+        <item>2pas</item>
     </string-array>
     <string-array name="q_11_ch">
         <item>1C1</item>
@@ -340,6 +340,7 @@
         <item>2PS_G</item>
         <item>2PS_Geo</item>
         <item>2PS_Inf</item>
+        <item>2PS_Ph</item>
         <item>2PS_M</item>
         <item>2PS_PhB</item>
         <item>2PS_SmwA</item>
@@ -390,7 +391,7 @@
         <item>5Orc2</item>
     </string-array>
     <string-array name="q_11_psy">
-        <item>5psy1</item>
+        <item>1psy1</item>
     </string-array>
     <string-array name="q_12_psy">
         <item>5psy2</item>

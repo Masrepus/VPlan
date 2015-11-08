@@ -11,6 +11,7 @@ public class CrashlyticsKeys {
     public static final String EVENT_REFRESH_VPLAN = "man. Aktualisierung (Vertretungen)";
     public static final String EVENT_REFRESH_EXAMS = "Aktualisierung (Tests)";
     public static final String EVENT_DELETED_OLD_DATA = "Alter SharedPrefs Key gelöscht";
+    public static final String EVENT_CUSTOM_CLASS = "Eigene Klasse hinzugefügt";
     public static final String KEY_PREF_KEY = "Key";
     public static final String KEY_USES_FILTER = "Filter";
     public static final String EVENT_WEAR_APP_OPENED = "Wear-App geöffnet";
