@@ -10,13 +10,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/textView10"
         android:textStyle="bold"
-        android:text="Klasse/Kursnummer" />
+        android:text="@string/add_class_title" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Groß-/Kleinschreibung beachten!"
+        android:text="@string/warning_case_sensitive"
         android:id="@+id/textView11" />
 
     <EditText
@@ -24,5 +24,5 @@
         android:layout_height="wrap_content"
         android:id="@+id/classEditText"
         android:layout_marginTop="15dp"
-        android:hint="z.B. 7C oder 1E2" />
+        android:hint="@string/add_class_example" />
 </LinearLayout>

@@ -116,5 +116,11 @@
     <string name="title_add_reminder">Add a reminder?</string>
     <string name="yes">Yes</string>
     <string name="hours_before">hours before</string>
+    <string name="add_class_example">e.g. 7C or 1E2</string>
+    <string name="add_class_title">Class/course number</string>
+    <string name="add_missing_class">Add missing class/course</string>
+    <string name="input_empty">Input empty</string>
+    <string name="remove_custom_class">Remove this custom class?</string>
+    <string name="warning_case_sensitive">Warning: case-sensitive!</string>
 
 </resources>
