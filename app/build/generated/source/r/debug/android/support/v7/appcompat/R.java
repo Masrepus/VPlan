@@ -366,18 +366,18 @@ public final class R {
 		public static final int abc_text_size_subtitle_material_toolbar = 0x7f0a0039;
 		public static final int abc_text_size_title_material = 0x7f0a003a;
 		public static final int abc_text_size_title_material_toolbar = 0x7f0a003b;
-		public static final int dialog_fixed_height_major = 0x7f0a005b;
-		public static final int dialog_fixed_height_minor = 0x7f0a005c;
-		public static final int dialog_fixed_width_major = 0x7f0a005d;
-		public static final int dialog_fixed_width_minor = 0x7f0a005e;
-		public static final int disabled_alpha_material_dark = 0x7f0a005f;
-		public static final int disabled_alpha_material_light = 0x7f0a0060;
-		public static final int highlight_alpha_material_colored = 0x7f0a0061;
-		public static final int highlight_alpha_material_dark = 0x7f0a0062;
-		public static final int highlight_alpha_material_light = 0x7f0a0063;
-		public static final int notification_large_icon_height = 0x7f0a0064;
-		public static final int notification_large_icon_width = 0x7f0a0065;
-		public static final int notification_subtext_size = 0x7f0a0066;
+		public static final int dialog_fixed_height_major = 0x7f0a005f;
+		public static final int dialog_fixed_height_minor = 0x7f0a0060;
+		public static final int dialog_fixed_width_major = 0x7f0a0061;
+		public static final int dialog_fixed_width_minor = 0x7f0a0062;
+		public static final int disabled_alpha_material_dark = 0x7f0a0063;
+		public static final int disabled_alpha_material_light = 0x7f0a0064;
+		public static final int highlight_alpha_material_colored = 0x7f0a0065;
+		public static final int highlight_alpha_material_dark = 0x7f0a0066;
+		public static final int highlight_alpha_material_light = 0x7f0a0067;
+		public static final int notification_large_icon_height = 0x7f0a0068;
+		public static final int notification_large_icon_width = 0x7f0a0069;
+		public static final int notification_subtext_size = 0x7f0a006a;
 	}
 	public static final class drawable {
 		public static final int abc_ab_share_pack_mtrl_alpha = 0x7f020000;
@@ -599,7 +599,7 @@ public final class R {
 		public static final int abc_shareactionprovider_share_with = 0x7f06000f;
 		public static final int abc_shareactionprovider_share_with_application = 0x7f060010;
 		public static final int abc_toolbar_collapse_description = 0x7f060011;
-		public static final int status_bar_notification_info_overflow = 0x7f06010c;
+		public static final int status_bar_notification_info_overflow = 0x7f06010d;
 	}
 	public static final class style {
 		public static final int AlertDialog_AppCompat = 0x7f0d0000;

@@ -41,6 +41,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private GoogleApiClient apiClient;
     private ShowcaseView showcase;
     private boolean tutorialMode;
+    private ArrayList<String> customFilterItems;
 
     /**
      * Called when the activity is first created.
@@ -1045,6 +1047,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 .putStringSet(getString(R.string.pref_key_filter_minfo), mittelstufeSet)
                 .putStringSet(getString(R.string.pref_key_filter_oinfo), oberstufeSet)
                 .apply();
+
+        refreshCustomFilter(pref);
+    }
+
+    private void refreshCustomFilter(SharedPreferences pref) {
+
+        //get currently saved custom classes
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
+
+        //keep a local copy of the custom items for later
+        customFilterItems = new ArrayList<>(customClasses);
     }
 
     private void refreshBgUpdates(Boolean activated, int interval) {
@@ -1138,7 +1151,49 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 childDialog.show();
             }
         });
-        builder.show();
+        final AlertDialog parentDialog = builder.create();
+        parentDialog.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //check if this is a custom item
+                final String customClass = filterCurrent.get(position);
+
+                if (customFilterItems.contains(filterCurrent.get(position))) {
+
+                    //custom item, prompt option to delete it
+                    AlertDialog.Builder deleteDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    deleteDialogBuilder.setMessage(R.string.remove_custom_class)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    removeClass(customClass);
+                                    refreshFilters();
+                                    parentDialog.dismiss();
+                                    new PagerAdapterLoader().execute(MainActivity.this);
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+                }
+                return true;
+            }
+        });
+        parentDialog.show();
+    }
+
+    private void removeClass(String customClass) {
+
+        //get the currently saved custom classes
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = pref.edit();
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
+
+        //now remove the requested class
+        customClasses.remove(customClass);
+
+        //save
+        editor.putStringSet(SharedPrefs.CUSTOM_CLASSES, customClasses);
+        editor.apply();
     }
 
     public void saveClass(AlertDialog dialog) {
@@ -1160,6 +1215,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //get currently saved custom classes and add the one the user wants to save
         HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
         customClasses.add(customClass);
+
+        //keep a local copy of the custom items for later
+        customFilterItems = new ArrayList<>(customClasses);
 
         editor.putStringSet(SharedPrefs.CUSTOM_CLASSES, customClasses);
         editor.apply();
