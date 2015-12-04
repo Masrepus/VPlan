@@ -17,14 +17,14 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.0'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.masrepus.vplanapp"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 26
-        versionName "3.9.4"
+        versionCode 27
+        versionName "3.9.5"
     }
 
     buildTypes {
@@ -48,7 +48,7 @@ dependencies {
     compile files('libs/jsoup-1.7.3.jar')
     compile project(':showcaseview')
     wearApp project(':wear')
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.3@aar') {
         transitive = true;
     }
 }
