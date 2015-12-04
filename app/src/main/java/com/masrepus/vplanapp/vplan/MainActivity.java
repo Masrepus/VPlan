@@ -164,6 +164,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         refreshFilters();
 
+        //prevent crash if linktable not present
+        try {
+            datasource.hasData(SQLiteHelperVplan.TABLE_LINKS);
+        } catch (Exception e) {
+            //no data there and no table to be found, fix this
+            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+        }
+
         //activate adapter for viewPager
         if (!datasource.hasData(SQLiteHelperVplan.TABLE_LINKS)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
