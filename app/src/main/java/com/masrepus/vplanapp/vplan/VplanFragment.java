@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,54 +66,57 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     R.layout.view_card_vplan, container, false);
 
             //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
-            if (listSizeBeforeFilter > 0) {
-                if (listSize == 0) {
-                    rootView = inflater.inflate(
-                            R.layout.view_card_no_data_vplan, container, false);
-                    TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
-                    String currTimePublished = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(args.getInt(Args.REQUESTED_VPLAN_ID)), "");
-                    timePublishedTV.setText(currTimePublished);
+            if (listSizeBeforeFilter > 0) return inflateDataLayout(inflater, container, args, listSize, hiddenItemsCount, listSizeBeforeFilter, rootView);
+            else return inflateNoDataLayout(inflater, container, args);
+        }
+    }
 
-                    //get the hidden items
-                    hiddenItems = ((ArrayList<Row>) args.getSerializable(Args.HIDDEN_ITEMS));
-                    displayHiddenItemsCount(rootView, hiddenItemsCount);
+    @NonNull
+    private View inflateNoDataLayout(LayoutInflater inflater, ViewGroup container, Bundle args) {
+        View rootView;
+        rootView = inflater.inflate(
+                R.layout.view_card_no_data_vplan, container, false);
 
-                    return rootView;
-                } else {
+        displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
 
-                    //MySimpleArrayAdapter adapter = pagerAdapter.getArrayAdapter(id);
-                    VplanListAdapter adapter = (VplanListAdapter) args.getSerializable(Args.ADAPTER);
+        TextView hiddenDataTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
+        hiddenDataTV.setText("");
 
+        RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
+        hiddenDataFrame.setOnClickListener(this);
+        return rootView;
+    }
 
-                    //display everything
-                    ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
+    @NonNull
+    private View inflateDataLayout(LayoutInflater inflater, ViewGroup container, Bundle args, int listSize, int hiddenItemsCount, int listSizeBeforeFilter, View rootView) {
+        if (listSize == 0) {
+            rootView = inflater.inflate(
+                    R.layout.view_card_no_data_vplan, container, false);
+            TextView timePublishedTV = (TextView) rootView.findViewById(R.id.timeChangedTextView);
+            String currTimePublished = pref.getString(SharedPrefs.PREFIX_VPLAN_TIME_PUBLISHED + String.valueOf(requestedVplanMode) + String.valueOf(args.getInt(Args.REQUESTED_VPLAN_ID)), "");
+            timePublishedTV.setText(currTimePublished);
 
-                    //get hidden items and activate the onclick listener for the footer
-                    //hiddenItems = pagerAdapter.getHiddenItems(id);
-                    hiddenItems = ((ArrayList<Row>) args.getSerializable(Args.HIDDEN_ITEMS));
-                    addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
+            //get the hidden items
+            hiddenItems = ((ArrayList<Row>) args.getSerializable(Args.HIDDEN_ITEMS));
+            displayHiddenItemsCount(rootView, hiddenItemsCount);
 
-                    listView.setAdapter(adapter);
+            return rootView;
+        } else {
+            VplanListAdapter adapter = (VplanListAdapter) args.getSerializable(Args.ADAPTER);
 
-                    //update textview for current timePublished
-                    displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
+            //display everything
+            ListView listView = (ListView) rootView.findViewById(R.id.vplanListView);
 
-                    return rootView;
-                }
-            } else {
+            //get hidden items and activate the onclick listener for the footer
+            hiddenItems = ((ArrayList<Row>) args.getSerializable(Args.HIDDEN_ITEMS));
+            addHiddenItemsCountFooter(listView, listSizeBeforeFilter - listSize);
 
-                rootView = inflater.inflate(
-                        R.layout.view_card_no_data_vplan, container, false);
+            listView.setAdapter(adapter);
 
-                displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
+            //update textview for current timePublished
+            displayTimePublished(rootView, args.getInt(Args.REQUESTED_VPLAN_ID));
 
-                TextView hiddenDataTV = (TextView) rootView.findViewById(R.id.hiddenItemsTV);
-                hiddenDataTV.setText("");
-
-                RelativeLayout hiddenDataFrame = (RelativeLayout) rootView.findViewById(R.id.hiddenDataFrame);
-                hiddenDataFrame.setOnClickListener(this);
-                return rootView;
-            }
+            return rootView;
         }
     }
 
