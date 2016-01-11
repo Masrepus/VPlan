@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.masrepus.vplanapp.CollectionTools;
@@ -20,9 +20,6 @@ import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by samuel on 19.08.14.
@@ -111,7 +108,71 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     public void fillWithData(int id) {
 
         datasource.open();
+        String tableName = getTableName(id);
 
+        if (datasource.hasData(tableName)) {
+
+            //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
+            hasData = true;
+
+            //open the db cursor
+            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
+                    SQLiteHelperVplan.COLUMN_STATUS});
+
+            ArrayList<Row> list = new ArrayList<>();
+            ArrayList<Row> tempList = new ArrayList<>();
+
+            //check whether filter is active
+            Boolean isFilterActive = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
+
+            //if filter is active, then use it after filling the Arraylist
+            int listSizeBeforeFilter = 0;
+            if (isFilterActive) {
+
+                tempList = getRawList(c, tempList);
+                listSizesBeforeFilter[id] = tempList.size();
+
+                //now perform the filtering
+                applyFilter(id, list, tempList);
+
+            } else {
+                // just fill the list normally
+                list = getRawList(c, list);
+
+                dataLists.set(id, list);
+                listSizesBeforeFilter[id] = list.size();
+            }
+        } else {
+            dataLists.set(id, null);
+            try {
+                hiddenItems.set(id, null);
+            } catch (Exception e) {
+            }
+        }
+        datasource.close();
+    }
+
+    private ArrayList<Row> getRawList(Cursor c, ArrayList<Row> tempList) {
+        while (c.moveToNext()) {
+            Row row = new Row();
+
+            //only add to list if row isn't null
+            String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+            if (help.contentEquals("Klasse")) continue;
+            if (help.contentEquals("")) continue;
+
+            row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
+            row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
+            row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+
+            tempList.add(row);
+        }
+
+        return tempList;
+    }
+
+    @NonNull
+    private String getTableName(int id) {
         //query the data for the right vplan -> get requested table name by passed arg
         String tableName;
 
@@ -136,118 +197,55 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
                 break;
         }
+        return tableName;
+    }
 
-        if (datasource.hasData(tableName)) {
+    private void applyFilter(int id, ArrayList<Row> list, ArrayList<Row> tempList) {
+        for (Row currRow : tempList) {
+            String klasse = currRow.getKlasse();
+            boolean isNeeded = false;
 
-            //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
-            hasData = true;
+            //look whether this row's klasse attribute contains any of the classes to filter for
+            if (filter.size() > 0) {
+                for (int i = 0; i <= filter.size() - 1; i++) {
+                    char[] klasseFilter = filter.get(i).toCharArray();
 
-            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
-                    SQLiteHelperVplan.COLUMN_STATUS});
+                    //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
+                    if (vplanMode == VplanModes.OINFO) {
+                        String filterItem = filter.get(i);
+                        isNeeded = klasse.contentEquals("Q" + filterItem);
 
-            ArrayList<Row> list = new ArrayList<>();
-            ArrayList<Row> tempList = new ArrayList<>();
+                        if (isNeeded) break;
+                        if (klasse.contentEquals("")) isNeeded = true;
+                    } else { //in u/minfo the order doesn't play a role
 
-            //check whether filter is active
-            Boolean isFilterActive = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
-
-            //if filter is active, then use it after filling the Arraylist
-            int listSizeBeforeFilter = 0;
-            if (isFilterActive) {
-
-                while (c.moveToNext()) {
-                    Row row = new Row();
-
-                    //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
-                    if (help.contentEquals("Klasse")) continue;
-                    if (help.contentEquals("")) continue;
-
-                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
-
-                    tempList.add(row);
-                }
-
-                listSizesBeforeFilter[id] = tempList.size();
-
-                //now perform the filtering
-                for (Row currRow : tempList) {
-                    String klasse = currRow.getKlasse();
-                    boolean isNeeded = false;
-
-                    //look whether this row's klasse attribute contains any of the classes to filter for
-                    if (filter.size() > 0) {
-                        for (int i = 0; i <= filter.size() - 1; i++) {
-                            char[] klasseFilter = filter.get(i).toCharArray();
-
-                            //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
-                            if (vplanMode == VplanModes.OINFO) {
-                                String filterItem = filter.get(i);
-                                isNeeded = klasse.contentEquals("Q" + filterItem);
-
-                                if (isNeeded) break;
-                                if (klasse.contentEquals("")) isNeeded = true;
-                            } else { //in u/minfo the order doesn't play a role
-
-                                //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
-                                for (int y = 0; y <= klasseFilter.length - 1; y++) {
-                                    if (klasse.contains(String.valueOf(klasseFilter[y]))) {
-                                        isNeeded = true;
-                                    } else {
-                                        isNeeded = false;
-                                        break;
-                                    }
-                                }
-                                if (isNeeded) break;
-
-                                //also set isneeded to true if klasse=""
-                                if (klasse.contentEquals("")) isNeeded = true;
+                        //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
+                        for (int y = 0; y <= klasseFilter.length - 1; y++) {
+                            if (klasse.contains(String.valueOf(klasseFilter[y]))) {
+                                isNeeded = true;
+                            } else {
+                                isNeeded = false;
+                                break;
                             }
                         }
-                    } else {
-                        //if there is no item in the filter list, then still take the rows without a value for class
-                        isNeeded = klasse.contentEquals("");
+                        if (isNeeded) break;
+
+                        //also set isneeded to true if klasse=""
+                        if (klasse.contentEquals("")) isNeeded = true;
                     }
-                    //if the test was positive, then add the current Row to the list
-                    if (isNeeded) list.add(currRow);
                 }
-
-                //now save the differences in the hiddenItems list
-                dataLists.set(id, list);
-                hiddenItems.set(id, new ArrayList<>(CollectionTools.nonOverLap(tempList, list)));
-                listSizesBeforeFilter[id] = tempList.size();
-
             } else {
-                // just fill the list normally
-                while (c.moveToNext()) {
-                    Row row = new Row();
-
-                    //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
-                    if (help.contentEquals("Klasse")) continue;
-                    if (help.contentEquals("")) continue;
-
-                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
-
-                    list.add(row);
-
-                }
-
-                dataLists.set(id, list);
-                listSizesBeforeFilter[id] = list.size();
+                //if there is no item in the filter list, then still take the rows without a value for class
+                isNeeded = klasse.contentEquals("");
             }
-        } else {
-            dataLists.set(id, null);
-            try {
-                hiddenItems.set(id, null);
-            } catch (Exception e) {
-            }
+            //if the test was positive, then add the current Row to the list
+            if (isNeeded) list.add(currRow);
         }
-        datasource.close();
+
+        //now save the differences in the hiddenItems list
+        dataLists.set(id, list);
+        hiddenItems.set(id, new ArrayList<>(CollectionTools.nonOverLap(tempList, list)));
+        listSizesBeforeFilter[id] = tempList.size();
     }
 
     /**
@@ -311,7 +309,12 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         SimpleDateFormat hour = new SimpleDateFormat("HH");
+        saveNextVplanDate(position, title, prefs, calendar, format, hour);
 
+        return title;
+    }
+
+    private void saveNextVplanDate(int position, CharSequence title, SharedPreferences prefs, Calendar calendar, SimpleDateFormat format, SimpleDateFormat hour) {
         //save the position of today's vplan in shared prefs
         if ((String.valueOf(title)).contains(format.format(calendar.getTime())) && Integer.valueOf(hour.format(calendar.getTime())) < 17) {
             SharedPreferences.Editor editor = prefs.edit();
@@ -329,7 +332,5 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                 editor.apply();
             }
         }
-
-        return title;
     }
 }

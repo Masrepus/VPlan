@@ -212,6 +212,29 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         wlp.gravity = Gravity.TOP;
         window.setAttributes(wlp);
 
+        //init ACTVs and number picker
+        initAutocompleteTVs(dialogView);
+        initNumberPicker(lessonPreset, dialogView);
+    }
+
+    private void initNumberPicker(int lessonPreset, View dialogView) {
+        MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
+        if (lessonPreset != 0) {
+
+            //preset the selected lesson in the dialog
+            lessonPicker.setLesson(lessonPreset);
+        } else {
+
+            //set the lesson to the last saved lesson + 1
+            SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+            ViewPager pager = (ViewPager) findViewById(R.id.pager);
+            int day = pager.getCurrentItem();
+            int lesson = pref.getInt(SharedPrefs.MAX_LESSON + day, 1) + 1;
+            lessonPicker.setLesson(lesson);
+        }
+    }
+
+    private void initAutocompleteTVs(View dialogView) {
         //init the actv adapters
         DataSource datasource = new DataSource(this);
         datasource.open();
@@ -240,21 +263,6 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         AutoCompleteTextView roomsACTV = (AutoCompleteTextView) dialogView.findViewById(R.id.roomACTV);
         roomsACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
         roomsACTV.setThreshold(1);
-
-        MyNumberPicker lessonPicker = (MyNumberPicker) dialogView.findViewById(R.id.lessonPicker);
-        if (lessonPreset != 0) {
-
-            //preset the selected lesson in the dialog
-            lessonPicker.setLesson(lessonPreset);
-        } else {
-
-            //set the lesson to the last saved lesson + 1
-            SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-            ViewPager pager = (ViewPager) findViewById(R.id.pager);
-            int day = pager.getCurrentItem();
-            int lesson = pref.getInt(SharedPrefs.MAX_LESSON + day, 1) + 1;
-            lessonPicker.setLesson(lesson);
-        }
     }
 
     private void addLesson(DataSource datasource, int day, int lesson, String subject, String room) {
@@ -295,15 +303,7 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         switch (which) {
 
             case DialogInterface.BUTTON_POSITIVE:
-                //save the entered data
-                AutoCompleteTextView subjectACTV = (AutoCompleteTextView) alertDialog.findViewById(R.id.subjectACTV);
-                AutoCompleteTextView roomACTV = (AutoCompleteTextView) alertDialog.findViewById(R.id.roomACTV);
-                MyNumberPicker lessonPicker = (MyNumberPicker) alertDialog.findViewById(R.id.lessonPicker);
-
-                addLesson(datasource, day, lessonPicker.getLesson(), subjectACTV.getText().toString(), roomACTV.getText().toString());
-
-                saveSubject(datasource, subjectACTV.getText().toString());
-                saveRoom(datasource, roomACTV.getText().toString());
+                saveData(day, datasource, alertDialog);
 
                 //refresh the timetable views
                 TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());
@@ -314,6 +314,18 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
                 dialog.dismiss();
                 break;
         }
+    }
+
+    private void saveData(int day, DataSource datasource, AlertDialog alertDialog) {
+        //save the entered data
+        AutoCompleteTextView subjectACTV = (AutoCompleteTextView) alertDialog.findViewById(R.id.subjectACTV);
+        AutoCompleteTextView roomACTV = (AutoCompleteTextView) alertDialog.findViewById(R.id.roomACTV);
+        MyNumberPicker lessonPicker = (MyNumberPicker) alertDialog.findViewById(R.id.lessonPicker);
+
+        addLesson(datasource, day, lessonPicker.getLesson(), subjectACTV.getText().toString(), roomACTV.getText().toString());
+
+        saveSubject(datasource, subjectACTV.getText().toString());
+        saveRoom(datasource, roomACTV.getText().toString());
     }
 
     private void saveRoom(DataSource datasource, String room) {
@@ -399,6 +411,36 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         //save the values in editingRow
         editingRow = new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString());
 
+        initActvAdapters(subjectACTV, roomACTV);
+
+        //now init the dialog and show it on top of the screen
+        showEditDialog(dialogView, subjectOld, roomOld, lesson);
+    }
+
+    private void showEditDialog(View dialogView, final TextView subjectOld, final TextView roomOld, final TextView lesson) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.edit_lesson))
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
+                    }
+                })
+                .setNegativeButton(R.string.cancel, this);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        //put the dialog to the complete top of the screen so that the actv dropdowns can be seen better
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.TOP;
+        window.setAttributes(wlp);
+    }
+
+    private void initActvAdapters(AutoCompleteTextView subjectACTV, AutoCompleteTextView roomACTV) {
         //init the actv adapters
         DataSource datasource = new DataSource(this);
         datasource.open();
@@ -422,28 +464,6 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
 
         subjectACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, subjects));
         roomACTV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rooms));
-
-        //now init the dialog and show it
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.edit_lesson))
-                .setView(dialogView)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
-                    }
-                })
-                .setNegativeButton(R.string.cancel, this);
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        //put the dialog to the complete top of the screen so that the actv dropdowns can be seen better
-        Window window = dialog.getWindow();
-        WindowManager.LayoutParams wlp = window.getAttributes();
-
-        wlp.gravity = Gravity.TOP;
-        window.setAttributes(wlp);
     }
 
     private void saveEditedLesson(AlertDialog dialog, DataSource datasource, TimetableRow oldData) {

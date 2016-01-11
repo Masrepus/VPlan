@@ -18,17 +18,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ActionMenuPresenter;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public ArrayList<String> filterUnterstufe = new ArrayList<>();
     public ArrayList<String> filterMittelstufe = new ArrayList<>();
     public ArrayList<String> filterOberstufe = new ArrayList<>();
+    private ArrayList<String> customFilterCurrent = new ArrayList<>();
+    private ArrayList<String> mergedFilter = new ArrayList<>();
     private int appMode;
     private int requestedVplanMode;
     private int requestedVplanId;
@@ -114,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private GoogleApiClient apiClient;
     private ShowcaseView showcase;
     private boolean tutorialMode;
-    private ArrayList<String> customFilterItems;
 
     /**
      * Called when the activity is first created.
@@ -142,6 +143,31 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
+        loadDbData(pref, editor);
+
+        //start loading the pager adapter asynchronously
+        new PagerAdapterLoader().execute(this);
+        NavigationView drawer = initDrawer();
+
+        //display last update timestamp
+        String lastUpdate = getString(R.string.last_update) + " " + pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
+        drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
+
+        //register change listener for settings sharedPrefs
+        SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        settingsPrefs.registerOnSharedPreferenceChangeListener(this);
+
+        buildApiClient();
+
+        //check if the tutorial has never been shown yet
+        tutorialMode = !pref.getBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", false);
+
+        if (tutorialMode) {
+            askAboutTutorial();
+        }
+    }
+
+    private void loadDbData(SharedPreferences pref, SharedPreferences.Editor editor) {
         datasource.open();
         //delete the urls in linktable if this the first time running after the update(resolve crash)
         if (18 > pref.getInt(SharedPrefs.LAST_VERSION_RUN, 0)) {
@@ -165,15 +191,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         refreshFilters();
 
+        //prevent crash if linktable not present
+        try {
+            datasource.hasData(SQLiteHelperVplan.TABLE_LINKS);
+        } catch (Exception e) {
+            //no data there and no table to be found, fix this
+            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+        }
+
         //activate adapter for viewPager
         if (!datasource.hasData(SQLiteHelperVplan.TABLE_LINKS)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
             welcome.setVisibility(View.VISIBLE);
         }
         datasource.close();
+    }
 
-        new PagerAdapterLoader().execute(this);
-
+    @NonNull
+    private NavigationView initDrawer() {
         //initialise navigation drawer
         NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
         drawer.setNavigationItemSelectedListener(this);
@@ -211,63 +246,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (actionBar != null) {
 
-            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
-
-
-                @Override
-                public void onDrawerClosed(View drawerView) {
-                    super.onDrawerClosed(drawerView);
-
-                    //set title corresponding to requested vplan mode
-                    switch (requestedVplanMode) {
-
-                        case VplanModes.UINFO:
-                            actionBar.setTitle(R.string.unterstufe);
-                            break;
-                        case VplanModes.MINFO:
-                            actionBar.setTitle(R.string.mittelstufe);
-                            break;
-                        case VplanModes.OINFO:
-                            actionBar.setTitle(R.string.oberstufe);
-                            break;
-                    }
-
-                    if (tutorialMode) {
-                        refreshTutorial();
-                    }
-                }
-
-                @Override
-                public void onDrawerOpened(View drawerView) {
-                    super.onDrawerOpened(drawerView);
-
-                    actionBar.setTitle(R.string.sgp);
-
-                    //if we are in tutorial mode continue giving instructions
-                    if (tutorialMode) {
-
-                        //if showcase is null, init it
-                        if (showcase == null) {
-                            showcase = new ShowcaseView.Builder(MainActivity.this)
-                                    .setStyle(R.style.ShowcaseTheme)
-                                    .build();
-                        }
-                        showcase.setButtonPosition(getRightParam(getResources()));
-                        showcase.setTarget(Target.NONE);
-                        showcase.setContentTitle(getString(R.string.tut_drawer_title));
-                        showcase.setContentText(getString(R.string.tut_drawer_text));
-                        showcase.setButtonText(getString(R.string.next));
-                        showcase.setShouldCentreText(true);
-                        showcase.overrideButtonClick(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                                layout.closeDrawers();
-                            }
-                        });
-                    }
-                }
-            };
+            initDrawerToggle(drawerLayout, toolbar, actionBar);
 
             drawerLayout.setDrawerListener(drawerToggle);
 
@@ -288,23 +267,67 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     break;
             }
         }
+        return drawer;
+    }
 
-        //display last update timestamp
-        String lastUpdate = getString(R.string.last_update) + " " + pref.getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
-        drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
+    private void initDrawerToggle(final DrawerLayout drawerLayout, final Toolbar toolbar, final ActionBar actionBar) {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed) {
 
-        //register change listener for settings sharedPrefs
-        SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        settingsPrefs.registerOnSharedPreferenceChangeListener(this);
 
-        buildApiClient();
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
 
-        //check if the tutorial has never been shown yet
-        tutorialMode = !pref.getBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", false);
+                //set title corresponding to requested vplan mode
+                switch (requestedVplanMode) {
 
-        if (tutorialMode) {
-            askAboutTutorial();
-        }
+                    case VplanModes.UINFO:
+                        actionBar.setTitle(R.string.unterstufe);
+                        break;
+                    case VplanModes.MINFO:
+                        actionBar.setTitle(R.string.mittelstufe);
+                        break;
+                    case VplanModes.OINFO:
+                        actionBar.setTitle(R.string.oberstufe);
+                        break;
+                }
+
+                if (tutorialMode) {
+                    refreshTutorial();
+                }
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+                actionBar.setTitle(R.string.sgp);
+
+                //if we are in tutorial mode continue giving instructions
+                if (tutorialMode) {
+
+                    //if showcase is null, init it
+                    if (showcase == null) {
+                        showcase = new ShowcaseView.Builder(MainActivity.this)
+                                .setStyle(R.style.ShowcaseTheme)
+                                .build();
+                    }
+                    showcase.setButtonPosition(getRightParam(getResources()));
+                    showcase.setTarget(Target.NONE);
+                    showcase.setContentTitle(getString(R.string.tut_drawer_title));
+                    showcase.setContentText(getString(R.string.tut_drawer_text));
+                    showcase.setButtonText(getString(R.string.next));
+                    showcase.setShouldCentreText(true);
+                    showcase.overrideButtonClick(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                            layout.closeDrawers();
+                        }
+                    });
+                }
+            }
+        };
     }
 
     private int getColor(Resources res, int id, Resources.Theme theme) {
@@ -490,51 +513,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
 
                 //now perform the filtering
-                int position = 0;
-
-                for (Row currRow : tempList) {
-                    String klasse = currRow.getKlasse();
-                    boolean isNeeded = false;
-
-                    //look whether this row's klasse attribute contains any of the classes to filter for
-                    if (filterCurrent.size() > 0) {
-                        for (int i = 0; i <= filterCurrent.size() - 1; i++) {
-                            char[] klasseFilter = filterCurrent.get(i).toCharArray();
-
-                            //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
-                            if (requestedVplanMode == VplanModes.OINFO) {
-                                String filterItem = filterCurrent.get(i);
-                                isNeeded = klasse.contentEquals("Q" + filterItem);
-
-                                if (isNeeded) break;
-                                if (klasse.contentEquals("")) isNeeded = true;
-                            } else { //in u/minfo the order doesn't play a role
-
-                                //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
-                                for (int y = 0; y <= klasseFilter.length - 1; y++) {
-                                    if (klasse.contains(String.valueOf(klasseFilter[y]))) {
-                                        isNeeded = true;
-                                    } else {
-                                        isNeeded = false;
-                                        break;
-                                    }
-                                }
-                                if (isNeeded) break;
-
-                                //also set isneeded to true if klasse=""
-                                if (klasse.contentEquals("")) isNeeded = true;
-                            }
-                        }
-                    } else {
-                        //if there is no item in the filter list, then still take the rows without a value for class
-                        isNeeded = klasse.contentEquals("");
-                    }
-                    //if the test was positive, then add the current Row to the map
-                    if (isNeeded) {
-                        dataMap.putDataMap(String.valueOf(position), currRow.putToDataMap(new DataMap()));
-                        position++;
-                    }
-                }
+                dataMap = filterRowsToDataMap(dataMap, tempList);
 
             } else {
                 // just fill the list normally
@@ -554,6 +533,56 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     dataMap.putDataMap(String.valueOf(position), row.putToDataMap(new DataMap()));
                     position++;
                 }
+            }
+        }
+
+        return dataMap;
+    }
+
+    private DataMap filterRowsToDataMap(DataMap dataMap, ArrayList<Row> tempList) {
+        int position = 0;
+
+        for (Row currRow : tempList) {
+            String klasse = currRow.getKlasse();
+            boolean isNeeded = false;
+
+            //look whether this row's klasse attribute contains any of the classes to filter for
+            if (mergedFilter.size() > 0) {
+                for (int i = 0; i <= mergedFilter.size() - 1; i++) {
+                    char[] klasseFilter = mergedFilter.get(i).toCharArray();
+
+                    //check whether this is oinfo, as in this case, the exact order of the filter chars must be given as well
+                    if (requestedVplanMode == VplanModes.OINFO) {
+                        String filterItem = mergedFilter.get(i);
+                        isNeeded = klasse.contentEquals("Q" + filterItem);
+
+                        if (isNeeded) break;
+                        if (klasse.contentEquals("")) isNeeded = true;
+                    } else { //in u/minfo the order doesn't play a role
+
+                        //if klasse contains all of the characters of the filter string, isNeeded will be true, because if one character returns false, the loop is stopped
+                        for (int y = 0; y <= klasseFilter.length - 1; y++) {
+                            if (klasse.contains(String.valueOf(klasseFilter[y]))) {
+                                isNeeded = true;
+                            } else {
+                                isNeeded = false;
+                                break;
+                            }
+                        }
+                        if (isNeeded) break;
+
+                        //also set isneeded to true if klasse=""
+                        if (klasse.contentEquals("")) isNeeded = true;
+                    }
+                }
+            } else {
+                //if there is no item in the filter list, then still take the rows without a value for class
+                isNeeded = klasse.contentEquals("");
+            }
+            //if the test was positive, then add the current Row to the map
+            if (isNeeded) {
+                dataMap.putDataMap(String.valueOf(position), currRow.putToDataMap(new DataMap()));
+                position++;
             }
         }
 
@@ -629,7 +658,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onActivityResult(requestCode, resultCode, data);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(null);
-        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, filterCurrent));
+        pager.setAdapter(new VplanPagerAdapter(getSupportFragmentManager(), this, this, mergedFilter));
         appMode = AppModes.VPLAN;
     }
 
@@ -965,7 +994,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             oldKeys.remove(getString(R.string.pref_key_bg_updates));
             oldKeys.remove(getString(R.string.pref_key_upd_int));
             oldKeys.remove(getString(R.string.pref_key_bg_upd_levels));
-            oldKeys.remove(SharedPrefs.CUSTOM_CLASSES);
+            oldKeys.remove(SharedPrefs.CUSTOM_CLASSES_PREFIX + VplanModes.UINFO);
+            oldKeys.remove(SharedPrefs.CUSTOM_CLASSES_PREFIX + VplanModes.MINFO);
+            oldKeys.remove(SharedPrefs.CUSTOM_CLASSES_PREFIX + VplanModes.OINFO);
 
             //now delete those old keys from settings prefs
             SharedPreferences.Editor editor = pref.edit();
@@ -1054,10 +1085,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void refreshCustomFilter(SharedPreferences pref) {
 
         //get currently saved custom classes
-        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<String>()));
 
         //keep a local copy of the custom items for later
-        customFilterItems = new ArrayList<>(customClasses);
+        customFilterCurrent = new ArrayList<>(customClasses);
+
+        //merge filterCurrent and custom filter
+        mergedFilter = new ArrayList<>();
+        mergedFilter.addAll(filterCurrent);
+        mergedFilter.addAll(customFilterCurrent);
     }
 
     private void refreshBgUpdates(Boolean activated, int interval) {
@@ -1110,10 +1146,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //show a dialog displaying the content of filterCurrent
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.curr_filter)
-                .setItems(filterCurrent.toArray(new String[filterCurrent.size()]), null);
+                .setItems(mergedFilter.toArray(new String[mergedFilter.size()]), null);
 
         //prepare the filter array list, if it is null then create a new one with a dummy item, else fill the dialog with the filter data
-        if (filterCurrent.size() == 0) {
+        if (mergedFilter.size() == 0) {
             builder.setItems(new CharSequence[]{getString(R.string.no_filter)}, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -1123,7 +1159,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
             });
         } else {
-            builder.setItems(filterCurrent.toArray(new String[filterCurrent.size()]), null);
+            builder.setItems(mergedFilter.toArray(new String[mergedFilter.size()]), null);
         }
 
         //add an add class/course button for custom elements
@@ -1156,9 +1192,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 //check if this is a custom item
-                final String customClass = filterCurrent.get(position);
+                final String customClass = mergedFilter.get(position);
 
-                if (customFilterItems.contains(filterCurrent.get(position))) {
+                if (customFilterCurrent.contains(mergedFilter.get(position))) {
 
                     //custom item, prompt option to delete it
                     AlertDialog.Builder deleteDialogBuilder = new AlertDialog.Builder(MainActivity.this);
@@ -1186,13 +1222,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //get the currently saved custom classes
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         SharedPreferences.Editor editor = pref.edit();
-        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<String>()));
 
         //now remove the requested class
         customClasses.remove(customClass);
 
         //save
-        editor.putStringSet(SharedPrefs.CUSTOM_CLASSES, customClasses);
+        editor.putStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, customClasses);
         editor.apply();
     }
 
@@ -1213,17 +1249,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences.Editor editor = pref.edit();
 
         //get currently saved custom classes and add the one the user wants to save
-        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES, new HashSet<String>()));
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<String>()));
         customClasses.add(customClass);
 
         //keep a local copy of the custom items for later
-        customFilterItems = new ArrayList<>(customClasses);
+        customFilterCurrent = new ArrayList<>(customClasses);
 
-        editor.putStringSet(SharedPrefs.CUSTOM_CLASSES, customClasses);
+        editor.putStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, customClasses);
         editor.apply();
 
         //notify answers that a custom class was added
-        Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_CUSTOM_CLASS).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, customClass));
+        Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_CUSTOM_CLASS).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, customClass + "(" + CrashlyticsKeys.parseVplanMode(requestedVplanMode)));
     }
 
     public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
@@ -1365,6 +1401,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     break;
             }
 
+            //also refresh the custom filter
+            refreshCustomFilter(PreferenceManager.getDefaultSharedPreferences(this));
+
             //collapse the drawer
             DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawerLayout.closeDrawers();
@@ -1491,7 +1530,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         @Override
         protected VplanPagerAdapter doInBackground(Activity... activities) {
-            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], filterCurrent);
+            return new VplanPagerAdapter(getSupportFragmentManager(), getApplicationContext(), activities[0], mergedFilter);
         }
 
         @Override
