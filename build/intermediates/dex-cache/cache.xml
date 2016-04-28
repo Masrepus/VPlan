@@ -1,12 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" >
-
-    <item
-        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/incremental-classes/debug/classes.jar"
-        jumboMode="false"
-        revision="23.0.2"
-        sha1="21a2479c641e4b60b3182ac8f37a6fa7e91cc838">
-        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/pre-dexed/debug/classes_6bf506ceff87e0ea81162b43df745631369aafc2.jar" />
-    </item>
-
-</items>
+<items version="2" />
