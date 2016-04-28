@@ -34,9 +34,13 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -755,8 +759,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             datasource.open();
             datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
 
+            //sort the entries
+            ArrayList<Element> sortedFiles = preprocessFiles(availableFiles);
+
             //now distribute the contents of availableFiles into a new list for the selection spinner
-            for (Element row : availableFiles) {
+            for (Element row : sortedFiles) {
 
                 //don't download more than 5 files
                 if (position > 4) break;
@@ -775,6 +782,39 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             datasource.close();
         }
+    }
+
+    private ArrayList<Element> preprocessFiles(Elements availableFiles) {
+
+        //sort the files in ascending order of date and then trim this list to max. 5 files
+        ArrayList<Element> sortedFiles = new ArrayList<>();
+        final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+        for (Element row : availableFiles) {
+            sortedFiles.add(row);
+        }
+
+        Collections.sort(sortedFiles, new Comparator<Element>() {
+            @Override
+            public int compare(Element e1, Element e2) {
+                //compare the two tag dates
+                try {
+                    return format.parse(e1.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]).compareTo(format.parse(e2.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]));
+                } catch (ParseException e) {
+                    return 1;
+                }
+            }
+        });
+
+        //only add a maximum of 5 files to the list
+        ArrayList<Element> trimmedFiles = new ArrayList<>();
+        int maxIndex = (sortedFiles.size() > 5) ? 4 : sortedFiles.size()-1;
+
+        for (int i=0; i<=maxIndex; i++) {
+            trimmedFiles.add(sortedFiles.get(i));
+        }
+
+        return trimmedFiles;
     }
 
     /**
@@ -963,8 +1003,11 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     datasource.open();
                     datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
 
+                    //sort and trim the list to max. 5 entries
+                    ArrayList<Element> sortedFiles = preprocessFiles(availableFiles);
+
                     //now distribute the contents of availableFiles into a new list for the selection spinner
-                    for (Element row : availableFiles) {
+                    for (Element row : sortedFiles) {
                         //don't save more than 5 days of data!
                         if (position > 4) break;
 
