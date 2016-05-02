@@ -13,6 +13,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -211,7 +214,29 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         MenuItem filterItem = menu.findItem(R.id.action_activate_filter);
         filterItem.setChecked(noOldItems);
 
+        tintIcons(menu);
+
         return true;
+    }
+
+    private void tintIcons(Menu menu) {
+
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
+        //tint the items according to our theme
+        MenuItem item = menu.findItem(R.id.action_refresh);
+        Drawable newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
+
+        item = menu.findItem(R.id.action_help);
+        newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
     }
 
     @Override

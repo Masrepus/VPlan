@@ -2,5 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true" android:drawable="@color/yellow_translucent" />
     <item android:state_checked="true" android:drawable="@color/yellow" />
-    <item android:drawable="@android:color/background_light" />
+    <item>
+        <shape>
+            <solid android:color="?attr/colorBackgroundLighter"/>
+        </shape>
+    </item>
 </selector>

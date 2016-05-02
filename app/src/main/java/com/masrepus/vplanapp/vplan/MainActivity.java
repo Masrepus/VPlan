@@ -12,6 +12,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -32,6 +35,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -724,7 +728,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             filterItem.setChecked(true);
         } else filterItem.setChecked(false);
+
+        tintIcons(menu);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void tintIcons(Menu menu) {
+
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
+        //tint the items according to our theme
+        MenuItem item = menu.findItem(R.id.action_refresh);
+        Drawable newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
+
+        item = menu.findItem(R.id.action_help);
+        newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
     }
 
     /**

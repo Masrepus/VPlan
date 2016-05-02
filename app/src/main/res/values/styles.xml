@@ -4,10 +4,16 @@
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryDark">@color/yellow_dark</item>
         <item name="colorAccent">@color/blue</item>
+        <item name="tintFab">@android:color/white</item>
+        <item name="tintMenu">#ff303030</item>
+        <item name="colorBackgroundLighter">#fffafafa</item>
     </style>
 
+    <attr name="tintFab" format="color"/>
+    <attr name="tintMenu" format="color"/>
+    <attr name="colorBackgroundLighter" format="color"/>
     <color name="yellow">#f7dd2b</color>
-    <color name="yellow_dark">#e7ce28</color>
+    <color name="yellow_dark">#ffca28</color>
     <color name="yellow_focused">@color/yellow</color>
     <color name="blue">#274595</color>
     <color name="blue_focused">#2745d4</color>
@@ -22,5 +28,12 @@
 
     <style name="ShowcaseTitle" parent="TextAppearance.ShowcaseView.Title">
         <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="ThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="tintFab">#ff212121</item>
+        <item name="colorAccent">@color/yellow_dark</item>
+        <item name="colorBackgroundLighter">#ff424242</item>
+        <item name="tintMenu">@android:color/white</item>
     </style>
 </resources>

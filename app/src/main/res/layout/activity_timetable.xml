@@ -57,7 +57,8 @@
                 android:layout_marginRight="16dp"
                 android:src="@drawable/fab_ic_add"
                 app:fabSize="normal"
-                app:borderWidth="0dp" />
+                app:borderWidth="0dp"
+                android:tint="?attr/tintFab" />
 
 
         </RelativeLayout>
