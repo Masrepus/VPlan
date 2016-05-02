@@ -634,12 +634,19 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
     private void refresh(MenuItem item) {
 
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
         //rotate the refresh button
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ImageView iv = (ImageView) inflater.inflate(R.layout.view_action_refresh, null);
 
         Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
         rotation.setRepeatCount(Animation.INFINITE);
+        iv.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         iv.startAnimation(rotation);
         item.setActionView(iv);
 
