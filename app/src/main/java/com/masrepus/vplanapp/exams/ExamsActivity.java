@@ -37,20 +37,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
-import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -71,8 +66,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import io.fabric.sdk.android.Fabric;
 
 
 public class ExamsActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -95,10 +88,6 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exams);
-
-        //init crashlytics
-        Fabric.with(this, new Crashlytics());
-        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.TESTS));
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -252,10 +241,6 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
                 return super.onOptionsItemSelected(item);
             case R.id.action_refresh:
-
-                //notify answers
-                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_EXAMS));
-
                 refresh(item);
                 return true;
             case R.id.action_settings:

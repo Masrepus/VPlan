@@ -50,9 +50,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
@@ -73,7 +70,6 @@ import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.network.DownloaderService;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
-import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -92,8 +88,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
@@ -127,10 +121,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //init crashlytics
-        Fabric.with(this, new Crashlytics());
-        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.VPLAN));
 
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -180,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
-        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         appMode = pref.getInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
@@ -752,13 +741,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_refresh:
-
-                //notify answers
-                CustomEvent event = new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
-                        .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
-                if (!filterCurrent.isEmpty()) event.putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, "aktiv");
-                Answers.getInstance().logCustom(event);
-
                 refresh(item);
                 return true;
             /*case R.id.tester:
@@ -939,9 +921,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode);
-        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
-        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(appMode));
         editor.apply();
 
         super.onPause();
@@ -1003,9 +983,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             for (String oldKey : oldKeys) {
                 editor.remove(oldKey);
                 editor.apply();
-
-                //report this to answers to double check that the right keys are being deleted
-                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_DELETED_OLD_DATA).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, oldKey));
             }
         }
 
@@ -1257,9 +1234,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         editor.putStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, customClasses);
         editor.apply();
-
-        //notify answers that a custom class was added
-        Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_CUSTOM_CLASS).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, customClass + "(" + CrashlyticsKeys.parseVplanMode(requestedVplanMode)));
     }
 
     public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
@@ -1385,7 +1359,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //change requested vplan mode and save it in shared prefs
             requestedVplanMode = vplanMode;
             pref.edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
-            Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
 
             //select the right filter
             switch (requestedVplanMode) {
