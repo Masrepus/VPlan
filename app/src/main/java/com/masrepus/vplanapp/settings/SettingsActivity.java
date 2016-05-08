@@ -1,6 +1,7 @@
 package com.masrepus.vplanapp.settings;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -20,6 +21,9 @@ public class SettingsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        //set dark theme if requested
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) setTheme(R.style.ThemeDark);
         setContentView(R.layout.activity_settings);
 
         //set actionbar

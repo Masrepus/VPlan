@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private GoogleApiClient apiClient;
     private ShowcaseView showcase;
     private boolean tutorialMode;
+    private boolean darkTheme;
 
     /**
      * Called when the activity is first created.
@@ -124,6 +125,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         datasource = new DataSource(this);
 
         super.onCreate(savedInstanceState);
+
+        //set dark theme if requested
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) {
+            setTheme(R.style.ThemeDark);
+            darkTheme = true;
+        } else darkTheme = false;
         setContentView(R.layout.activity_main);
 
         //get the state of the filter from shared prefs
@@ -971,6 +978,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (sharedPreferences == getSharedPreferences(SharedPrefs.PREFS_NAME, 0)) {
             if (key.contains(SharedPrefs.PREFIX_LAST_UPDATE)) activatePagerAdapter();
         }
+
+        //if this was a theme change, restart
+        if (darkTheme != sharedPreferences.getBoolean(getString(R.string.pref_key_dark_theme), false)) {
+            finish();
+            startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            return;
+        }
+
         //settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
     }
@@ -1035,6 +1050,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 refreshBgUpdates(Boolean.valueOf(entry.getValue().toString()), interval);
 
+                continue;
+            }
+
+            //treat dark theme settings separately
+            if (entry.getKey().contentEquals(getString(R.string.pref_key_dark_theme))) {
                 continue;
             }
 

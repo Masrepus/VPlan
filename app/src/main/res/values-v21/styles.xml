@@ -4,6 +4,9 @@
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryDark">@color/yellow_dark</item>
         <item name="colorAccent">@color/blue</item>
+        <item name="tintFab">@android:color/white</item>
+        <item name="tintMenu">#ff303030</item>
+        <item name="colorBackgroundLighter">#fffafafa</item>
         <item name="android:alertDialogTheme">@style/ThemeYellow.AlertDialog</item>
     </style>
 

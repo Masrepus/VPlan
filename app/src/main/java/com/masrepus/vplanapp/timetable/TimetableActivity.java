@@ -56,6 +56,9 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //set dark theme if requested
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) setTheme(R.style.ThemeDark);
         setContentView(R.layout.activity_timetable);
 
         //activate the view_toolbar

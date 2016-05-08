@@ -81,13 +81,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void updateSummary(Preference p) {
+        //note each preference's key in order to find old unused entries in the shared prefs file
+        keys.add(p.getKey());
+
         if (p instanceof MultiSelectListPreference) {
             MultiSelectListPreference multiPref = (MultiSelectListPreference) p;
 
             //get the values that were saved in this preference item and join them with commas
             //treat bg update levels separately
-            //note each multiselectlistpreference's key in order to find old unused entries in the shared prefs file
-            keys.add(multiPref.getKey());
 
             Set<String> values = preferences.getStringSet(multiPref.getKey(), null);
 

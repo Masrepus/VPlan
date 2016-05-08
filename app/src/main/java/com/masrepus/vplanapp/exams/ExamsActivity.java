@@ -90,6 +90,9 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //set dark theme if requested
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) setTheme(R.style.ThemeDark);
         setContentView(R.layout.activity_exams);
 
         //activate the toolbar
