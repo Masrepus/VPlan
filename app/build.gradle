@@ -16,7 +16,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 28
-        versionName "3.9.6"
+        versionName "3.9"
     }
 
     buildTypes {
@@ -37,6 +37,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.3.+'
     compile 'com.android.support:design:23.3.+'
     compile 'com.google.android.gms:play-services-wearable:+'
+    compile 'com.github.rampo.updatechecker:library:2.1.8'
     compile files('libs/jsoup-1.7.3.jar')
     compile project(':showcaseview')
     wearApp project(':wear')

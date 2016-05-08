@@ -83,6 +83,8 @@ import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
+import com.rampo.updatechecker.UpdateChecker;
+import com.rampo.updatechecker.store.Store;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -166,6 +168,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (tutorialMode) {
             askAboutTutorial();
         }
+
+        //check for updates
+        UpdateChecker checker = new UpdateChecker(this);
+        checker.setStore(Store.GOOGLE_PLAY);
+        checker.setSuccessfulChecksRequired(2);
+        checker.start();
     }
 
     private void loadDbData(SharedPreferences pref, SharedPreferences.Editor editor) {
