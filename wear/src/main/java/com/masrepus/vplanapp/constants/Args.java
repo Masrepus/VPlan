@@ -9,5 +9,4 @@ public class Args {
     public static final String ACTION_REFRESH = "com.masrepus.vplanapp.action.refresh";
     public static final String ACTION_UPDATE_UI = "com.masrepus.vplanapp.action.updateUI";
     public static final String VPLAN_LIST = "vplanlist";
-    public static final String WEAR_APP_OPENED = "wearAppOpened";
 }

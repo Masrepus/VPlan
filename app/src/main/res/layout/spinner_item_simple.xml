@@ -15,7 +15,7 @@
         android:layout_gravity="center_horizontal|bottom"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
-        android:textColor="@android:color/secondary_text_light"
+        android:textColor="?android:attr/textColorSecondary"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:paddingRight="25dp"

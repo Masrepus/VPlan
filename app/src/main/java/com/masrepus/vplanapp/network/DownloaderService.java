@@ -16,9 +16,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -32,7 +29,6 @@ import com.google.android.gms.wearable.Wearable;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
-import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -45,8 +41,6 @@ import com.masrepus.vplanapp.vplan.Row;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import io.fabric.sdk.android.Fabric;
 
 public class DownloaderService extends Service {
 
@@ -73,9 +67,6 @@ public class DownloaderService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        //init crashlytics
-        Fabric.with(this, new Crashlytics());
-
         Log.d("DownloaderService", "Starting bg download service");
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -90,7 +81,6 @@ public class DownloaderService extends Service {
         } else notifyWear = false;
 
         lastRequestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
-        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
 
         //get the current filter
         switch (lastRequestedVplanMode) {
@@ -120,7 +110,6 @@ public class DownloaderService extends Service {
 
         //now save the current vplan mode in shared prefs
         editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
-        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
         editor.apply();
 
         new BgDownloader().execute(this);
@@ -545,10 +534,6 @@ public class DownloaderService extends Service {
                 return;
             }
 
-            //notify answers
-            Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_BG_DOWNLOAD)
-                    .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode)));
-
             if (downloaded_levels == levels.length) {
 
                 //sync to wear
@@ -565,7 +550,6 @@ public class DownloaderService extends Service {
 
                 //update shared prefs as well
                 editor.putInt(SharedPrefs.VPLAN_MODE, vplanMode);
-                Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
                 editor.apply();
 
                 new BgDownloader().execute(context);

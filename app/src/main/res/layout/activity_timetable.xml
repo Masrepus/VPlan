@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tabs"
-            android:background="@color/yellow"
+            android:background="?attr/colorPrimary"
             android:layout_below="@id/toolbar"/>
 
         <RelativeLayout
@@ -57,7 +57,8 @@
                 android:layout_marginRight="16dp"
                 android:src="@drawable/fab_ic_add"
                 app:fabSize="normal"
-                app:borderWidth="0dp" />
+                app:borderWidth="0dp"
+                android:tint="?attr/tintFab" />
 
 
         </RelativeLayout>
@@ -68,7 +69,7 @@
         android:layout_width="250dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/background_light"
+        android:background="?attr/colorBackgroundLighter"
         android:showDividers="middle"
         app:menu="@menu/drawer"
         app:itemTextColor="@color/text_selector"

@@ -250,5 +250,8 @@
     <string name="add_class_example">z.B. 7C oder 1E2</string>
     <string name="input_empty">Leere Eingabe</string>
     <string name="remove_custom_class">Diese selbst hinzugefügte Klasse löschen?</string>
+    <string name="miscellaneous">Sonstiges</string>
+    <string name="use_dark_theme">Dunkles Design verwenden</string>
+    <string name="pref_key_dark_theme">pref_key_dark_theme</string>
 
 </resources>

@@ -12,6 +12,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -32,6 +35,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,9 +54,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
@@ -73,7 +74,6 @@ import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.network.DownloaderService;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
-import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.DataKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
@@ -83,6 +83,8 @@ import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.timetable.TimetableActivity;
+import com.rampo.updatechecker.UpdateChecker;
+import com.rampo.updatechecker.store.Store;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -92,8 +94,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, Serializable, GoogleApiClient.ConnectionCallbacks, NavigationView.OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener {
 
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private GoogleApiClient apiClient;
     private ShowcaseView showcase;
     private boolean tutorialMode;
+    private boolean darkTheme;
 
     /**
      * Called when the activity is first created.
@@ -126,11 +127,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         datasource = new DataSource(this);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        //init crashlytics
-        Fabric.with(this, new Crashlytics());
-        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.VPLAN));
+        //set dark theme if requested
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) {
+            setTheme(R.style.ThemeDark);
+            darkTheme = true;
+        } else darkTheme = false;
+        setContentView(R.layout.activity_main);
 
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -165,6 +168,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (tutorialMode) {
             askAboutTutorial();
         }
+
+        //check for updates
+        UpdateChecker checker = new UpdateChecker(this);
+        checker.setStore(Store.GOOGLE_PLAY);
+        checker.setSuccessfulChecksRequired(2);
+        checker.start();
     }
 
     private void loadDbData(SharedPreferences pref, SharedPreferences.Editor editor) {
@@ -180,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         requestedVplanMode = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
-        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         appMode = pref.getInt(SharedPrefs.APPMODE, AppModes.VPLAN);
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             FrameLayout fl = (FrameLayout) findViewById(R.id.frameLayout);
@@ -735,7 +743,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (pref.getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false)) {
             filterItem.setChecked(true);
         } else filterItem.setChecked(false);
+
+        tintIcons(menu);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void tintIcons(Menu menu) {
+
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
+        //tint the items according to our theme
+        MenuItem item = menu.findItem(R.id.action_refresh);
+        Drawable newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
+
+        item = menu.findItem(R.id.action_help);
+        newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
     }
 
     /**
@@ -752,13 +783,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_refresh:
-
-                //notify answers
-                CustomEvent event = new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_VPLAN)
-                        .putCustomAttribute(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
-                if (!filterCurrent.isEmpty()) event.putCustomAttribute(CrashlyticsKeys.KEY_USES_FILTER, "aktiv");
-                Answers.getInstance().logCustom(event);
-
                 refresh(item);
                 return true;
             /*case R.id.tester:
@@ -914,12 +938,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Called when the refresh actionbar item is clicked; starts a full online parse
      */
     private void refresh(MenuItem item) {
+
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
         //rotate the refresh button
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ImageView iv = (ImageView) inflater.inflate(R.layout.view_action_refresh, null);
 
         Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
         rotation.setRepeatCount(Animation.INFINITE);
+        iv.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         iv.startAnimation(rotation);
         item.setActionView(iv);
 
@@ -939,9 +971,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode);
-        Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(requestedVplanMode));
         editor.putInt(SharedPrefs.APPMODE, AppModes.VPLAN);
-        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(appMode));
         editor.apply();
 
         super.onPause();
@@ -956,6 +986,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (sharedPreferences == getSharedPreferences(SharedPrefs.PREFS_NAME, 0)) {
             if (key.contains(SharedPrefs.PREFIX_LAST_UPDATE)) activatePagerAdapter();
         }
+
+        //if this was a theme change, restart
+        if (darkTheme != sharedPreferences.getBoolean(getString(R.string.pref_key_dark_theme), false)) {
+            finish();
+            startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            return;
+        }
+
         //settings have been changed, so update the filter array if the classes to filter have been changed
         refreshFilters();
     }
@@ -1003,9 +1041,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             for (String oldKey : oldKeys) {
                 editor.remove(oldKey);
                 editor.apply();
-
-                //report this to answers to double check that the right keys are being deleted
-                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_DELETED_OLD_DATA).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, oldKey));
             }
         }
 
@@ -1023,6 +1058,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 refreshBgUpdates(Boolean.valueOf(entry.getValue().toString()), interval);
 
+                continue;
+            }
+
+            //treat dark theme settings separately
+            if (entry.getKey().contentEquals(getString(R.string.pref_key_dark_theme))) {
                 continue;
             }
 
@@ -1257,9 +1297,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         editor.putStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, customClasses);
         editor.apply();
-
-        //notify answers that a custom class was added
-        Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_CUSTOM_CLASS).putCustomAttribute(CrashlyticsKeys.KEY_PREF_KEY, customClass + "(" + CrashlyticsKeys.parseVplanMode(requestedVplanMode)));
     }
 
     public void showAlert(final Context context, int titleStringRes, int msgStringRes, int buttonCount) {
@@ -1385,7 +1422,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //change requested vplan mode and save it in shared prefs
             requestedVplanMode = vplanMode;
             pref.edit().putInt(SharedPrefs.VPLAN_MODE, requestedVplanMode).apply();
-            Crashlytics.setString(CrashlyticsKeys.KEY_VPLAN_MODE, CrashlyticsKeys.parseVplanMode(vplanMode));
 
             //select the right filter
             switch (requestedVplanMode) {

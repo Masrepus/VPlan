@@ -13,6 +13,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,20 +40,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
-import com.masrepus.vplanapp.constants.CrashlyticsKeys;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
@@ -72,8 +70,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import io.fabric.sdk.android.Fabric;
-
 
 public class ExamsActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -94,11 +90,10 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exams);
 
-        //init crashlytics
-        Fabric.with(this, new Crashlytics());
-        Crashlytics.setString(CrashlyticsKeys.KEY_APP_MODE, CrashlyticsKeys.parseAppMode(AppModes.TESTS));
+        //set dark theme if requested
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) setTheme(R.style.ThemeDark);
+        setContentView(R.layout.activity_exams);
 
         //activate the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -222,7 +217,29 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         MenuItem filterItem = menu.findItem(R.id.action_activate_filter);
         filterItem.setChecked(noOldItems);
 
+        tintIcons(menu);
+
         return true;
+    }
+
+    private void tintIcons(Menu menu) {
+
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
+        //tint the items according to our theme
+        MenuItem item = menu.findItem(R.id.action_refresh);
+        Drawable newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
+
+        item = menu.findItem(R.id.action_help);
+        newIcon = item.getIcon();
+        newIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        item.setIcon(newIcon);
     }
 
     @Override
@@ -252,10 +269,6 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
                 pref.edit().putInt(SharedPrefs.APPMODE, AppModes.VPLAN).apply();
                 return super.onOptionsItemSelected(item);
             case R.id.action_refresh:
-
-                //notify answers
-                Answers.getInstance().logCustom(new CustomEvent(CrashlyticsKeys.EVENT_REFRESH_EXAMS));
-
                 refresh(item);
                 return true;
             case R.id.action_settings:
@@ -624,12 +637,19 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
     private void refresh(MenuItem item) {
 
+        //get the tint color
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.tintMenu, typedValue, true);
+        int color = typedValue.data;
+
         //rotate the refresh button
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ImageView iv = (ImageView) inflater.inflate(R.layout.view_action_refresh, null);
 
         Animation rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.refresh_clockwise);
         rotation.setRepeatCount(Animation.INFINITE);
+        iv.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         iv.startAnimation(rotation);
         item.setActionView(iv);
 
