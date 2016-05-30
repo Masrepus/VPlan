@@ -65,7 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:divider="@drawable/divider"
+                    android:divider="?attr/divider"
                     android:showDividers="middle">
 
                     <RelativeLayout
@@ -144,10 +144,11 @@
             android:layout_gravity="start"
             android:background="?attr/colorBackgroundLighter"
             android:showDividers="middle"
-            app:menu="@menu/drawer"
-            app:itemTextColor="@color/text_selector"
-            app:itemIconTint="@color/icon_selector"
-            app:itemBackground="@drawable/yellow_selector">
+            app:menu="@menu/drawer_full"
+            app:itemTextColor="?attr/text_selector"
+            app:itemIconTint="?attr/icon_selector"
+            app:itemBackground="?attr/yellow_selector"
+            android:visibility="gone">
         </android.support.design.widget.NavigationView>
     </android.support.v4.widget.DrawerLayout>
 </RelativeLayout>

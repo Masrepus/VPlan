@@ -4,7 +4,7 @@
     <item android:state_checked="true" android:drawable="@color/yellow" />
     <item>
         <shape>
-            <solid android:color="?attr/colorBackgroundLighter"/>
+            <solid android:color="@color/colorBackgroundLighter_Y"/>
         </shape>
     </item>
 </selector>
