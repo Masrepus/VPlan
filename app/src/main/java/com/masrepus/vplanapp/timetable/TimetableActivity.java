@@ -96,12 +96,7 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
 
         //init the tabs
         SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
-        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getColor(getResources(), R.color.blue, getTheme());
-            }
-        });
+        tabs.setCustomTabColorizer(position -> getColor(getResources(), R.color.blue, getTheme()));
         tabs.setDistributeEvenly(true);
         tabs.setViewPager(pager);
 
@@ -360,25 +355,12 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
             //show a dialog and ask the user if this lesson should be edited or deleted
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(getString(R.string.edit_or_delete))
-                    .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            TextView lesson = (TextView) v.findViewById(R.id.lesson);
-                            removeLesson(new DataSource(TimetableActivity.this), lesson.getText().toString());
-                        }
+                    .setPositiveButton(getString(R.string.delete), (dialog, which) -> {
+                        TextView lesson = (TextView) v.findViewById(R.id.lesson);
+                        removeLesson(new DataSource(TimetableActivity.this), lesson.getText().toString());
                     })
-                    .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.edit, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            editLesson(v);
-                        }
-                    }).show();
+                    .setNeutralButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton(R.string.edit, (dialog, which) -> editLesson(v)).show();
         }
 
         return true;
@@ -415,12 +397,7 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.edit_lesson))
                 .setView(dialogView)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString()));
-                    }
-                })
+                .setPositiveButton(R.string.ok, (dialog, which) -> saveEditedLesson((AlertDialog) dialog, new DataSource(TimetableActivity.this), new TimetableRow(lesson.getText().toString(), subjectOld.getText().toString(), roomOld.getText().toString())))
                 .setNegativeButton(R.string.cancel, this);
 
         AlertDialog dialog = builder.create();

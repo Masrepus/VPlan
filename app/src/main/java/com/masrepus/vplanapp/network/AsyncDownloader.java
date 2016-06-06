@@ -790,19 +790,14 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         ArrayList<Element> sortedFiles = new ArrayList<>();
         final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
-        for (Element row : availableFiles) {
-            sortedFiles.add(row);
-        }
+        sortedFiles.addAll(availableFiles);
 
-        Collections.sort(sortedFiles, new Comparator<Element>() {
-            @Override
-            public int compare(Element e1, Element e2) {
-                //compare the two tag dates
-                try {
-                    return format.parse(e1.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]).compareTo(format.parse(e2.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]));
-                } catch (ParseException e) {
-                    return 1;
-                }
+        Collections.sort(sortedFiles, (e1, e2) -> {
+            //compare the two tag dates
+            try {
+                return format.parse(e1.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]).compareTo(format.parse(e2.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]));
+            } catch (ParseException e) {
+                return 1;
             }
         });
 

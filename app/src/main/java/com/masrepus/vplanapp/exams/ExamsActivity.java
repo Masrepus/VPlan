@@ -196,12 +196,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //set listadapter
         examsList = initData();
         //sort by date
-        Collections.sort(examsList, new Comparator<ExamsRow>() {
-            @Override
-            public int compare(ExamsRow examsRow, ExamsRow examsRow2) {
-                return examsRow.getDate().compareTo(examsRow2.getDate());
-            }
-        });
+        Collections.sort(examsList, (examsRow, examsRow2) -> examsRow.getDate().compareTo(examsRow2.getDate()));
 
         ListView listView = (ListView) findViewById(R.id.examsList);
         ExamsListAdapter adapter = new ExamsListAdapter(this, R.layout.list_item_exam, examsList);
@@ -277,22 +272,19 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
             case R.id.action_open_browser:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.open_browser) + "...")
-                        .setItems(new CharSequence[]{getString(R.string.unterstufe) + "/" + getString(R.string.mittelstufe), getString(R.string.oberstufe)}, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //open the right website
-                                switch (i) {
-                                    case 0:
-                                        //u/minfo
-                                        Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.MINFO));
-                                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                                        break;
-                                    case 1:
-                                        //oinfo
-                                        uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.OINFO));
-                                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                                        break;
-                                }
+                        .setItems(new CharSequence[]{getString(R.string.unterstufe) + "/" + getString(R.string.mittelstufe), getString(R.string.oberstufe)}, (dialogInterface, i) -> {
+                            //open the right website
+                            switch (i) {
+                                case 0:
+                                    //u/minfo
+                                    Uri uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.MINFO));
+                                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                                    break;
+                                case 1:
+                                    //oinfo
+                                    uri = Uri.parse(AsyncDownloader.findRequestedTestsPage(getApplicationContext(), VplanModes.OINFO));
+                                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                                    break;
                             }
                         })
                         .show();
@@ -334,12 +326,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
                 //explain to the user that we need this permission in order to add calendar events
                 new AlertDialog.Builder(this)
                         .setMessage(R.string.perm_rationale_calendar)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR}, REQUEST_CALENDAR);
-                            }
-                        })
+                        .setPositiveButton(R.string.ok, (dialog, which) -> ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR}, REQUEST_CALENDAR))
                         .setNegativeButton(R.string.cancel, null)
                         .show();
                 return;
@@ -500,12 +487,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //ask the user to choose the calendar into which the exams should be saved
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.choose_calendar_title)
-                .setCursor(calendarCursor, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int position) {
-                        showReminderDialog(calIds.get(position));
-                    }
-                }, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
+                .setCursor(calendarCursor, (dialogInterface, position) -> showReminderDialog(calIds.get(position)), CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
         builder.show();
     }
 
@@ -514,24 +496,18 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //show a dialog where the user can choose to set a default reminder time for exams
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.title_add_reminder)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText timeET = (EditText) reminderDialog.findViewById(R.id.timeEditText);
-                        int time = Integer.parseInt(timeET.getText().toString());
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    EditText timeET = (EditText) reminderDialog.findViewById(R.id.timeEditText);
+                    int time = Integer.parseInt(timeET.getText().toString());
 
-                        //multiply the contents of the edit text by timespanFactor
-                        time = time * timespanFactor;
-                        addToCalendar(calendar, time);
-                        dialog.dismiss();
-                    }
+                    //multiply the contents of the edit text by timespanFactor
+                    time = time * timespanFactor;
+                    addToCalendar(calendar, time);
+                    dialog.dismiss();
                 })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addToCalendar(calendar, -1);
-                        dialog.dismiss();
-                    }
+                .setNegativeButton(R.string.no, (dialog, which) -> {
+                    addToCalendar(calendar, -1);
+                    dialog.dismiss();
                 })
                 .setNeutralButton(R.string.cancel, null);
         reminderDialog = builder.create();
@@ -678,26 +654,11 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //if buttoncount is 1, then there should be only one ok button, otherwise also add a cancel one
         switch (buttonCount) {
             case 1:
-                builder.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                builder.setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss());
                 break;
             case 2:
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivityForResult(new Intent(context, SettingsActivity.class), 0);
-                    }
-                })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                builder.setPositiveButton(R.string.ok, (dialog, which) -> startActivityForResult(new Intent(context, SettingsActivity.class), 0))
+                        .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 break;
         }
 

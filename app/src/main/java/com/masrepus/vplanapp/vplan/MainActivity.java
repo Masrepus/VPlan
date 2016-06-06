@@ -1,5 +1,6 @@
 package com.masrepus.vplanapp.vplan;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -138,12 +139,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //get the state of the filter from shared prefs
         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-        pref.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                requestedVplanId = sharedPreferences.getInt(SharedPrefs.REQUESTED_VPLAN_ID, 0);
-                currentVPlanLink = sharedPreferences.getString(SharedPrefs.CURR_VPLAN_LINK, "");
-            }
+        pref.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
+            requestedVplanId = sharedPreferences.getInt(SharedPrefs.REQUESTED_VPLAN_ID, 0);
+            currentVPlanLink = sharedPreferences.getString(SharedPrefs.CURR_VPLAN_LINK, "");
         });
 
         loadDbData(pref, editor);
@@ -326,12 +324,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     showcase.setContentText(getString(R.string.tut_drawer_text));
                     showcase.setButtonText(getString(R.string.next));
                     showcase.setShouldCentreText(true);
-                    showcase.overrideButtonClick(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                            layout.closeDrawers();
-                        }
+                    showcase.overrideButtonClick(v -> {
+                        DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        layout.closeDrawers();
                     });
                 }
             }
@@ -359,13 +354,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         showcase.setTarget(new ViewTarget(findViewById(R.id.action_refresh)));
         showcase.setContentTitle(getString(R.string.tut_refresh_title));
         showcase.setContentText(getString(R.string.tut_refresh_text));
-        showcase.overrideButtonClick(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showcase.hide();
-                View refresh = findViewById(R.id.action_refresh);
-                refresh.performClick();
-            }
+        showcase.overrideButtonClick(v -> {
+            showcase.hide();
+            View refresh = findViewById(R.id.action_refresh);
+            refresh.performClick();
         });
     }
 
@@ -384,12 +376,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             showcase.setContentTitle(getString(R.string.filter));
             showcase.setContentText(getString(R.string.tut_filter_hardware_menu));
             showcase.setShouldCentreText(false);
-            showcase.overrideButtonClick(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showcase.hide();
-                    MainActivity.this.openOptionsMenu();
-                }
+            showcase.overrideButtonClick(v -> {
+                showcase.hide();
+                MainActivity.this.openOptionsMenu();
             });
         } else {
             if (showcase == null) {
@@ -408,12 +397,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             showcase.setContentText(getString(R.string.tut_filter_no_menubutton));
             showcase.setShouldCentreText(false);
             showcase.setHideOnTouchOutside(true);
-            showcase.overrideButtonClick(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showcase.hide();
-                    views.get(views.size() - 1).performClick();
-                }
+            showcase.overrideButtonClick(v -> {
+                showcase.hide();
+                views.get(views.size() - 1).performClick();
             });
         }
         showcase.show();
@@ -642,12 +628,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         apiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
-                        Log.d("Google Services", "onConnectionFailed: " + connectionResult);
-                    }
-                })
+                .addOnConnectionFailedListener(connectionResult -> Log.d("Google Services", "onConnectionFailed: " + connectionResult))
 
                         //request access to the Wearable API
                 .addApi(Wearable.API)
@@ -817,19 +798,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setTitle(getString(R.string.filter))
                                 .setMessage(getString(R.string.filter_explanations))
-                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
-                                    }
+                                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                                    dialog.dismiss();
+                                    startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 0);
                                 })
-                                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }).show();
+                                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss()).show();
                     } else {
                         item.setChecked(true);
                         SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
@@ -863,22 +836,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.tutorial))
                 .setMessage(getString(R.string.msg_start_tutorial))
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //disable the tutorial mode
-                        SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                        pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
-                        tutorialMode = false;
-                        dialog.dismiss();
-                    }
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    //disable the tutorial mode
+                    SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
+                    pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
+                    tutorialMode = false;
+                    dialog.dismiss();
                 })
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showTutorial();
-                        dialog.dismiss();
-                    }
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    showTutorial();
+                    dialog.dismiss();
                 }).show();
     }
 
@@ -895,12 +862,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 .build();
         showcase.setButtonPosition(getRightParam(getResources()));
         showcase.setButtonText(getString(R.string.next));
-        showcase.overrideButtonClick(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-                layout.openDrawer(findViewById(R.id.drawer_left));
-            }
+        showcase.overrideButtonClick(v -> {
+            DrawerLayout layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            layout.openDrawer(findViewById(R.id.drawer_left));
         });
         showcase.setBlocksTouches(false);
     }
@@ -1018,7 +982,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         SharedPreferences mPref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         //get the keys used in settings or skip if not available
-        ArrayList<String> usedKeys = new ArrayList<>(mPref.getStringSet(SharedPrefs.USED_SETTINGS_KEYS, new HashSet<String>()));
+        ArrayList<String> usedKeys = new ArrayList<>(mPref.getStringSet(SharedPrefs.USED_SETTINGS_KEYS, new HashSet<>()));
 
         if (usedKeys.size() > 0) {
             //find the differences between used keys and keys present in sharedPrefs file
@@ -1125,7 +1089,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void refreshCustomFilter(SharedPreferences pref) {
 
         //get currently saved custom classes
-        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<String>()));
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<>()));
 
         //keep a local copy of the custom items for later
         customFilterCurrent = new ArrayList<>(customClasses);
@@ -1190,69 +1154,54 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         //prepare the filter array list, if it is null then create a new one with a dummy item, else fill the dialog with the filter data
         if (mergedFilter.size() == 0) {
-            builder.setItems(new CharSequence[]{getString(R.string.no_filter)}, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //open settings to let the user add classes to the filter
-                    startActivityForResult(new Intent(context, SettingsActivity.class), 0);
-                    dialog.cancel();
-                }
+            builder.setItems(new CharSequence[]{getString(R.string.no_filter)}, (dialog, which) -> {
+                //open settings to let the user add classes to the filter
+                startActivityForResult(new Intent(context, SettingsActivity.class), 0);
+                dialog.cancel();
             });
         } else {
             builder.setItems(mergedFilter.toArray(new String[mergedFilter.size()]), null);
         }
 
         //add an add class/course button for custom elements
-        builder.setPositiveButton(getString(R.string.add_missing_class), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+        builder.setPositiveButton(getString(R.string.add_missing_class), (dialog, which) -> {
+            dialog.dismiss();
 
-                //show a dialog where the user can enter a custom class
-                View dialogView = View.inflate(MainActivity.this, R.layout.dialog_add_class, null);
-                AlertDialog.Builder childBuilder = new AlertDialog.Builder(MainActivity.this);
-                childBuilder.setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                saveClass((AlertDialog) dialog);
-                                dialog.dismiss();
-                                refreshFilters();
-                                //refresh the adapter
-                                new PagerAdapterLoader().execute(MainActivity.this);
-                            }
-                        });
-                AlertDialog childDialog = childBuilder.create();
-                childDialog.setView(dialogView);
-                childDialog.show();
-            }
+            //show a dialog where the user can enter a custom class
+            View dialogView = View.inflate(MainActivity.this, R.layout.dialog_add_class, null);
+            AlertDialog.Builder childBuilder = new AlertDialog.Builder(MainActivity.this);
+            childBuilder.setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.ok, (dialog1, which1) -> {
+                        saveClass((AlertDialog) dialog1);
+                        dialog1.dismiss();
+                        refreshFilters();
+                        //refresh the adapter
+                        new PagerAdapterLoader().execute(MainActivity.this);
+                    });
+            AlertDialog childDialog = childBuilder.create();
+            childDialog.setView(dialogView);
+            childDialog.show();
         });
         final AlertDialog parentDialog = builder.create();
-        parentDialog.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //check if this is a custom item
-                final String customClass = mergedFilter.get(position);
+        parentDialog.getListView().setOnItemLongClickListener((parent, view, position, id) -> {
+            //check if this is a custom item
+            final String customClass = mergedFilter.get(position);
 
-                if (customFilterCurrent.contains(mergedFilter.get(position))) {
+            if (customFilterCurrent.contains(mergedFilter.get(position))) {
 
-                    //custom item, prompt option to delete it
-                    AlertDialog.Builder deleteDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                    deleteDialogBuilder.setMessage(R.string.remove_custom_class)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    removeClass(customClass);
-                                    refreshFilters();
-                                    parentDialog.dismiss();
-                                    new PagerAdapterLoader().execute(MainActivity.this);
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-                }
-                return true;
+                //custom item, prompt option to delete it
+                AlertDialog.Builder deleteDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                deleteDialogBuilder.setMessage(R.string.remove_custom_class)
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
+                            removeClass(customClass);
+                            refreshFilters();
+                            parentDialog.dismiss();
+                            new PagerAdapterLoader().execute(MainActivity.this);
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
             }
+            return true;
         });
         parentDialog.show();
     }
@@ -1262,7 +1211,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //get the currently saved custom classes
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         SharedPreferences.Editor editor = pref.edit();
-        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<String>()));
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<>()));
 
         //now remove the requested class
         customClasses.remove(customClass);
@@ -1289,7 +1238,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences.Editor editor = pref.edit();
 
         //get currently saved custom classes and add the one the user wants to save
-        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<String>()));
+        HashSet<String> customClasses = new HashSet<>(pref.getStringSet(SharedPrefs.CUSTOM_CLASSES_PREFIX + requestedVplanMode, new HashSet<>()));
         customClasses.add(customClass);
 
         //keep a local copy of the custom items for later
@@ -1308,26 +1257,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         //if buttoncount is 1, then there should be only one ok button, otherwise also add a cancel one
         switch (buttonCount) {
             case 1:
-                builder.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                builder.setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss());
                 break;
             case 2:
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivityForResult(new Intent(context, SettingsActivity.class), 0);
-                    }
-                })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                builder.setPositiveButton(R.string.ok, (dialog, which) -> startActivityForResult(new Intent(context, SettingsActivity.class), 0))
+                        .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 break;
         }
 
@@ -1579,12 +1513,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             //init the tab layout
             SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
-            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                @Override
-                public int getIndicatorColor(int position) {
-                    return getColor(getResources(), R.color.blue, getTheme());
-                }
-            });
+            tabs.setCustomTabColorizer(position -> getColor(getResources(), R.color.blue, getTheme()));
             tabs.setDistributeEvenly(true);
             tabs.setViewPager(pager);
 
