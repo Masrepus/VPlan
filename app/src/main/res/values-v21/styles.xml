@@ -5,8 +5,12 @@
         <item name="colorPrimaryDark">@color/yellow_dark</item>
         <item name="colorAccent">@color/blue</item>
         <item name="tintFab">@android:color/white</item>
-        <item name="tintMenu">#ff303030</item>
-        <item name="colorBackgroundLighter">#fffafafa</item>
+        <item name="tintMenu">@color/tintMenu_Y</item>
+        <item name="colorBackgroundLighter">@color/colorBackgroundLighter_Y</item>
+        <item name="yellow_selector">@drawable/yellow_selector_y</item>
+        <item name="icon_selector">@color/icon_selector_y</item>
+        <item name="text_selector">@color/text_selector_y</item>
+        <item name="divider">@drawable/divider_y</item>
         <item name="android:alertDialogTheme">@style/ThemeYellow.AlertDialog</item>
     </style>
 

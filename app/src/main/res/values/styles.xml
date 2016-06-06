@@ -4,14 +4,32 @@
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryDark">@color/yellow_dark</item>
         <item name="colorAccent">@color/blue</item>
-        <item name="tintFab">@android:color/white</item>
-        <item name="tintMenu">#ff303030</item>
-        <item name="colorBackgroundLighter">#fffafafa</item>
+        <item name="tintFab">@color/tintFab_Y</item>
+        <item name="tintMenu">@color/tintMenu_Y</item>
+        <item name="colorBackgroundLighter">@color/colorBackgroundLighter_Y</item>
+        <item name="yellow_selector">@drawable/yellow_selector_y</item>
+        <item name="icon_selector">@color/icon_selector_y</item>
+        <item name="text_selector">@color/text_selector_y</item>
+        <item name="divider">@drawable/divider_y</item>
     </style>
 
-    <attr name="tintFab" format="color"/>
-    <attr name="tintMenu" format="color"/>
-    <attr name="colorBackgroundLighter" format="color"/>
+    <attr name="tintFab" format="reference"/>
+    <attr name="tintMenu" format="reference"/>
+    <attr name="colorBackgroundLighter" format="reference"/>
+    <attr name="yellow_selector" format="reference"/>
+    <attr name="icon_selector" format="reference"/>
+    <attr name="text_selector" format="reference"/>
+    <attr name="divider" format="reference"/>
+
+    <color name="colorBackgroundLighter_Y">#fffafafa</color>
+    <color name="colorBackgroundLighter_D">#ff424242</color>
+
+    <color name="tintFab_Y">@android:color/white</color>
+    <color name="tintFab_D">#ff212121</color>
+
+    <color name="tintMenu_Y">#ff303030</color>
+    <color name="tintMenu_D">@android:color/white</color>
+
     <color name="yellow">#f7dd2b</color>
     <color name="yellow_dark">#ffca28</color>
     <color name="yellow_focused">@color/yellow</color>
@@ -31,9 +49,13 @@
     </style>
 
     <style name="ThemeDark" parent="Theme.AppCompat.NoActionBar">
-        <item name="tintFab">#ff212121</item>
+        <item name="tintFab">@color/tintFab_D</item>
         <item name="colorAccent">@color/yellow_dark</item>
-        <item name="colorBackgroundLighter">#ff424242</item>
-        <item name="tintMenu">@android:color/white</item>
+        <item name="colorBackgroundLighter">@color/colorBackgroundLighter_D</item>
+        <item name="tintMenu">@color/tintMenu_D</item>
+        <item name="yellow_selector">@drawable/yellow_selector_d</item>
+        <item name="icon_selector">@color/icon_selector_d</item>
+        <item name="text_selector">@color/text_selector_d</item>
+        <item name="divider">@drawable/divider_d</item>
     </style>
 </resources>

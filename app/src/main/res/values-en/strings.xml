@@ -122,5 +122,7 @@
     <string name="input_empty">Input empty</string>
     <string name="remove_custom_class">Remove this custom class?</string>
     <string name="warning_case_sensitive">Warning: case-sensitive!</string>
+    <string name="miscellaneous">Miscellaneous</string>
+    <string name="use_dark_theme">Use dark theme </string>
 
 </resources>
