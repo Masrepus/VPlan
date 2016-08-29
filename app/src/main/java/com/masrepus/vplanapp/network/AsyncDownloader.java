@@ -359,7 +359,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         subject += " " + split2[i];
                     }
 
-                    subject = subject.replace('\uFFFD', 'ö');
+                    //TODO verursacht Build-Fehler subject = subject.replace('\uFFFD', 'ö');
 
                     datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, grade, date, subject, type);
                 }
@@ -628,8 +628,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         }
         String currentDate = null;
         if (separated != null) {
-            if (separated.length <= 2) currentDate = separated[1].trim();
-            else currentDate = separated[2].trim();
+            if (separated.length > 2) currentDate = separated[2].trim();
+            else if (separated.length == 2) currentDate = separated[1].trim();
         }
 
         //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
@@ -1019,10 +1019,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     }
 
                     datasource.close();
-                }
-            }
-
-            return true;
+                    return true;
+                } else return false;
+            } else return false;
     }
 
     public String refreshLastUpdate() {
