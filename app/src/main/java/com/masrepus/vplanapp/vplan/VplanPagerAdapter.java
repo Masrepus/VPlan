@@ -215,6 +215,9 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
                         String filterItem = filter.get(i);
                         isNeeded = klasse.contentEquals("Q" + filterItem);
 
+                        //some courses with e.g. Q1Inf1 can also sometimes be called Q1Inf. So look for those cases
+                        if (filterItem.charAt(filterItem.length()-1) == '1') isNeeded = (klasse + "1").contentEquals("Q" + filterItem);
+
                         if (isNeeded) break;
                         if (klasse.contentEquals("")) isNeeded = true;
                     } else { //in u/minfo the order doesn't play a role
