@@ -9,7 +9,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '24 rc3'
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
         applicationId "com.masrepus.vplanapp"
@@ -41,4 +41,10 @@ dependencies {
     compile files('libs/jsoup-1.7.3.jar')
     compile project(':showcaseview')
     wearApp project(':wear')
+}
+
+task clean(type: Exec) {
+    ext.lockhunter = '\"C:\\Program Files\\Lock Hunter\\LockHunter.exe\"'
+    def buildDir = file(new File("build"))
+    commandLine 'cmd', "$lockhunter", '/delete', '/silent', buildDir
 }
