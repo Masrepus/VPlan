@@ -2,130 +2,123 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.3.0\support-annotations-23.3.0.jar"
-        jumboMode="true"
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\VPlan\showcaseview\unspecified\jars\libs\nineoldandroids-2.4.0.jar"
+        jumboMode="false"
         revision="24.0.2"
-        sha1="db7791d75a07fef9844d06236c1c59ba7bf6997c">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-23.3.0_9cec310a1e845a6a1801662eb8f38a32f2ded89f\classes.dex" />
+        sha1="d7b9adf3bc0b172b13965a4efe5c93e8a38b081f">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\nineoldandroids-2.4.0_5bf7974bcc8c11b05e74ff3113ce048b1977b252.jar" />
     </item>
     <item
         jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.3.0\jars\classes.jar"
-        jumboMode="true"
+        jumboMode="false"
         revision="24.0.2"
         sha1="23be6993826b8fd88bbc8d14928bb3b8960d3d4e">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-23.3.0_d53803661cbacdff0cb3ee507746f0827da8a073\classes.dex" />
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-23.3.0_d53803661cbacdff0cb3ee507746f0827da8a073.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
-        jumboMode="true"
+        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.3.0\support-annotations-23.3.0.jar"
+        jumboMode="false"
         revision="24.0.2"
-        sha1="ff892cadf5cc7e767e4c6c003afeb7ac3c1c9ec2">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_a5a387796c9d0f99d6677af9590c44ff4c5c1a1d\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.github.rampo.updatechecker\library\2.1.8\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="eb5c07f3d6f461eb6f7662ad57dec8630d1ed688">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.github.rampo.updatechecker-library-2.1.8_81b78e0f9675484e94eff0bec6c2fbb4acf0df5b\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\design\23.3.0\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="f0001e71cea6ae432a00021c6f727f5ef0f3d27e">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-design-23.3.0_9855c90e96b5c09560ebca621b7004ddfdc17626\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wearable\9.4.0\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="b1acf13f1b7d8232af78a30833f9a966d1394c84">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-wearable-9.4.0_21a9aa6459c1e451809c038c9a1a3aaed0fa9b94\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.3.0\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="debf30ce0a7560396b6235edef77e447006454c2">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-23.3.0_958b3757944646cab4894172d7a346c07ceaac05\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\9.4.0\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-basement-9.4.0_7ff9aebc7402714535a726182f3478ecf7c2122b\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.3.0\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="82ce13fd19cdfde0e392f03c27edeba8d4333648">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-cardview-v7-23.3.0_ec82f43cf623794f7dec0d49483c1f0b660802b6\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\VPlan\showcaseview\unspecified\jars\libs\nineoldandroids-2.4.0.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="d7b9adf3bc0b172b13965a4efe5c93e8a38b081f">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\8\nineoldandroids-2.4.0_5bf7974bcc8c11b05e74ff3113ce048b1977b252\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="6b14a41484cfb171b099fbcbd38809195b84eea1">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_07b4528b37b42400e31421b34e92f327694d6fd6\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\classes.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="8a034dd16c0dfd75fe86c52c2cd581592acc684a">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-23.3.0_56eaa3db97600838539f73ceace0fb9fc81ebc8d\classes.dex" />
-    </item>
-    <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\libs\jsoup-1.7.3.jar"
-        jumboMode="true"
-        revision="24.0.2"
-        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\2\jsoup-1.7.3_6868d1a6e4f2b656b302a81be6295a0faf21e5fa\classes.dex" />
+        sha1="db7791d75a07fef9844d06236c1c59ba7bf6997c">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\support-annotations-23.3.0_9cec310a1e845a6a1801662eb8f38a32f2ded89f.jar" />
     </item>
     <item
         jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.4.0\jars\classes.jar"
-        jumboMode="true"
+        jumboMode="false"
         revision="24.0.2"
         sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-base-9.4.0_aaa089d70b84da1dc8a360e8d6d37becd9dae604\classes.dex" />
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-base-9.4.0_aaa089d70b84da1dc8a360e8d6d37becd9dae604.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\libs\internal_impl-23.3.0.jar"
-        jumboMode="true"
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\classes.jar"
+        jumboMode="false"
         revision="24.0.2"
-        sha1="4da5a4d697d32497c6f85567a5112e62fdfd0676">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-23.3.0_ab2fcf6edf3a6fde2ddbc31a1843ecc4cc6c8316\classes.dex" />
+        sha1="8a034dd16c0dfd75fe86c52c2cd581592acc684a">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.3.0_56eaa3db97600838539f73ceace0fb9fc81ebc8d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.github.rampo.updatechecker\library\2.1.8\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="eb5c07f3d6f461eb6f7662ad57dec8630d1ed688">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.github.rampo.updatechecker-library-2.1.8_81b78e0f9675484e94eff0bec6c2fbb4acf0df5b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\VPlan\showcaseview\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="9ec7d7190c55716d4bcec2c62e9f7ef46782d56a">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\VPlan-showcaseview-unspecified_f307d2f7dd768e2269351f865f0403e988844436.jar" />
     </item>
     <item
         jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.3.0\jars\classes.jar"
-        jumboMode="true"
+        jumboMode="false"
         revision="24.0.2"
         sha1="1b8e03daaa43fb0a4cd57e378167c2fd70454c1e">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-23.3.0_ea74dbd01167cfd55eb10e06385fb70fca8122b2\classes.dex" />
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.3.0_ea74dbd01167cfd55eb10e06385fb70fca8122b2.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\libs\internal_impl-23.3.0.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="4da5a4d697d32497c6f85567a5112e62fdfd0676">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\internal_impl-23.3.0_ab2fcf6edf3a6fde2ddbc31a1843ecc4cc6c8316.jar" />
     </item>
     <item
         jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.3.0\jars\classes.jar"
-        jumboMode="true"
+        jumboMode="false"
         revision="24.0.2"
         sha1="a0b5d60246cd9d4f3f2443611b3b4c25265840b5">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-23.3.0_7b53fcc07b2eb008505c17ca0bd0350bbf2ac3a5\classes.dex" />
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.3.0_7b53fcc07b2eb008505c17ca0bd0350bbf2ac3a5.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\design\23.3.0\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="f0001e71cea6ae432a00021c6f727f5ef0f3d27e">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-design-23.3.0_9855c90e96b5c09560ebca621b7004ddfdc17626.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wearable\9.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="b1acf13f1b7d8232af78a30833f9a966d1394c84">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-wearable-9.4.0_21a9aa6459c1e451809c038c9a1a3aaed0fa9b94.jar" />
     </item>
     <item
         jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\9.4.0\jars\classes.jar"
-        jumboMode="true"
+        jumboMode="false"
         revision="24.0.2"
         sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-tasks-9.4.0_882f94f78f9e7938294e1c528923ed3599552f91\classes.dex" />
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-tasks-9.4.0_882f94f78f9e7938294e1c528923ed3599552f91.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.3.0\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="debf30ce0a7560396b6235edef77e447006454c2">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-recyclerview-v7-23.3.0_958b3757944646cab4894172d7a346c07ceaac05.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\9.4.0\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.google.android.gms-play-services-basement-9.4.0_7ff9aebc7402714535a726182f3478ecf7c2122b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\libs\jsoup-1.7.3.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\jsoup-1.7.3_6868d1a6e4f2b656b302a81be6295a0faf21e5fa.jar" />
+    </item>
+    <item
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.3.0\jars\classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="82ce13fd19cdfde0e392f03c27edeba8d4333648">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\debug\com.android.support-cardview-v7-23.3.0_ec82f43cf623794f7dec0d49483c1f0b660802b6.jar" />
     </item>
 
 </items>
