@@ -176,31 +176,7 @@
                     android:key="@string/pref_key_rhet_q11"
                     android:entries="@array/q_11_rhe"
                     android:entryValues="@array/q_11_rhe" />
-                <MultiSelectListPreference
-                    android:title="@string/foto"
-                    android:key="@string/pref_key_foto_q11"
-                    android:entries="@array/q_11_foto"
-                    android:entryValues="@array/q_11_foto" />
-                <MultiSelectListPreference
-                    android:title="@string/ssp"
-                    android:key="@string/pref_key_ssp_q11"
-                    android:entries="@array/ssp"
-                    android:entryValues="@array/ssp" />
-                <MultiSelectListPreference
-                    android:title="@string/bigb"
-                    android:key="@string/pref_key_bigb_q11"
-                    android:entries="@array/q_11_bigb"
-                    android:entryValues="@array/q_11_bigb" />
-                <MultiSelectListPreference
-                    android:title="@string/cho"
-                    android:key="@string/pref_key_cho_q11"
-                    android:entries="@array/q_11_cho"
-                    android:entryValues="@array/q_11_cho" />
-                <MultiSelectListPreference
-                    android:title="@string/orc"
-                    android:key="@string/pref_key_orc_q11"
-                    android:entries="@array/q_11_orch"
-                    android:entryValues="@array/q_11_orch" />
+
                 <MultiSelectListPreference
                     android:title="@string/psy"
                     android:key="@string/pref_key_psy_q11"
@@ -212,15 +188,10 @@
                     android:entries="@array/q11_spo_add"
                     android:entryValues="@array/q11_spo_add" />
                 <MultiSelectListPreference
-                    android:title="@string/ekon"
-                    android:key="@string/pref_key_ekon_q11"
-                    android:entries="@array/q_11_e_konv"
-                    android:entryValues="@array/q_11_e_konv" />
-                <MultiSelectListPreference
-                    android:title="@string/bcp"
-                    android:key="@string/pref_key_bcp_q11"
-                    android:entries="@array/q_11_bcp"
-                    android:entryValues="@array/q_11_bcp" />
+                    android:title="@string/optional_subject"
+                    android:key="@string/pref_key_optional_subject"
+                    android:entries="@array/wahlfach"
+                    android:entryValues="@array/wahlfach" />
                 </PreferenceScreen>
 
             <PreferenceScreen
@@ -342,38 +313,19 @@
                     android:key="@string/pref_key_psy_q12"
                     android:entries="@array/q_12_psy"
                     android:entryValues="@array/q_12_psy" />
-                <MultiSelectListPreference
-                    android:title="@string/bigb"
-                    android:key="@string/pref_key_bigb_q12"
-                    android:entries="@array/q_12_bigb"
-                    android:entryValues="@array/q_12_bigb" />
-                <MultiSelectListPreference
-                    android:title="@string/foto"
-                    android:key="@string/pref_key_foto_q12"
-                    android:entries="@array/q_12_foto"
-                    android:entryValues="@array/q_12_foto" />
-                <MultiSelectListPreference
-                    android:title="@string/ssp"
-                    android:key="@string/pref_key_ssp_q12"
-                    android:entries="@array/ssp"
-                    android:entryValues="@array/ssp" />
-                <MultiSelectListPreference
-                    android:title="@string/cho"
-                    android:key="@string/pref_key_cho_q12"
-                    android:entries="@array/q_12_cho"
-                    android:entryValues="@array/q_12_cho" />
-                <MultiSelectListPreference
-                    android:title="@string/orc"
-                    android:key="@string/pref_key_orc_q12"
-                    android:entries="@array/q_12_orch"
-                    android:entryValues="@array/q_12_orch" />
+
                 <MultiSelectListPreference
                     android:title="@string/sp_add"
                     android:key="@string/pref_key_sp_add_q12"
                     android:entries="@array/q12_spo_add"
                     android:entryValues="@array/q12_spo_add" />
+                <MultiSelectListPreference
+                    android:title="@string/optional_subject"
+                    android:key="@string/pref_key_optional_subject"
+                    android:entries="@array/wahlfach"
+                    android:entryValues="@array/wahlfach" />
             </PreferenceScreen>
-            </PreferenceScreen>
+        </PreferenceScreen>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/bg_updates">
