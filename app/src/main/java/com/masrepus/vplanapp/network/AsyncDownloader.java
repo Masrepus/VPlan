@@ -110,7 +110,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
      * @return returns true if everything went well
      */
     @Override
-    final protected Boolean doInBackground(Context... context) {
+    protected Boolean doInBackground(Context... context) {
 
         this.context = context[0];
         datasource = new DataSource(this.context);
@@ -607,8 +607,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         }
         String currentDate = null;
         if (separated != null) {
-            if (separated.length <= 2) currentDate = separated[1].trim();
-            else currentDate = separated[2].trim();
+            if (separated.length > 2) currentDate = separated[2].trim();
+            else if (separated.length == 2) currentDate = separated[1].trim();
         }
 
         //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
@@ -624,7 +624,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //only take the current day of the week and the date out of the header text; delete the space before the split string
         String[] separated = null;
         if (headerCurrentDate != null) {
-            separated = headerCurrentDate.split("für");
+            separated = headerCurrentDate.split("für"); //TODO split geht nur beim Debuggen??
         }
         String currentDate = null;
         if (separated != null) {

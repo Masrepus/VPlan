@@ -1580,6 +1580,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         @Override
+        protected Boolean doInBackground(Context... context) {
+            return super.doInBackground(context);
+        }
+
+        @Override
         protected void onPostExecute(Boolean success) {
 
             super.onPostExecute(success);
