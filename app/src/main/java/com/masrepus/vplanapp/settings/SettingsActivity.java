@@ -3,6 +3,7 @@ package com.masrepus.vplanapp.settings;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.masrepus.vplanapp.R;
@@ -10,7 +11,7 @@ import com.masrepus.vplanapp.R;
 /**
  * Created by samuel on 01.09.14.
  */
-public class SettingsActivity extends ActionBarActivity {
+public class SettingsActivity extends AppCompatActivity {
 
 
     /**

@@ -2,123 +2,274 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\VPlan\showcaseview\unspecified\jars\libs\nineoldandroids-2.4.0.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\16e9f8b7a69758bc8c98c93443b0994f597d378b\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="d7b9adf3bc0b172b13965a4efe5c93e8a38b081f">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\nineoldandroids-2.4.0_5bf7974bcc8c11b05e74ff3113ce048b1977b252.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="25438f55fc6d906a0e72f30b21487541430ede43">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_e1e2b7e8b2681289ca8ffe09710d2ae4e225776b.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.3.0\jars\classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="23be6993826b8fd88bbc8d14928bb3b8960d3d4e">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-animated-vector-drawable-23.3.0_d53803661cbacdff0cb3ee507746f0827da8a073.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\16e9f8b7a69758bc8c98c93443b0994f597d378b\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="25438f55fc6d906a0e72f30b21487541430ede43">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_e1e2b7e8b2681289ca8ffe09710d2ae4e225776b\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.3.0\support-annotations-23.3.0.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="db7791d75a07fef9844d06236c1c59ba7bf6997c">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\support-annotations-23.3.0_9cec310a1e845a6a1801662eb8f38a32f2ded89f.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\aba55bb60ce6fb6f3e3f424e84a9f19f1b6bcdc5\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="0a0ef86b7fa568a52bf6214a0326ca1f1d618da7">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_b6bf89651850ebaadc8c257ff1f0ca8cab64fe46\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.4.0\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.1.0\support-annotations-25.1.0.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="3dee4ce5844d39d843d503fb8fe04e51e5bfffac">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-base-9.4.0_aaa089d70b84da1dc8a360e8d6d37becd9dae604.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="64cb6b229a8bdfd907bc8dd46839a0053e4c018d">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\support-annotations-25.1.0_2328ad89811e3db5416e93ccaf2b6eebe8b572c9.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="8a034dd16c0dfd75fe86c52c2cd581592acc684a">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-support-v4-23.3.0_56eaa3db97600838539f73ceace0fb9fc81ebc8d.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\eb85485e7231a5e482226d8cbc601856c21cc098\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="ca3c7aa31e2726a400a6e552b93cb9f63c9a1e6d">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_18f8823f2197e95f1c1b181514835ecd972c2685\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.github.rampo.updatechecker\library\2.1.8\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\918b9946c7a4a46e30430f271056e85a7f6e3b7e\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="eb5c07f3d6f461eb6f7662ad57dec8630d1ed688">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.github.rampo.updatechecker-library-2.1.8_81b78e0f9675484e94eff0bec6c2fbb4acf0df5b.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="6addaba208e21c6da776d0ca75b6b23a6ccd5499">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_5caf75a0597934d1d7f7644a20f6fb2cc1f6136b.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\VPlan\showcaseview\unspecified\jars\classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="9ec7d7190c55716d4bcec2c62e9f7ef46782d56a">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\VPlan-showcaseview-unspecified_f307d2f7dd768e2269351f865f0403e988844436.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\918b9946c7a4a46e30430f271056e85a7f6e3b7e\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="6addaba208e21c6da776d0ca75b6b23a6ccd5499">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_5caf75a0597934d1d7f7644a20f6fb2cc1f6136b\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.3.0\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\eb85485e7231a5e482226d8cbc601856c21cc098\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="1b8e03daaa43fb0a4cd57e378167c2fd70454c1e">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-appcompat-v7-23.3.0_ea74dbd01167cfd55eb10e06385fb70fca8122b2.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="ca3c7aa31e2726a400a6e552b93cb9f63c9a1e6d">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_18f8823f2197e95f1c1b181514835ecd972c2685.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\libs\internal_impl-23.3.0.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="4da5a4d697d32497c6f85567a5112e62fdfd0676">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\internal_impl-23.3.0_ab2fcf6edf3a6fde2ddbc31a1843ecc4cc6c8316.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\486824db81d051bb397ca94b739b86de9201d1fa\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="aee64634871d88a419d59eb743c1258a60f19700">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_ecae2fdf14b3e99038388a92a45190475b87a5b1\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.3.0\jars\classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="a0b5d60246cd9d4f3f2443611b3b4c25265840b5">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-support-vector-drawable-23.3.0_7b53fcc07b2eb008505c17ca0bd0350bbf2ac3a5.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.1.0\support-annotations-25.1.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="64cb6b229a8bdfd907bc8dd46839a0053e4c018d">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\support-annotations-25.1.0_2328ad89811e3db5416e93ccaf2b6eebe8b572c9\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\design\23.3.0\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\0cfe98d66471a91e3d11f0d4772dbde48de73cc3\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="f0001e71cea6ae432a00021c6f727f5ef0f3d27e">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-design-23.3.0_9855c90e96b5c09560ebca621b7004ddfdc17626.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="ac293d0ffbcbf7333f3a88268b702a33e5c7d2e8">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_3ddd574a2c1fc41103f602c78ab10323208f5a03.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wearable\9.4.0\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\486824db81d051bb397ca94b739b86de9201d1fa\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="b1acf13f1b7d8232af78a30833f9a966d1394c84">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-wearable-9.4.0_21a9aa6459c1e451809c038c9a1a3aaed0fa9b94.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="aee64634871d88a419d59eb743c1258a60f19700">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_ecae2fdf14b3e99038388a92a45190475b87a5b1.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\9.4.0\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\aba55bb60ce6fb6f3e3f424e84a9f19f1b6bcdc5\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="8a36d229011e75f0caef408e1adf0d3fd4d94e02">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-tasks-9.4.0_882f94f78f9e7938294e1c528923ed3599552f91.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="0a0ef86b7fa568a52bf6214a0326ca1f1d618da7">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_b6bf89651850ebaadc8c257ff1f0ca8cab64fe46.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.3.0\jars\classes.jar"
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\0578ff3a9e6d85bf0ef3f97bd4e03c7d40de35d5\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="debf30ce0a7560396b6235edef77e447006454c2">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-recyclerview-v7-23.3.0_958b3757944646cab4894172d7a346c07ceaac05.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="756f6297eef79784f5e356dcd4f39865028b2bd0">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_2bf1c01f1a0018ef6cb54e225fb3bd3095f5bbaa.jar" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\9.4.0\jars\classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="618485fef3ebe12127f7622abbc9b5b39057b5c2">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.google.android.gms-play-services-basement-9.4.0_7ff9aebc7402714535a726182f3478ecf7c2122b.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\0578ff3a9e6d85bf0ef3f97bd4e03c7d40de35d5\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="756f6297eef79784f5e356dcd4f39865028b2bd0">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_2bf1c01f1a0018ef6cb54e225fb3bd3095f5bbaa\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\libs\jsoup-1.7.3.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="ab1f22cadc2f8b514e55ba368f5128056fe304da">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\jsoup-1.7.3_6868d1a6e4f2b656b302a81be6295a0faf21e5fa.jar" />
+        is-multidex="true"
+        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\google\m2repository\com\google\android\wearable\wearable\2.0.0-beta1\wearable-2.0.0-beta1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="2cd455acbbe3964cfaf50edf58cc3f4d5b136ea3">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\wearable-2.0.0-beta1_7e3d9d5bd8eeb238f43b7d08e51d53e85a0c4409\classes.dex" />
     </item>
     <item
-        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.3.0\jars\classes.jar"
+        is-multidex="true"
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\incremental-runtime-classes\wear1\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="7fadb286755322aaaf03484e62370b1a2c5e1a75">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10000\instant-run_4335d7e00fda690592fa7cb15dba0bb8c939047c\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\b1b20d1aed0c0736a03fe91c9a7db7b23423c314\output\jars\classes.jar"
         jumboMode="false"
-        revision="24.0.2"
-        sha1="82ce13fd19cdfde0e392f03c27edeba8d4333648">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\app\build\intermediates\pre-dexed\release\com.android.support-cardview-v7-23.3.0_ec82f43cf623794f7dec0d49483c1f0b660802b6.jar" />
+        optimize="true"
+        revision="25.0.0"
+        sha1="2a53c4f3518116b8c6aee0e477233f0f7da8616f">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_64e4493db965e6d520e05acaae8239de48858d3f.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\incremental-classes\wear1\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="74e55eab465476b906a63dd4dafa0520ec6d30fa">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10000\instant-run-bootstrap_8d6b151f93d899a0183a483678e8f652850d2b14\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\b1b20d1aed0c0736a03fe91c9a7db7b23423c314\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="2a53c4f3518116b8c6aee0e477233f0f7da8616f">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_64e4493db965e6d520e05acaae8239de48858d3f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\41d9bf926faad9e4e12e4b6c1e1cf5b760964298\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="b266c8faa5af72e579b9da36ef35053ffed6ac64">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_9cfe72f79d335c394930a5b4d88f1dbd00f7fac4\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\google\m2repository\com\google\android\wearable\wearable\2.0.0-beta1\wearable-2.0.0-beta1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="2cd455acbbe3964cfaf50edf58cc3f4d5b136ea3">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\wearable-2.0.0-beta1_7e3d9d5bd8eeb238f43b7d08e51d53e85a0c4409.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\2ad72d3c385d1332767136a78547b20f6eccbcc5\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="f02263e35e52668dd17b73bf961437e3d562b35f">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_05c22a790aeff2adb0e5af4083ab1ce3ca22ddb6\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\41d9bf926faad9e4e12e4b6c1e1cf5b760964298\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="b266c8faa5af72e579b9da36ef35053ffed6ac64">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_9cfe72f79d335c394930a5b4d88f1dbd00f7fac4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\2ad72d3c385d1332767136a78547b20f6eccbcc5\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="f02263e35e52668dd17b73bf961437e3d562b35f">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_05c22a790aeff2adb0e5af4083ab1ce3ca22ddb6.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\0cfe98d66471a91e3d11f0d4772dbde48de73cc3\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="ac293d0ffbcbf7333f3a88268b702a33e5c7d2e8">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_3ddd574a2c1fc41103f602c78ab10323208f5a03\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\997b0de03f7f1476fcf6f834f94602cd5d8f0084\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_95b16814f758ffb9146ec293b8f5e8b6ed06f9ef.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\997b0de03f7f1476fcf6f834f94602cd5d8f0084\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_95b16814f758ffb9146ec293b8f5e8b6ed06f9ef\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Samue\.android\build-cache\e3a51643d3fcbe636f4d48fd3a93ca2b4f2d19c3\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="408a599ac77cd17fe8e8919326bec617b3d005bd">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear2\release\classes_507d59186cc679824c9b00b7f01aefdc0ee1b2d9.jar" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Samue\.android\build-cache\e3a51643d3fcbe636f4d48fd3a93ca2b4f2d19c3\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="408a599ac77cd17fe8e8919326bec617b3d005bd">
+        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\transforms\dex\wear1\debug\folders\1000\10\classes_507d59186cc679824c9b00b7f01aefdc0ee1b2d9\classes.dex" />
     </item>
 
 </items>

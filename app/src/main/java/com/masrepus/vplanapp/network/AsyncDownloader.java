@@ -110,7 +110,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
      * @return returns true if everything went well
      */
     @Override
-    final protected Boolean doInBackground(Context... context) {
+    protected Boolean doInBackground(Context... context) {
 
         this.context = context[0];
         datasource = new DataSource(this.context);
@@ -359,7 +359,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                         subject += " " + split2[i];
                     }
 
-                    subject = subject.replace('\uFFFD', 'ö');
+                    //TODO verursacht Build-Fehler subject = subject.replace('\uFFFD', 'ö');
 
                     datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, grade, date, subject, type);
                 }
@@ -607,8 +607,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         }
         String currentDate = null;
         if (separated != null) {
-            if (separated.length <= 2) currentDate = separated[1].trim();
-            else currentDate = separated[2].trim();
+            if (separated.length > 2) currentDate = separated[2].trim();
+            else if (separated.length == 2) currentDate = separated[1].trim();
         }
 
         //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
@@ -624,12 +624,12 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         //only take the current day of the week and the date out of the header text; delete the space before the split string
         String[] separated = null;
         if (headerCurrentDate != null) {
-            separated = headerCurrentDate.split("für");
+            separated = headerCurrentDate.split("für"); //TODO split geht nur beim Debuggen??
         }
         String currentDate = null;
         if (separated != null) {
-            if (separated.length <= 2) currentDate = separated[1].trim();
-            else currentDate = separated[2].trim();
+            if (separated.length > 2) currentDate = separated[2].trim();
+            else if (separated.length == 2) currentDate = separated[1].trim();
         }
 
         //now save the current loaded vplan's date and its last-changed timestamp, each including vplanmode, for later usage
@@ -790,19 +790,14 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         ArrayList<Element> sortedFiles = new ArrayList<>();
         final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
-        for (Element row : availableFiles) {
-            sortedFiles.add(row);
-        }
+        sortedFiles.addAll(availableFiles);
 
-        Collections.sort(sortedFiles, new Comparator<Element>() {
-            @Override
-            public int compare(Element e1, Element e2) {
-                //compare the two tag dates
-                try {
-                    return format.parse(e1.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]).compareTo(format.parse(e2.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]));
-                } catch (ParseException e) {
-                    return 1;
-                }
+        Collections.sort(sortedFiles, (e1, e2) -> {
+            //compare the two tag dates
+            try {
+                return format.parse(e1.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]).compareTo(format.parse(e2.child(0).child(0).attributes().get("href").split("schuelerplan_vom_")[1].split("\\.")[0]));
+            } catch (ParseException e) {
+                return 1;
             }
         });
 
@@ -1024,10 +1019,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     }
 
                     datasource.close();
-                }
-            }
-
-            return true;
+                    return true;
+                } else return false;
+            } else return false;
     }
 
     public String refreshLastUpdate() {

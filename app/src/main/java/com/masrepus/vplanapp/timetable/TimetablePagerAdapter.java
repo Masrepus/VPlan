@@ -59,12 +59,9 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             //transfer those lessons into the final list and add free lessons where needed
             ArrayList<TimetableRow> rows = new ArrayList<>();
 
-            Collections.sort(tempRows, new Comparator<TimetableRow>() {
-                @Override
-                public int compare(TimetableRow lhs, TimetableRow rhs) {
-                    //sort by lessons
-                    return Integer.valueOf(lhs.getLesson()).compareTo(Integer.valueOf(rhs.getLesson()));
-                }
+            Collections.sort(tempRows, (lhs, rhs) -> {
+                //sort by lessons
+                return Integer.valueOf(lhs.getLesson()).compareTo(Integer.valueOf(rhs.getLesson()));
             });
 
             if (tempRows.size() > 0) tempRows = fillGaps(tempRows);
@@ -93,12 +90,9 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             } else fillListUp(tempRows, 11); //four afternoon lessons
 
             //sort the rows one last time
-            Collections.sort(tempRows, new Comparator<TimetableRow>() {
-                @Override
-                public int compare(TimetableRow lhs, TimetableRow rhs) {
-                    //sort by lessons
-                    return Integer.valueOf(lhs.getLesson()).compareTo(Integer.valueOf(rhs.getLesson()));
-                }
+            Collections.sort(tempRows, (lhs, rhs) -> {
+                //sort by lessons
+                return Integer.valueOf(lhs.getLesson()).compareTo(Integer.valueOf(rhs.getLesson()));
             });
 
             //now get the current max lesson value as this might have changed

@@ -85,13 +85,13 @@ public class DownloaderService extends Service {
         //get the current filter
         switch (lastRequestedVplanMode) {
             case VplanModes.UINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), new HashSet<String>()));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_uinfo), new HashSet<>()));
                 break;
             case VplanModes.MINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), new HashSet<String>()));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_minfo), new HashSet<>()));
                 break;
             case VplanModes.OINFO:
-                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), new HashSet<String>()));
+                filterCurrent.addAll(pref.getStringSet(getString(R.string.pref_key_filter_oinfo), new HashSet<>()));
                 break;
         }
 
@@ -288,12 +288,7 @@ public class DownloaderService extends Service {
     private void buildApiClient() {
 
         apiClient = new GoogleApiClient.Builder(this)
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
-                        Log.d("Google Services", "onConnectionFailed: " + connectionResult);
-                    }
-                })
+                .addOnConnectionFailedListener(connectionResult -> Log.d("Google Services", "onConnectionFailed: " + connectionResult))
 
                         //request access to the Wearable API
                 .addApi(Wearable.API)
