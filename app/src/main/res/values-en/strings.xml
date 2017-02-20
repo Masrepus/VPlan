@@ -124,5 +124,6 @@
     <string name="warning_case_sensitive">Warning: case-sensitive!</string>
     <string name="miscellaneous">Miscellaneous</string>
     <string name="use_dark_theme">Use dark theme </string>
+    <string name="optional_subject">Optional subjects</string>
 
 </resources>
