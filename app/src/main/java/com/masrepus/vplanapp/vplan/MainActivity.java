@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         try {
             //save the current version code in shared prefs
             editor.putInt(SharedPrefs.LAST_VERSION_RUN, getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+            editor.apply();
         } catch (PackageManager.NameNotFoundException ignored) {
         }
 
