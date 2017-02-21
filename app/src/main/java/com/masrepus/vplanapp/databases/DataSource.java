@@ -7,9 +7,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.masrepus.vplanapp.timetable.TimetableRow;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
+import com.masrepus.vplanapp.timetable.TimetableRow;
 
 /**
  * Used as a user interface for MySQLiteHelper

@@ -24,7 +24,6 @@ import com.masrepus.vplanapp.databases.SQLiteHelperTests;
 import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
 import com.masrepus.vplanapp.vplan.MainActivity;
 
-
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

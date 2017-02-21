@@ -8,10 +8,10 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import com.masrepus.vplanapp.network.DownloaderService;
 import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
+import com.masrepus.vplanapp.network.DownloaderService;
 
 import java.io.Serializable;
 import java.util.ArrayList;
