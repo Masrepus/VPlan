@@ -7,12 +7,12 @@
         <EditTextPreference
             android:title="@string/uname"
             android:key="@string/key_uname"
-            android:defaultValue="" />
+            android:defaultValue=" " />
         <EditTextPreference
             android:title="@string/pwd"
             android:key="@string/key_pwd"
             android:password="true"
-            android:defaultValue="" />
+            android:defaultValue=" " />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/filter_title">

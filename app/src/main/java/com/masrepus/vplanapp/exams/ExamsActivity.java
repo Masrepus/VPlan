@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -65,7 +64,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -383,7 +381,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
             //log the event id
             if (uri != null) {
-                Long id = new Long(uri.getLastPathSegment());
+                Long id = Long.valueOf(uri.getLastPathSegment());
                 Log.d(ACTIVITY_NAME, "Exam " + exam.getTitle() + " added to calendar " + calendar.getName() + " with ID " + id);
 
                 //now add a reminder if the user requested this

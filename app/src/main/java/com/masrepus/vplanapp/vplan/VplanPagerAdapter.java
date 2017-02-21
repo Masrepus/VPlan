@@ -126,7 +126,6 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             Boolean isFilterActive = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
 
             //if filter is active, then use it after filling the Arraylist
-            int listSizeBeforeFilter = 0;
             if (isFilterActive) {
 
                 tempList = getRawList(c, tempList);

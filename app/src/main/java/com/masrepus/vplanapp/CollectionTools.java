@@ -1,7 +1,5 @@
 package com.masrepus.vplanapp;
 
-import com.masrepus.vplanapp.vplan.Row;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

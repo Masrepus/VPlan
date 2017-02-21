@@ -1,19 +1,16 @@
 package com.masrepus.vplanapp.vplan;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -46,7 +43,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -59,7 +55,6 @@ import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
@@ -482,14 +477,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
                     SQLiteHelperVplan.COLUMN_STATUS});
 
-            ArrayList<Row> list = new ArrayList<>();
             ArrayList<Row> tempList = new ArrayList<>();
 
             //check whether filter is active
             Boolean isFilterActive = getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getBoolean(SharedPrefs.IS_FILTER_ACTIVE, false);
 
             //if filter is active, then use it after filling the Arraylist
-            int listSizeBeforeFilter = 0;
             if (isFilterActive) {
 
                 while (c.moveToNext()) {
@@ -823,7 +816,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             case R.id.action_help:
                 SharedPreferences pref = getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
-                pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true);
+                pref.edit().putBoolean(SharedPrefs.TUT_SHOWN_PREFIX + "MainActivity", true).apply();
                 tutorialMode = true;
                 askAboutTutorial();
             default:

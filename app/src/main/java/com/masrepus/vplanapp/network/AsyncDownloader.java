@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -147,7 +146,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         downloaded_files = 0;
         SharedPreferences pref = context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         int vplanModeBefore = pref.getInt(SharedPrefs.VPLAN_MODE, VplanModes.UINFO);
-        SharedPreferences.Editor editor = pref.edit();
 
         //get the filter sets
         filters = new ArrayList<>();
