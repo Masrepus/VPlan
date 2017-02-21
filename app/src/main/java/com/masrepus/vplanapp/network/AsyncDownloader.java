@@ -177,37 +177,37 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             for (String currGrade : currFilter) {
                 grade = currGrade;
 
-                    if (currFilter == filters.get(2)) {
-                        //oinfo
+                if (currFilter == filters.get(2)) {
+                    //oinfo
 
-                        requestedVplanMode = OINFO;
-                        if (grade.charAt(0) == '1') {
-                            grade = "11"; //1XY means grade 11, 2XY grade 12
-                            //check whether this grade has been downloaded already
-                            if (downloaded11) continue;
-                            else total_downloads++;
-                            success = parseOinfoTests();
-                            downloaded11 = true;
-                        } else {
-                            grade = "12";
-                            if (downloaded12) continue;
-                            else total_downloads++;
-                            success = parseOinfoTests();
-                            downloaded12 = true;
-                        }
-                        if (!success) return false;
-                    } else if (currFilter == filters.get(0)) {
-                        //uinfo or minfo
-                        requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
-                        success = parseUinfoMinfoTests(currGrade);
-
-                        if (!success) return false;
+                    requestedVplanMode = OINFO;
+                    if (grade.charAt(0) == '1') {
+                        grade = "11"; //1XY means grade 11, 2XY grade 12
+                        //check whether this grade has been downloaded already
+                        if (downloaded11) continue;
+                        else total_downloads++;
+                        success = parseOinfoTests();
+                        downloaded11 = true;
                     } else {
-                        requestedVplanMode = MINFO;
-                        success = parseUinfoMinfoTests(currGrade);
-
-                        if (!success) return false;
+                        grade = "12";
+                        if (downloaded12) continue;
+                        else total_downloads++;
+                        success = parseOinfoTests();
+                        downloaded12 = true;
                     }
+                    if (!success) return false;
+                } else if (currFilter == filters.get(0)) {
+                    //uinfo or minfo
+                    requestedVplanMode = UINFO; //this is important for findRequestedTestsPage
+                    success = parseUinfoMinfoTests(currGrade);
+
+                    if (!success) return false;
+                } else {
+                    requestedVplanMode = MINFO;
+                    success = parseUinfoMinfoTests(currGrade);
+
+                    if (!success) return false;
+                }
 
                 downloaded_files++;
                 publishProgress(ProgressCode.PARSING_FINISHED);
@@ -301,7 +301,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         } catch (IOException e) {
 
             if (e instanceof HttpStatusException) {
-                switch (((HttpStatusException)e).getStatusCode()) {
+                switch (((HttpStatusException) e).getStatusCode()) {
 
                     case UNAUTHORIZED:
                         publishProgress(ProgressCode.ERR_NO_CREDS);
@@ -378,7 +378,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
             doc = Jsoup.connect(findRequestedTestsPage()).get();
         } catch (IOException e) {
             if (e instanceof HttpStatusException) {
-                switch (((HttpStatusException)e).getStatusCode()) {
+                switch (((HttpStatusException) e).getStatusCode()) {
 
                     case UNAUTHORIZED:
                         publishProgress(ProgressCode.ERR_NO_CREDS);
@@ -800,9 +800,9 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         //only add a maximum of 5 files to the list
         ArrayList<Element> trimmedFiles = new ArrayList<>();
-        int maxIndex = (sortedFiles.size() > 5) ? 4 : sortedFiles.size()-1;
+        int maxIndex = (sortedFiles.size() > 5) ? 4 : sortedFiles.size() - 1;
 
-        for (int i=0; i<=maxIndex; i++) {
+        for (int i = 0; i <= maxIndex; i++) {
             trimmedFiles.add(sortedFiles.get(i));
         }
 
@@ -944,81 +944,81 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         //load the list of files that are available just now
 
-            //encode uname and pw for http post
-            String encoding = encodeCredentials();
+        //encode uname and pw for http post
+        String encoding = encodeCredentials();
 
-            if (encoding == null && requestedVplanMode != OINFO) {
+        if (encoding == null && requestedVplanMode != OINFO) {
 
-                publishProgress(ProgressCode.ERR_NO_CREDS);
-                return false;
+            publishProgress(ProgressCode.ERR_NO_CREDS);
+            return false;
+        }
+
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(getVPlanUrl(VplanModes.FILES_ONLY, true)).header("Authorization", "Basic " + encoding).post();
+        } catch (IOException e) {
+            if (e instanceof HttpStatusException) {
+                HttpStatusException exception = (HttpStatusException) e;
+
+                switch (exception.getStatusCode()) {
+
+                    case UNAUTHORIZED:
+                        publishProgress(ProgressCode.ERR_NO_CREDS);
+                        break;
+                    default:
+                        publishProgress(ProgressCode.ERR_NO_INTERNET);
+                        break;
+                }
             }
+            return false;
+        }
 
-            Document doc = null;
+        if (doc != null) {
+
+            //parse!
+
+            //tempContent contains all found tables
+            Elements tempContent = doc.select("table[class=hyphenate]");
+            //first table is the wanted one for available files list
+            Elements availableFiles;
+
             try {
-                doc = Jsoup.connect(getVPlanUrl(VplanModes.FILES_ONLY, true)).header("Authorization", "Basic " + encoding).post();
-            } catch (IOException e) {
-                if (e instanceof HttpStatusException) {
-                    HttpStatusException exception = (HttpStatusException) e;
-
-                    switch (exception.getStatusCode()) {
-
-                        case UNAUTHORIZED:
-                            publishProgress(ProgressCode.ERR_NO_CREDS);
-                            break;
-                        default:
-                            publishProgress(ProgressCode.ERR_NO_INTERNET);
-                            break;
-                    }
-                }
-                return false;
+                availableFiles = tempContent.get(0).child(0).children();
+            } catch (Exception e) {
+                availableFiles = null;
             }
 
-            if (doc != null) {
+            //db input of available files + url's
+            if (availableFiles != null) {
 
-                //parse!
+                int position = 0;
+                datasource.open();
+                datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
 
-                //tempContent contains all found tables
-                Elements tempContent = doc.select("table[class=hyphenate]");
-                //first table is the wanted one for available files list
-                Elements availableFiles;
+                //sort and trim the list to max. 5 entries
+                ArrayList<Element> sortedFiles = preprocessFiles(availableFiles);
 
-                try {
-                    availableFiles = tempContent.get(0).child(0).children();
-                } catch (Exception e) {
-                    availableFiles = null;
+                //now distribute the contents of availableFiles into a new list for the selection spinner
+                for (Element row : sortedFiles) {
+                    //don't save more than 5 days of data!
+                    if (position > 4) break;
+
+                    String url;
+                    String tag;
+
+                    tag = row.child(0).text();
+                    url = row.child(0).child(0).attributes().get("href");
+
+                    //sql insert
+                    datasource.createRowLinks(position, tag, url);
+
+                    position++;
                 }
 
-                //db input of available files + url's
-                if (availableFiles != null) {
-
-                    int position = 0;
-                    datasource.open();
-                    datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
-
-                    //sort and trim the list to max. 5 entries
-                    ArrayList<Element> sortedFiles = preprocessFiles(availableFiles);
-
-                    //now distribute the contents of availableFiles into a new list for the selection spinner
-                    for (Element row : sortedFiles) {
-                        //don't save more than 5 days of data!
-                        if (position > 4) break;
-
-                        String url;
-                        String tag;
-
-                        tag = row.child(0).text();
-                        url = row.child(0).child(0).attributes().get("href");
-
-                        //sql insert
-                        datasource.createRowLinks(position, tag, url);
-
-                        position++;
-                    }
-
-                    datasource.close();
-                    return true;
-                } else return false;
+                datasource.close();
+                return true;
             } else return false;
+        } else return false;
     }
 
     public String refreshLastUpdate() {

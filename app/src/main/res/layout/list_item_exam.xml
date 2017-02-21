@@ -1,82 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/grade"
-        android:layout_gravity="left|center_vertical"
-        android:layout_alignParentRight="false"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="false"
-        android:textColor="@android:color/darker_gray"
-        android:text="small text"
-        android:layout_alignParentTop="true"
-        android:textStyle="bold"
-        android:layout_alignLeft="@+id/relativeLayout"
-        android:layout_alignTop="@+id/date"
-        android:paddingTop="4dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/date"
+        android:layout_alignLeft="@+id/relativeLayout"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignTop="@+id/date"
+        android:layout_centerVertical="true"
         android:layout_gravity="left|center_vertical"
-        android:textStyle="bold"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:paddingTop="4dp"
+        android:text="small text"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/darker_gray"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="left|center_vertical"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:visibility="visible"
-        android:layout_alignParentLeft="false"
-        android:layout_marginTop="10dp"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="5dp"
-        android:layout_alignParentTop="true" />
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:visibility="visible" />
 
     <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/relativeLayout"
-        android:layout_centerVertical="true"
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/grade"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp">
 
         <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Large Text"
-                android:id="@+id/subject"
-                android:layout_gravity="right|center_vertical"
-            android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="false"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp" />
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Large Text"
-                android:id="@+id/type"
-                android:layout_gravity="right|center_vertical"
-            android:layout_alignParentRight="false"
-                android:layout_alignParentLeft="true"
+            android:id="@+id/subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
-                android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp" />
-        </RelativeLayout>
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
+            android:layout_centerVertical="true"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </RelativeLayout>
+</RelativeLayout>

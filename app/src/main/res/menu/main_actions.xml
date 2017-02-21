@@ -19,12 +19,12 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_activate_filter"
-        android:title="@string/activate_filter"
-        android:checkable="true" />
+        android:checkable="true"
+        android:title="@string/activate_filter" />
     <item
         android:id="@+id/action_help"
-        android:title="@string/tutorial"
         android:icon="@drawable/ic_help"
+        android:title="@string/tutorial"
         app:showAsAction="ifRoom" />
     <!--<item
         android:id="@+id/tester"

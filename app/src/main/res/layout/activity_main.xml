@@ -2,91 +2,89 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <RelativeLayout
+            android:id="@+id/background"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/background"
             android:animateLayoutChanges="true">
 
             <RelativeLayout
+                android:id="@+id/toolbarLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/toolbarLayout">
+                android:layout_height="wrap_content">
 
                 <include
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:id="@+id/toolbar"
                     layout="@layout/view_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentTop="true" />
 
                 <com.masrepus.vplanapp.vplan.SlidingTabLayout
+                    android:id="@+id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tabs"
-                    android:background="?attr/colorPrimary"
-                    android:layout_below="@id/toolbar"/>
+                    android:layout_below="@id/toolbar"
+                    android:background="?attr/colorPrimary" />
             </RelativeLayout>
 
             <FrameLayout
+                android:id="@+id/frameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/frameLayout"
-                android:visibility="gone"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:layout_below="@id/toolbarLayout"
                 android:background="@color/blue"
                 android:clickable="true"
                 android:onClick="onFilterInfoClick"
-                android:layout_below="@id/toolbarLayout">
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/filterWarning"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/filterWarning"
                     android:layout_gravity="center"
-                    android:textStyle="italic"
                     android:text="small text"
-                    android:textColor="@android:color/primary_text_dark" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/primary_text_dark"
+                    android:textStyle="italic" />
             </FrameLayout>
 
             <ProgressBar
+                android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/progressBar"
+                android:layout_below="@+id/frameLayout"
                 android:indeterminateBehavior="cycle"
-                android:visibility="gone"
-                android:layout_below="@+id/frameLayout" />
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/welcome_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/no_data"
-                android:id="@+id/welcome_textView"
                 android:layout_centerInParent="true"
+                android:clickable="true"
                 android:gravity="center_horizontal"
                 android:onClick="refresh"
-                android:clickable="true"
+                android:text="@string/no_data"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:visibility="gone" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/progressBar">
-            </android.support.v4.view.ViewPager>
+                android:layout_below="@+id/progressBar"></android.support.v4.view.ViewPager>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/infoFab"
@@ -98,9 +96,9 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/ic_info"
-                app:fabSize="mini"
+                android:tint="?attr/tintFab"
                 app:borderWidth="0dp"
-                android:tint="?attr/tintFab" />
+                app:fabSize="mini" />
         </RelativeLayout>
 
         <android.support.design.widget.NavigationView
@@ -110,12 +108,11 @@
             android:layout_gravity="start"
             android:background="?attr/colorBackgroundLighter"
             android:showDividers="middle"
-            app:menu="@menu/drawer_full"
-            app:itemTextColor="?attr/text_selector"
-            app:itemIconTint="?attr/icon_selector"
+            android:visibility="gone"
             app:itemBackground="?attr/yellow_selector"
-            android:visibility="gone">
-        </android.support.design.widget.NavigationView>
+            app:itemIconTint="?attr/icon_selector"
+            app:itemTextColor="?attr/text_selector"
+            app:menu="@menu/drawer_full"></android.support.design.widget.NavigationView>
 
     </android.support.v4.widget.DrawerLayout>
 

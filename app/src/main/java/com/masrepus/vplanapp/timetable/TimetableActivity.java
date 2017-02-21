@@ -58,7 +58,8 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
 
         //set dark theme if requested
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) setTheme(R.style.ThemeDark);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false))
+            setTheme(R.style.ThemeDark);
         setContentView(R.layout.activity_timetable);
 
         //activate the view_toolbar
@@ -262,8 +263,10 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         String tableName = SQLiteHelperTimetable.DAYS[day];
 
         Cursor c = datasource.queryTimetable(tableName, new String[]{SQLiteHelperTimetable.COLUMN_LESSON}, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lesson + "'");
-        if (c.getCount() == 0) datasource.createRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
-        else Toast.makeText(this, getString(R.string.lesson_already_saved), Toast.LENGTH_SHORT).show();
+        if (c.getCount() == 0)
+            datasource.createRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
+        else
+            Toast.makeText(this, getString(R.string.lesson_already_saved), Toast.LENGTH_SHORT).show();
 
         datasource.close();
     }

@@ -624,7 +624,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(connectionResult -> Log.d("Google Services", "onConnectionFailed: " + connectionResult))
 
-                        //request access to the Wearable API
+                //request access to the Wearable API
                 .addApi(Wearable.API)
                 .build();
     }
@@ -1218,14 +1218,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void saveClass(AlertDialog dialog) {
 
         //get the entered class
-        String customClass = ((EditText)dialog.findViewById(R.id.classEditText)).getText().toString();
+        String customClass = ((EditText) dialog.findViewById(R.id.classEditText)).getText().toString();
         if (customClass.isEmpty()) {
             Toast.makeText(MainActivity.this, R.string.input_empty, Toast.LENGTH_LONG).show();
             return;
         }
 
         //remove leading Q if needed
-        if (customClass.charAt(0) == 'Q' && customClass.length() > 1) customClass = customClass.substring(1);
+        if (customClass.charAt(0) == 'Q' && customClass.length() > 1)
+            customClass = customClass.substring(1);
 
         //add the saved class to sharedprefs
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);

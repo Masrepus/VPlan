@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="ThemeYellow" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryDark">@color/yellow_dark</item>
@@ -13,13 +14,13 @@
         <item name="divider">@drawable/divider_y</item>
     </style>
 
-    <attr name="tintFab" format="reference"/>
-    <attr name="tintMenu" format="reference"/>
-    <attr name="colorBackgroundLighter" format="reference"/>
-    <attr name="yellow_selector" format="reference"/>
-    <attr name="icon_selector" format="reference"/>
-    <attr name="text_selector" format="reference"/>
-    <attr name="divider" format="reference"/>
+    <attr name="tintFab" format="reference" />
+    <attr name="tintMenu" format="reference" />
+    <attr name="colorBackgroundLighter" format="reference" />
+    <attr name="yellow_selector" format="reference" />
+    <attr name="icon_selector" format="reference" />
+    <attr name="text_selector" format="reference" />
+    <attr name="divider" format="reference" />
 
     <color name="colorBackgroundLighter_Y">#fffafafa</color>
     <color name="colorBackgroundLighter_D">#ff424242</color>
@@ -36,7 +37,7 @@
     <color name="blue">#274595</color>
     <color name="blue_focused">#2745d4</color>
     <color name="yellow_translucent">#aaf7dd2b</color>
-    
+
     <style name="ShowcaseTheme" parent="ShowcaseView.Light">
         <item name="sv_backgroundColor">#ccffffff</item>
         <item name="sv_showcaseColor">@color/blue</item>

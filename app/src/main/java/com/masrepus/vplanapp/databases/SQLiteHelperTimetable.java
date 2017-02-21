@@ -68,7 +68,8 @@ public class SQLiteHelperTimetable extends SQLiteOpenHelper {
     public void newTable(SQLiteDatabase db, String tableName) {
         db.execSQL("DROP TABLE IF EXISTS " + tableName);
         for (String weekday : DAYS) {
-            if (weekday.contentEquals(tableName)) db.execSQL(CREATE.replace(TABLENAME_WILDCARD, tableName));
+            if (weekday.contentEquals(tableName))
+                db.execSQL(CREATE.replace(TABLENAME_WILDCARD, tableName));
         }
 
         if (tableName.contentEquals(TABLE_ROOMS_ACTV)) db.execSQL(ROOMS_ACTV_CREATE);

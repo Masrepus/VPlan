@@ -90,7 +90,8 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
 
         //set dark theme if requested
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false)) setTheme(R.style.ThemeDark);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_dark_theme), false))
+            setTheme(R.style.ThemeDark);
         setContentView(R.layout.activity_exams);
 
         //activate the toolbar
@@ -399,8 +400,10 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         }
 
         //check success and notify the user
-        if (saved == exams.size()) Toast.makeText(this, getString(R.string.cal_insert_success), Toast.LENGTH_LONG).show();
-        else if (saved < exams.size()) Toast.makeText(this, (exams.size() - saved) + getString(R.string.cal_insert_error), Toast.LENGTH_LONG).show();
+        if (saved == exams.size())
+            Toast.makeText(this, getString(R.string.cal_insert_success), Toast.LENGTH_LONG).show();
+        else if (saved < exams.size())
+            Toast.makeText(this, (exams.size() - saved) + getString(R.string.cal_insert_error), Toast.LENGTH_LONG).show();
     }
 
     private ArrayList<Exam> getExams() {

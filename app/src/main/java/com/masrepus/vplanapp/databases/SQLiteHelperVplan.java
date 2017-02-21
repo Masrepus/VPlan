@@ -11,20 +11,9 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
     public static final String COLUMN_GRADE = "klasse";
     public static final String COLUMN_STUNDE = "stunde";
     public static final String COLUMN_STATUS = "status";
-    //VPlantable creation sql statement
-    private static final String VPLAN_0_CREATE = "create table "
-            + TABLE_VPLAN_0 + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_GRADE
-            + " text, " + COLUMN_STUNDE + " text, "
-            + COLUMN_STATUS + " text);";
     public static final String TABLE_LINKS = "linktable";
     public static final String COLUMN_TAG = "tag";
     public static final String COLUMN_URL = "url";
-    //linktable creation sql statement
-    private static final String LINK_CREATE = "create table "
-            + TABLE_LINKS + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_TAG
-            + " text, " + COLUMN_URL + " text);";
     public static final String TABLE_ANNOUNCEMENTS = "announcements";
     public static final String COLUMN_ANNOUNCEMENT = "announcement";
     //announcement table
@@ -33,37 +22,48 @@ public class SQLiteHelperVplan extends SQLiteOpenHelper {
             + " integer primary key autoincrement, " + COLUMN_ANNOUNCEMENT
             + " text);";
     public static final String TABLE_VPLAN_1 = "vplantable1";
+    public static final String TABLE_VPLAN_2 = "vplantable2";
+    public static final String TABLE_VPLAN_3 = "vplantable3";
+    public static final String TABLE_VPLAN_4 = "vplantable4";
+    public static final String[] tablesVplan = {TABLE_VPLAN_0, TABLE_VPLAN_1, TABLE_VPLAN_2, TABLE_VPLAN_3, TABLE_VPLAN_4};
+    public static final String DATABASE_UINFO = "uinfo.db";
+    public static final String DATABASE_MINFO = "minfo.db";
+    public static final String DATABASE_OINFO = "oinfo.db";
+    //VPlantable creation sql statement
+    private static final String VPLAN_0_CREATE = "create table "
+            + TABLE_VPLAN_0 + "(" + COLUMN_ID
+            + " integer primary key autoincrement, " + COLUMN_GRADE
+            + " text, " + COLUMN_STUNDE + " text, "
+            + COLUMN_STATUS + " text);";
+    //linktable creation sql statement
+    private static final String LINK_CREATE = "create table "
+            + TABLE_LINKS + "(" + COLUMN_ID
+            + " integer primary key autoincrement, " + COLUMN_TAG
+            + " text, " + COLUMN_URL + " text);";
     //VPlantable 1
     private static final String VPLAN_1_CREATE = "create table "
             + TABLE_VPLAN_1 + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
-    public static final String TABLE_VPLAN_2 = "vplantable2";
     //VPlantable 2
     private static final String VPLAN_2_CREATE = "create table "
             + TABLE_VPLAN_2 + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
-    public static final String TABLE_VPLAN_3 = "vplantable3";
     //VPlantable 3
     private static final String VPLAN_3_CREATE = "create table "
             + TABLE_VPLAN_3 + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
-    public static final String TABLE_VPLAN_4 = "vplantable4";
     //VPlantable 4
     private static final String VPLAN_4_CREATE = "create table "
             + TABLE_VPLAN_4 + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_GRADE
             + " text, " + COLUMN_STUNDE + " text, "
             + COLUMN_STATUS + " text);";
-    public static final String[] tablesVplan = {TABLE_VPLAN_0, TABLE_VPLAN_1, TABLE_VPLAN_2, TABLE_VPLAN_3, TABLE_VPLAN_4};
-    public static final String DATABASE_UINFO = "uinfo.db";
-    public static final String DATABASE_MINFO = "minfo.db";
-    public static final String DATABASE_OINFO = "oinfo.db";
     private static final int DATABASE_VERSION = 4;
 
     public SQLiteHelperVplan(Context context, String dbName) {

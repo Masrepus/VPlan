@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    android:paddingTop="10dp"
+    android:orientation="vertical"
     android:paddingBottom="10dp"
     android:paddingLeft="5dp"
-    android:paddingRight="5dp">
+    android:paddingRight="5dp"
+    android:paddingTop="10dp">
 
     <FrameLayout
+        android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/frame"
         android:paddingLeft="15dp"
         android:paddingRight="15dp">
 
         <TextView
+            android:id="@+id/lesson"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/lesson"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_gravity="left" />
+            android:layout_gravity="left"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
+            android:id="@+id/room"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/room"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </FrameLayout>
 
     <TextView
+        android:id="@+id/subject"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/subject"
         android:layout_below="@+id/frame"
         android:layout_centerHorizontal="true"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold" />
 
 </RelativeLayout>

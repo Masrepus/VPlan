@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:clickable="false"
     android:gravity="center">
 
     <TextView
+        android:id="@+id/itemTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/itemTV"
-        android:layout_gravity="center_horizontal|bottom"
-        android:paddingTop="13dp"
-        android:paddingBottom="13dp"
-        android:textColor="?android:attr/textColorSecondary"
         android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal|bottom"
         android:gravity="center_horizontal"
+        android:paddingBottom="13dp"
+        android:paddingLeft="10dp"
         android:paddingRight="25dp"
+        android:paddingTop="13dp"
         android:text="Text"
         android:textAlignment="center"
-        android:paddingLeft="10dp" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:attr/textColorSecondary" />
 </RelativeLayout>

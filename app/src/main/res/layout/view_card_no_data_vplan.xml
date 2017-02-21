@@ -1,57 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.CardView
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="6dp"
-    app:cardElevation="3dp"
-    app:cardUseCompatPadding="true"
-    app:cardBackgroundColor="?attr/colorBackgroundLighter"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    app:cardBackgroundColor="?attr/colorBackgroundLighter"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="3dp"
+    app:cardUseCompatPadding="true">
 
     <RelativeLayout
+        android:id="@+id/hiddenDataFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:clickable="true"
-        android:id="@+id/hiddenDataFrame">
+        android:clickable="true">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/no_data_today"
             android:id="@+id/nodataTV"
-            android:layout_gravity="center"
-            android:layout_centerHorizontal="true" />
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/hiddenItemsTV"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center"
+            android:text="@string/no_data_today"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/hiddenItemsTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/nodataTV"
             android:layout_centerHorizontal="true"
-            android:textColor="@android:color/darker_gray"
+            android:layout_gravity="center"
             android:clickable="false"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/darker_gray"
             android:textSize="20sp" />
     </RelativeLayout>
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/frameLayout"
         android:layout_gravity="bottom">
 
         <TextView
+            android:id="@+id/timeChangedTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/timeChangedTextView"
-            android:layout_toRightOf="@+id/nodataTV"
             android:layout_gravity="center"
+            android:layout_toRightOf="@+id/nodataTV"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="italic" />
     </FrameLayout>
 </android.support.v7.widget.CardView>

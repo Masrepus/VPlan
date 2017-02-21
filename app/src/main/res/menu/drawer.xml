@@ -7,19 +7,19 @@
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/vplan_appmode_item"
-                    android:title="@string/vplan"
                     android:checkable="true"
-                    android:icon="@drawable/ic_info_circle"/>
+                    android:icon="@drawable/ic_info_circle"
+                    android:title="@string/vplan" />
                 <item
                     android:id="@+id/exams_appmode_item"
-                    android:title="@string/exams"
                     android:checkable="true"
-                    android:icon="@drawable/ic_exams"/>
+                    android:icon="@drawable/ic_exams"
+                    android:title="@string/exams" />
                 <item
                     android:id="@+id/timetable_appmode_item"
-                    android:title="@string/timetable"
                     android:checkable="true"
-                    android:icon="@drawable/ic_timetable"/>
+                    android:icon="@drawable/ic_timetable"
+                    android:title="@string/timetable" />
             </group>
         </menu>
     </item>

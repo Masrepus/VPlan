@@ -289,7 +289,7 @@ public class DownloaderService extends Service {
         apiClient = new GoogleApiClient.Builder(this)
                 .addOnConnectionFailedListener(connectionResult -> Log.d("Google Services", "onConnectionFailed: " + connectionResult))
 
-                        //request access to the Wearable API
+                //request access to the Wearable API
                 .addApi(Wearable.API)
                 .build();
         apiClient.connect();

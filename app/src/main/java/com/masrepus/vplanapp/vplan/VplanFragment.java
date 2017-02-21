@@ -66,7 +66,8 @@ public class VplanFragment extends Fragment implements View.OnClickListener {
                     R.layout.view_card_vplan, container, false);
 
             //if there should be no data available after filtering, then inflate the no-data layout and mention the removed entries
-            if (listSizeBeforeFilter > 0) return inflateDataLayout(inflater, container, args, listSize, hiddenItemsCount, listSizeBeforeFilter, rootView);
+            if (listSizeBeforeFilter > 0)
+                return inflateDataLayout(inflater, container, args, listSize, hiddenItemsCount, listSizeBeforeFilter, rootView);
             else return inflateNoDataLayout(inflater, container, args);
         }
     }

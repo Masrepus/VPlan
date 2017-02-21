@@ -66,13 +66,12 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
 
             int maxLesson;
             if (tempRows.size() > 0) {
-                maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+                maxLesson = Integer.valueOf(tempRows.get(tempRows.size() - 1).getLesson());
 
                 //now save this value for the add lesson dialog
                 SharedPreferences pref = activity.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
                 pref.edit().putInt(SharedPrefs.MAX_LESSON + i, maxLesson).apply();
-            }
-            else maxLesson = 6;
+            } else maxLesson = 6;
 
             //check if the last lesson is lesson 6
             if (maxLesson <= 6) {
@@ -94,7 +93,7 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
             });
 
             //now get the current max lesson value as this might have changed
-            maxLesson = Integer.valueOf(tempRows.get(tempRows.size()-1).getLesson());
+            maxLesson = Integer.valueOf(tempRows.get(tempRows.size() - 1).getLesson());
 
             insertBreaks(tempRows, rows, maxLesson);
 
@@ -165,7 +164,7 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
 
         ArrayList<TimetableRow> cache = new ArrayList<>();
 
-        for (int lesson = 1; lesson <= Integer.valueOf(list.get(list.size()-1).getLesson()); lesson++) {
+        for (int lesson = 1; lesson <= Integer.valueOf(list.get(list.size() - 1).getLesson()); lesson++) {
 
             if (position > list.size() - 1) {
 

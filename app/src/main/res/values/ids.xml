@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <item type="id" name="TAG_DAY"/>
-    <item type="id" name="TAG_VPLAN_ID"/>
-    <item type="id" name="TAG_POSITION"/>
-    <item type="id" name="TAG_VIEWHOLDER"/>
-    <item type="id" name="TAG_VPLAN_MODE"/>
-    <item type="id" name="TAG_APPMODE"/>
-    <item type="id" name="TAG_DATE"/>
-    <item type="id" name="TAG_SUBJECT"/>
-    <item type="id" name="TAG_TYPE_FULL"/>
-    <item type="id" name="TAG_CALENDAR_ID"/>
+    <item name="TAG_DAY" type="id" />
+    <item name="TAG_VPLAN_ID" type="id" />
+    <item name="TAG_POSITION" type="id" />
+    <item name="TAG_VIEWHOLDER" type="id" />
+    <item name="TAG_VPLAN_MODE" type="id" />
+    <item name="TAG_APPMODE" type="id" />
+    <item name="TAG_DATE" type="id" />
+    <item name="TAG_SUBJECT" type="id" />
+    <item name="TAG_TYPE_FULL" type="id" />
+    <item name="TAG_CALENDAR_ID" type="id" />
 </resources>

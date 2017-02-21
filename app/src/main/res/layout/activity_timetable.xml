@@ -19,11 +19,11 @@
             android:layout_alignParentTop="true" />
 
         <com.masrepus.vplanapp.vplan.SlidingTabLayout
+            android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tabs"
-            android:background="?attr/colorPrimary"
-            android:layout_below="@id/toolbar"/>
+            android:layout_below="@id/toolbar"
+            android:background="?attr/colorPrimary" />
 
         <RelativeLayout
             android:id="@+id/background"
@@ -34,8 +34,7 @@
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </android.support.v4.view.ViewPager>
+                android:layout_height="match_parent"></android.support.v4.view.ViewPager>
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -56,9 +55,9 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/fab_ic_add"
-                app:fabSize="normal"
+                android:tint="?attr/tintFab"
                 app:borderWidth="0dp"
-                android:tint="?attr/tintFab" />
+                app:fabSize="normal" />
 
 
         </RelativeLayout>
@@ -71,10 +70,9 @@
         android:layout_gravity="start"
         android:background="?attr/colorBackgroundLighter"
         android:showDividers="middle"
-        app:menu="@menu/drawer_full"
-        app:itemTextColor="?attr/text_selector"
-        app:itemIconTint="?attr/icon_selector"
+        android:visibility="gone"
         app:itemBackground="?attr/yellow_selector"
-        android:visibility="gone">
-    </android.support.design.widget.NavigationView>
+        app:itemIconTint="?attr/icon_selector"
+        app:itemTextColor="?attr/text_selector"
+        app:menu="@menu/drawer_full"></android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

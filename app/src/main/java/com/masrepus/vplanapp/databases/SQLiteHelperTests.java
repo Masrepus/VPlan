@@ -19,6 +19,7 @@ public class SQLiteHelperTests extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_SUBJECT = "subject";
+    public static final String DATABASE_TESTS = "tests.db";
     private static final String CREATE_UINFO_MINFO = "create table "
             + TABLE_TESTS_UINFO_MINFO + "(" + SQLiteHelperVplan.COLUMN_ID
             + " integer primary key autoincrement, " + SQLiteHelperVplan.COLUMN_GRADE
@@ -27,7 +28,6 @@ public class SQLiteHelperTests extends SQLiteOpenHelper {
             + TABLE_TESTS_OINFO + "(" + SQLiteHelperVplan.COLUMN_ID
             + " integer primary key autoincrement, " + SQLiteHelperVplan.COLUMN_GRADE
             + " text, " + COLUMN_TYPE + " text, " + COLUMN_SUBJECT + " text, " + COLUMN_DATE + " text);";
-    public static final String DATABASE_TESTS = "tests.db";
     private static final int DATABASE_VERSION = 1;
 
 
