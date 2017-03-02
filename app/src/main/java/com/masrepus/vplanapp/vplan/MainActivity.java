@@ -1374,15 +1374,31 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             //recreate the pageradapter
             ViewPager pager = (ViewPager) findViewById(R.id.pager);
             pager.setAdapter(null);
-            pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
 
-            //now start the adapter loading in a separate thread
-            new PagerAdapterLoader().execute(this);
+            //check whether we have data for this day
+            datasource.open();
+            if (!datasource.hasData(SQLiteHelper.TABLE_LINKS, requestedVplanMode)) {
+                TextView welcome = (TextView) findViewById(R.id.welcome_textView);
+                welcome.setVisibility(View.VISIBLE);
 
-            //load the right last-update timestamp
-            String lastUpdate = getString(R.string.last_update) + " " + getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
-            NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
-            drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
+                //clear the tab layout
+                SlidingTabLayout tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+                tabs.setCustomTabColorizer(position -> getColor(getResources(), R.color.blue, getTheme()));
+                tabs.setDistributeEvenly(true);
+                tabs.setViewPager(null);
+            } else {
+
+                pager.setAdapter(new LoadingAdapter(getSupportFragmentManager()));
+
+                //now start the adapter loading in a separate thread
+                new PagerAdapterLoader().execute(this);
+
+                //load the right last-update timestamp
+                String lastUpdate = getString(R.string.last_update) + " " + getSharedPreferences(SharedPrefs.PREFS_NAME, 0).getString(SharedPrefs.PREFIX_LAST_UPDATE + appMode + requestedVplanMode, "");
+                NavigationView drawer = (NavigationView) findViewById(R.id.drawer_left);
+                drawer.getMenu().findItem(R.id.lastUpdate).setTitle(lastUpdate);
+            }
+            datasource.close();
         } //else just ignore the click
     }
 
