@@ -14,7 +14,7 @@ import android.util.Log;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 3;
     public static final String DB_NAME = "vplan.db";
 
     public static final String TABLE_VPLAN = "vplantable";
@@ -140,7 +140,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
 
     }
 
