@@ -42,7 +42,7 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
         for (int i = 0; i < 5; i++) {
 
             ArrayList<TimetableRow> tempRows = new ArrayList<>();
-            Cursor c = datasource.query(false, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_LESSON, SQLiteHelper.COLUMN_SUBJECT, SQLiteHelper.COLUMN_ROOM});
+            Cursor c = datasource.query(false, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_LESSON, SQLiteHelper.COLUMN_SUBJECT, SQLiteHelper.COLUMN_ROOM}, SQLiteHelper.COLUMN_DAY + "=" + i);
 
             //iterate through all of this day's timetable entries and add them to the arraylist
             while (c.moveToNext()) {
