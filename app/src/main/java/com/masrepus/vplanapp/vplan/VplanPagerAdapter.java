@@ -108,7 +108,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         datasource.open();
 
-        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN)) {
+        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN, vplanMode)) {
 
             //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
             hasData = true;

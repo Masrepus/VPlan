@@ -184,7 +184,7 @@ public class DownloaderService extends Service {
 
         //query the data for the right vplan -> get requested table name by passed arg
 
-        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN)) {
+        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN, vplanMode)) {
 
             Cursor c = datasource.query(false, SQLiteHelper.TABLE_VPLAN, new String[]{SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_LESSON,
                     SQLiteHelper.COLUMN_STATUS}, lastRequestedVplanMode);

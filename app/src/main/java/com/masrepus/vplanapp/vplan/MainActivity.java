@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         //activate adapter for viewPager
-        if (!datasource.hasData(SQLiteHelper.TABLE_LINKS)) {
+        if (!datasource.hasData(SQLiteHelper.TABLE_LINKS, requestedVplanMode)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
             welcome.setVisibility(View.VISIBLE);
         }
@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         DataMap dataMap = new DataMap();
 
-        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN)) {
+        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN, requestedVplanMode)) {
 
             //get this day's vplan
             Cursor c = datasource.query(false, SQLiteHelper.TABLE_VPLAN, new String[]{SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_LESSON,

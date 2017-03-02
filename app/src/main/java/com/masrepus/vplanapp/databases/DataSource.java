@@ -190,4 +190,19 @@ public class DataSource {
     public boolean hasData(String tablename) {
         return DatabaseUtils.queryNumEntries(database, tablename) > 0;
     }
+
+    public boolean hasData(String tablename, int requestedVplanMode) {
+        Cursor c = database.query(
+                tablename,
+                null,
+                SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + requestedVplanMode,
+                null,
+                null,
+                null,
+                null);
+        boolean hasData = c.moveToNext();
+
+        c.close();
+        return hasData;
+    }
 }
