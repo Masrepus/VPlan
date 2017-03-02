@@ -33,7 +33,7 @@ import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 import com.masrepus.vplanapp.vplan.MainActivity;
 import com.masrepus.vplanapp.vplan.Row;
 
@@ -133,7 +133,7 @@ public class DownloaderService extends Service {
 
         //get the number of available days
         datasource.open();
-        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_LINKS, new String[]{SQLiteHelper.COLUMN_ID}, lastRequestedVplanMode);
         int count = c.getCount();
         if (count > 5) count = 5; //max 5 items
 
@@ -183,12 +183,11 @@ public class DownloaderService extends Service {
         DataMap dataMap = new DataMap();
 
         //query the data for the right vplan -> get requested table name by passed arg
-        String tableName = SQLiteHelperVplan.tablesVplan[id];
 
-        if (datasource.hasData(tableName)) {
+        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN)) {
 
-            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
-                    SQLiteHelperVplan.COLUMN_STATUS});
+            Cursor c = datasource.query(false, SQLiteHelper.TABLE_VPLAN, new String[]{SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_LESSON,
+                    SQLiteHelper.COLUMN_STATUS}, lastRequestedVplanMode);
 
             ArrayList<Row> tempList = new ArrayList<>();
 
@@ -202,13 +201,13 @@ public class DownloaderService extends Service {
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    String help = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
                     if (help.contentEquals("Klasse")) continue;
                     if (help.contentEquals("")) continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_LESSON)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_STATUS)));
 
                     tempList.add(row);
                 }
@@ -267,13 +266,13 @@ public class DownloaderService extends Service {
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    String help = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
                     if (help.contentEquals("Klasse")) continue;
                     if (help.contentEquals("")) continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_LESSON)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_STATUS)));
 
                     dataMap.putDataMap(String.valueOf(position), row.putToDataMap(new DataMap()));
                     position++;

@@ -20,8 +20,7 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.constants.XmlTags;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperTests;
-import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 import com.masrepus.vplanapp.vplan.MainActivity;
 
 import org.jsoup.HttpStatusException;
@@ -113,11 +112,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         this.context = context[0];
         datasource = new DataSource(this.context);
 
-        //clear the announcements table
-        datasource.open();
-        datasource.newTable(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS);
-        datasource.close();
-
         SharedPreferences pref = this.context.getSharedPreferences(SharedPrefs.PREFS_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
@@ -166,8 +160,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         //clear all existing data
         datasource.open();
-        datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
-        datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
+        datasource.newTable(SQLiteHelper.TABLE_TESTS);
         datasource.close();
 
         boolean success = false;
@@ -240,10 +233,12 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         if (isCancelled()) return false;
 
+        //clear the current announcements
         datasource.open();
+        datasource.delete(SQLiteHelper.TABLE_ANNOUNCEMENTS, requestedVplanMode);
 
         //look up the current url's
-        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_URL});
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_LINKS, new String[]{SQLiteHelper.COLUMN_URL}, requestedVplanMode);
 
         total_downloads = c.getCount();
         downloaded_files = 0;
@@ -254,7 +249,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             //load every available vplan into the db
             requestedVplanId = c.getPosition();
-            currentVPlanLink = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_URL));
+            currentVPlanLink = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_URL));
 
             editor.putInt(SharedPrefs.REQUESTED_VPLAN_ID, requestedVplanId)
                     .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
@@ -326,7 +321,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             //check whether existing test data must be wiped because this is the first round
             if (!downloadedUinfoMinfo) {
-                datasource.newTable(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO);
+                datasource.delete(SQLiteHelper.TABLE_TESTS, VplanModes.MINFO);
             }
 
             for (TextNode node : testNodes) {
@@ -358,7 +353,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                     //TODO verursacht Build-Fehler subject = subject.replace('\uFFFD', 'ö');
 
-                    datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, grade, date, subject, type);
+                    datasource.createRowTests(VplanModes.UINFO_MINFO, grade, date, subject, type);
                 }
             }
 
@@ -472,7 +467,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         //save the current announcements
         datasource.open();
-        datasource.createRowAnnouncements(requestedVplanId, announcements);
+        datasource.createRowAnnouncements(requestedVplanMode, requestedVplanId, announcements);
         datasource.close();
 
         //get timePublished timestamp
@@ -529,7 +524,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         datasource.open();
 
-        clearExistingTable();
+        //clear the entries for this day
+        datasource.delete(SQLiteHelper.TABLE_VPLAN, SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + requestedVplanMode + " and " + SQLiteHelper.COLUMN_ID + "=" + requestedVplanId);
 
         //iterate through the items
         for (Element item : items) {
@@ -568,30 +564,8 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         if (stunde != null && !klasse.contentEquals("Klasse")) {
 
             if (requestedVplanId <= 4) {
-                datasource.createRowVplan(SQLiteHelperVplan.tablesVplan[requestedVplanId], stunde, klasse, status);
+                datasource.createRowVplan(requestedVplanId, requestedVplanMode, stunde, klasse, status);
             }
-        }
-    }
-
-    public void clearExistingTable() {
-
-        //clear the existing table for the requested vplan
-        switch (requestedVplanId) {
-            case 0:
-                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_0);
-                break;
-            case 1:
-                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_1);
-                break;
-            case 2:
-                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_2);
-                break;
-            case 3:
-                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_3);
-                break;
-            case 4:
-                datasource.newTable(SQLiteHelperVplan.TABLE_VPLAN_4);
-                break;
         }
     }
 
@@ -647,7 +621,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             //check whether existing test data must be wiped because this is the first round
             if (!downloaded11 && !downloaded12) {
-                datasource.newTable(SQLiteHelperTests.TABLE_TESTS_OINFO);
+                datasource.delete(SQLiteHelper.TABLE_TESTS, VplanModes.OINFO);
             }
 
             //iterate through the rows
@@ -689,12 +663,13 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     }
 
                     //now check whether we got this in the db already (5xy courses are treated as grade 12)
-                    Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_SUBJECT}, SQLiteHelperTests.COLUMN_SUBJECT + " = " + "'" + course + "'");
+                    Cursor c = datasource.query(false, SQLiteHelper.TABLE_TESTS, new String[]{SQLiteHelper.COLUMN_SUBJECT}, SQLiteHelper.COLUMN_SUBJECT + " = " + "'" + course + "'");
                     if (c.getCount() > 0) isNeeded = false;
+                    c.close();
 
                     //sql insert, but skip this if the course column is empty
                     if (!course.contentEquals("\u00a0") && isNeeded) {
-                        datasource.createRowTests(SQLiteHelperTests.TABLE_TESTS_OINFO, grade, date, course, context.getString(R.string.standard_test_abbrev)); //in oinfo, all tests are of the same type and grade is not relevant
+                        datasource.createRowTests(VplanModes.OINFO, grade, date, course, context.getString(R.string.standard_test_abbrev)); //in oinfo, all tests are of the same type and grade is not relevant
                     }
                 }
             }
@@ -705,11 +680,10 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     public void parseVplan(Elements tableRows) {
 
         if (tableRows != null) {
-            int position = 0;
 
             datasource.open();
 
-            clearExistingTable();
+            datasource.delete(SQLiteHelper.TABLE_VPLAN, SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + requestedVplanMode + " and " + SQLiteHelper.COLUMN_ID + "=" + requestedVplanId);
 
             for (Element row : tableRows) {
 
@@ -741,8 +715,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 }
 
                 insertVplanRow(stunde, klasse, status);
-
-                position++;
             }
             datasource.close();
         }
@@ -754,7 +726,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
             int position = 0;
             datasource.open();
-            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+            datasource.delete(SQLiteHelper.TABLE_LINKS, requestedVplanMode);
 
             //sort the entries
             ArrayList<Element> sortedFiles = preprocessFiles(availableFiles);
@@ -772,7 +744,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 url = row.child(0).child(0).attributes().get("href");
 
                 //sql insert
-                datasource.createRowLinks(position, tag, url);
+                datasource.createRowLinks(requestedVplanMode, position, tag, url);
 
                 position++;
             }
@@ -993,7 +965,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
                 int position = 0;
                 datasource.open();
-                datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+                datasource.delete(SQLiteHelper.TABLE_LINKS, requestedVplanMode);
 
                 //sort and trim the list to max. 5 entries
                 ArrayList<Element> sortedFiles = preprocessFiles(availableFiles);
@@ -1010,7 +982,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     url = row.child(0).child(0).attributes().get("href");
 
                     //sql insert
-                    datasource.createRowLinks(position, tag, url);
+                    datasource.createRowLinks(requestedVplanMode, position, tag, url);
 
                     position++;
                 }

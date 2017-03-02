@@ -52,7 +52,7 @@ import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperTests;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.settings.SettingsPrefListener;
@@ -413,8 +413,8 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
         ArrayList<Exam> exams = new ArrayList<>();
 
-        //get the data from both test tables
-        Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
+        //get the data from the test table
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_TESTS, new String[]{SQLiteHelper.COLUMN_DAY, SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_TYPE, SQLiteHelper.COLUMN_SUBJECT});
 
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -426,29 +426,10 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         while (c.moveToNext()) {
 
             try {
-                dateString = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
-                grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
-                type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
-                subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
-
-                date = format.parse(dateString);
-
-                //grade + type + subject goes to the title
-                exams.add(new Exam(date.getTime(), grade + ": " + type + " in " + subject));
-            } catch (ParseException ignored) {
-            }
-        }
-
-        //now oinfo
-        c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
-
-        while (c.moveToNext()) {
-
-            try {
-                dateString = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
-                grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
-                type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
-                subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
+                dateString = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_DAY));
+                grade = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
+                type = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_TYPE));
+                subject = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_SUBJECT));
 
                 date = format.parse(dateString);
 
@@ -550,8 +531,8 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
 
         ArrayList<ExamsRow> examsList = new ArrayList<>();
 
-        //get the data from both test tables
-        Cursor c = datasource.query(SQLiteHelperTests.TABLE_TESTS_UINFO_MINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
+        //get the data from the test table
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_TESTS, new String[]{SQLiteHelper.COLUMN_DAY, SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_TYPE, SQLiteHelper.COLUMN_SUBJECT});
 
         Date today = Calendar.getInstance().getTime();
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
@@ -559,7 +540,7 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
         //fill arraylist
         while (c.moveToNext()) {
 
-            String date = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
+            String date = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_DAY));
 
             //if requested, skip old entries
             if (noOldItems) {
@@ -574,36 +555,9 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
 
-            String subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
-            String type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
-            String grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
-
-            ExamsRow row = new ExamsRow(date, grade, subject, type);
-            examsList.add(row);
-        }
-
-        c = datasource.query(SQLiteHelperTests.TABLE_TESTS_OINFO, new String[]{SQLiteHelperTests.COLUMN_DATE, SQLiteHelperTests.COLUMN_GRADE, SQLiteHelperTests.COLUMN_TYPE, SQLiteHelperTests.COLUMN_SUBJECT});
-
-        while (c.moveToNext()) {
-
-            String date = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_DATE));
-
-            //if requested, skip old entries
-            if (noOldItems) {
-                Date currDate;
-                try {
-                    currDate = format.parse(date);
-                } catch (ParseException e) {
-                    currDate = null;
-                }
-                if (currDate != null) {
-                    if (currDate.before(today)) continue;
-                }
-            }
-
-            String subject = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_SUBJECT));
-            String type = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_TYPE));
-            String grade = c.getString(c.getColumnIndex(SQLiteHelperTests.COLUMN_GRADE));
+            String subject = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_SUBJECT));
+            String type = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_TYPE));
+            String grade = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
 
             ExamsRow row = new ExamsRow(date, grade, subject, type);
             examsList.add(row);

@@ -73,7 +73,7 @@ import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.Tutorial;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.network.AsyncDownloader;
 import com.masrepus.vplanapp.network.DownloaderService;
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         datasource.open();
         //delete the urls in linktable if this the first time running after the update(resolve crash)
         if (18 > pref.getInt(SharedPrefs.LAST_VERSION_RUN, 0)) {
-            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+            datasource.delete(SQLiteHelper.TABLE_LINKS, requestedVplanMode);
         }
         try {
             //save the current version code in shared prefs
@@ -195,14 +195,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         //prevent crash if linktable not present
         try {
-            datasource.hasData(SQLiteHelperVplan.TABLE_LINKS);
+            datasource.hasData(SQLiteHelper.TABLE_LINKS);
         } catch (Exception e) {
             //no data there and no table to be found, fix this
-            datasource.newTable(SQLiteHelperVplan.TABLE_LINKS);
+            datasource.newTable(SQLiteHelper.TABLE_LINKS);
         }
 
         //activate adapter for viewPager
-        if (!datasource.hasData(SQLiteHelperVplan.TABLE_LINKS)) {
+        if (!datasource.hasData(SQLiteHelper.TABLE_LINKS)) {
             TextView welcome = (TextView) findViewById(R.id.welcome_textView);
             welcome.setVisibility(View.VISIBLE);
         }
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         //get the number of available days
         datasource.open();
-        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_LINKS, new String[]{SQLiteHelper.COLUMN_ID}, requestedVplanMode);
         int count = c.getCount();
         if (count > 5) count = 5; //max 5 items!
 
@@ -469,13 +469,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         DataMap dataMap = new DataMap();
 
-        //query the data for the right vplan -> get requested table name by passed arg
-        String tableName = SQLiteHelperVplan.tablesVplan[id];
+        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN)) {
 
-        if (datasource.hasData(tableName)) {
-
-            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
-                    SQLiteHelperVplan.COLUMN_STATUS});
+            //get this day's vplan
+            Cursor c = datasource.query(false, SQLiteHelper.TABLE_VPLAN, new String[]{SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_LESSON,
+                    SQLiteHelper.COLUMN_STATUS}, SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + requestedVplanMode + " and " + SQLiteHelper.COLUMN_ID + "=" + id);
 
             ArrayList<Row> tempList = new ArrayList<>();
 
@@ -489,13 +487,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    String help = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
                     if (help.contentEquals("Klasse")) continue;
                     if (help.contentEquals("")) continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_LESSON)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_STATUS)));
 
                     tempList.add(row);
                 }
@@ -510,13 +508,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     Row row = new Row();
 
                     //only add to list if row isn't null
-                    String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+                    String help = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
                     if (help.contentEquals("Klasse")) continue;
                     if (help.contentEquals("")) continue;
 
-                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+                    row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS)));
+                    row.setStunde(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_LESSON)));
+                    row.setStatus(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_STATUS)));
 
                     dataMap.putDataMap(String.valueOf(position), row.putToDataMap(new DataMap()));
                     position++;
@@ -1404,10 +1402,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         String announcements;
         datasource.open();
 
-        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_ANNOUNCEMENTS, new String[]{SQLiteHelperVplan.COLUMN_ANNOUNCEMENT});
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_ANNOUNCEMENTS, new String[]{SQLiteHelper.COLUMN_STATUS}, SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + requestedVplanMode + " and " + SQLiteHelper.COLUMN_ID + "=" + position);
         try {
-            c.moveToPosition(position);
-            announcements = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_ANNOUNCEMENT));
+            c.moveToNext();
+            announcements = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_STATUS));
 
             datasource.close();
 

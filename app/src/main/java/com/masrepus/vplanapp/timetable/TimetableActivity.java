@@ -33,7 +33,7 @@ import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperTimetable;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 import com.masrepus.vplanapp.exams.ExamsActivity;
 import com.masrepus.vplanapp.settings.SettingsActivity;
 import com.masrepus.vplanapp.settings.SettingsPrefListener;
@@ -229,18 +229,22 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         DataSource datasource = new DataSource(this);
         datasource.open();
 
-        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_SUBJECT});
+        //get all distinct subjects and rooms
+        //first subjects
+        Cursor c = datasource.query(true, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_SUBJECT});
         ArrayList<String> subjects = new ArrayList<>();
-
-        while (c.moveToNext()) {
-            subjects.add(c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_SUBJECT)));
-        }
-
-        c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_ROOMS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_ROOM});
         ArrayList<String> rooms = new ArrayList<>();
 
         while (c.moveToNext()) {
-            rooms.add(c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_ROOM)));
+            subjects.add(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_SUBJECT)));
+        }
+        c.close();
+
+        //now rooms
+        c = datasource.query(true, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_ROOM});
+
+        while (c.moveToNext()) {
+            rooms.add(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_ROOM)));
         }
 
         datasource.close();
@@ -260,11 +264,9 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         datasource.open();
 
         //save the lesson details in the timetable db, if it doesn't exist already
-        String tableName = SQLiteHelperTimetable.DAYS[day];
-
-        Cursor c = datasource.queryTimetable(tableName, new String[]{SQLiteHelperTimetable.COLUMN_LESSON}, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lesson + "'");
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_LESSON}, SQLiteHelper.COLUMN_LESSON + "='" + lesson + "' and " + SQLiteHelper.COLUMN_DAY + "=" + day);
         if (c.getCount() == 0)
-            datasource.createRowTimetable(tableName, String.valueOf(lesson), String.valueOf(subject), room);
+            datasource.createRowTimetable(day, String.valueOf(lesson), String.valueOf(subject), room);
         else
             Toast.makeText(this, getString(R.string.lesson_already_saved), Toast.LENGTH_SHORT).show();
 
@@ -315,31 +317,6 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         MyNumberPicker lessonPicker = (MyNumberPicker) alertDialog.findViewById(R.id.lessonPicker);
 
         addLesson(datasource, day, lessonPicker.getLesson(), subjectACTV.getText().toString(), roomACTV.getText().toString());
-
-        saveSubject(datasource, subjectACTV.getText().toString());
-        saveRoom(datasource, roomACTV.getText().toString());
-    }
-
-    private void saveRoom(DataSource datasource, String room) {
-
-        //add this room to the database if it doesn't exist already
-        datasource.open();
-        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_ROOMS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_ROOM}, SQLiteHelperTimetable.COLUMN_ROOM + "='" + room + "'");
-
-        if (c.getCount() == 0) datasource.addRoom(room);
-
-        datasource.close();
-    }
-
-    private void saveSubject(DataSource datasource, String subject) {
-
-        //add this subject to the database if it doesn't exist already
-        datasource.open();
-        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_SUBJECT}, SQLiteHelperTimetable.COLUMN_SUBJECT + "='" + subject + "'");
-
-        if (c.getCount() == 0) datasource.addSubject(subject);
-
-        datasource.close();
     }
 
     @Override
@@ -419,18 +396,22 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         DataSource datasource = new DataSource(this);
         datasource.open();
 
-        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_SUBJECTS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_SUBJECT});
+        //get all distinct subjects and rooms
+        //first subjects
+        Cursor c = datasource.query(true, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_SUBJECT});
         ArrayList<String> subjects = new ArrayList<>();
-
-        while (c.moveToNext()) {
-            subjects.add(c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_SUBJECT)));
-        }
-
-        c = datasource.queryTimetable(SQLiteHelperTimetable.TABLE_ROOMS_ACTV, new String[]{SQLiteHelperTimetable.COLUMN_ROOM});
         ArrayList<String> rooms = new ArrayList<>();
 
         while (c.moveToNext()) {
-            rooms.add(c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_ROOM)));
+            subjects.add(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_SUBJECT)));
+        }
+        c.close();
+
+        //now rooms
+        c = datasource.query(true, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_ROOM});
+
+        while (c.moveToNext()) {
+            rooms.add(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_ROOM)));
         }
 
         datasource.close();
@@ -453,24 +434,21 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         //db insert
         datasource.open();
 
-        Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.DAYS[day], new String[]{SQLiteHelperTimetable.COLUMN_LESSON}, SQLiteHelperTimetable.COLUMN_LESSON + "='" + lessonPicker.getLesson() + "'");
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_LESSON}, SQLiteHelper.COLUMN_LESSON + "='" + lessonPicker.getLesson() + "' and " + SQLiteHelper.COLUMN_DAY + "=" + day);
 
         //check if there is an entry in that lesson
         if (c.getCount() == 0) {
-            datasource.updateRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString(), editingRow);
-
-            saveSubject(datasource, subjectACTV.getText().toString());
-            saveRoom(datasource, roomACTV.getText().toString());
+            datasource.updateRowTimetable(day, String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString(), editingRow);
         } else {
 
             //first delete the data that was in that lesson
-            datasource.deleteRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()));
+            datasource.deleteRowTimetable(day, String.valueOf(lessonPicker.getLesson()));
 
             //now delete this row's old data
-            datasource.deleteRowTimetable(SQLiteHelperTimetable.DAYS[day], oldData.getLesson());
+            datasource.deleteRowTimetable(day, oldData.getLesson());
 
             //now save the new data
-            datasource.createRowTimetable(SQLiteHelperTimetable.DAYS[day], String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString());
+            datasource.createRowTimetable(day, String.valueOf(lessonPicker.getLesson()), subjectACTV.getText().toString(), roomACTV.getText().toString());
 
         }
 
@@ -487,11 +465,10 @@ public class TimetableActivity extends AppCompatActivity implements View.OnClick
         //find out the currently visible day
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         int position = pager.getCurrentItem();
-        String tableName = SQLiteHelperTimetable.DAYS[position];
 
         //delete the row in this day's timetable that contains this lesson attribute
         datasource.open();
-        datasource.deleteRowTimetable(tableName, lesson);
+        datasource.deleteRowTimetable(position, lesson);
         datasource.close();
 
         TimetablePagerAdapter adapter = new TimetablePagerAdapter(this, getSupportFragmentManager());

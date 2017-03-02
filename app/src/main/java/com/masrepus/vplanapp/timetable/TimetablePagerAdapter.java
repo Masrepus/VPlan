@@ -11,7 +11,7 @@ import com.masrepus.vplanapp.R;
 import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperTimetable;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,14 +42,14 @@ public class TimetablePagerAdapter extends FragmentStatePagerAdapter {
         for (int i = 0; i < 5; i++) {
 
             ArrayList<TimetableRow> tempRows = new ArrayList<>();
-            Cursor c = datasource.queryTimetable(SQLiteHelperTimetable.DAYS[i], new String[]{SQLiteHelperTimetable.COLUMN_LESSON, SQLiteHelperTimetable.COLUMN_SUBJECT, SQLiteHelperTimetable.COLUMN_ROOM});
+            Cursor c = datasource.query(false, SQLiteHelper.TABLE_TIMETABLE, new String[]{SQLiteHelper.COLUMN_LESSON, SQLiteHelper.COLUMN_SUBJECT, SQLiteHelper.COLUMN_ROOM});
 
             //iterate through all of this day's timetable entries and add them to the arraylist
             while (c.moveToNext()) {
 
-                String lesson = c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_LESSON));
-                String subject = c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_SUBJECT));
-                String room = c.getString(c.getColumnIndex(SQLiteHelperTimetable.COLUMN_ROOM));
+                String lesson = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_LESSON));
+                String subject = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_SUBJECT));
+                String room = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_ROOM));
 
                 tempRows.add(new TimetableRow(lesson, subject, room));
             }

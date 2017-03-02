@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -15,7 +14,7 @@ import com.masrepus.vplanapp.constants.Args;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
 import com.masrepus.vplanapp.databases.DataSource;
-import com.masrepus.vplanapp.databases.SQLiteHelperVplan;
+import com.masrepus.vplanapp.databases.SQLiteHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
 
         //get the amount of available days from database
         datasource.open();
-        Cursor c = datasource.query(SQLiteHelperVplan.TABLE_LINKS, new String[]{SQLiteHelperVplan.COLUMN_ID});
+        Cursor c = datasource.query(false, SQLiteHelper.TABLE_LINKS, new String[]{SQLiteHelper.COLUMN_ID}, vplanMode);
         count = c.getCount();
         datasource.close();
 
@@ -108,16 +107,15 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
     public void fillWithData(int id) {
 
         datasource.open();
-        String tableName = getTableName(id);
 
-        if (datasource.hasData(tableName)) {
+        if (datasource.hasData(SQLiteHelper.TABLE_VPLAN)) {
 
             //set hasData to true so that the adapter loader knows whether to disable the welcome tv or not
             hasData = true;
 
             //open the db cursor
-            Cursor c = datasource.query(tableName, new String[]{SQLiteHelperVplan.COLUMN_ID, SQLiteHelperVplan.COLUMN_GRADE, SQLiteHelperVplan.COLUMN_STUNDE,
-                    SQLiteHelperVplan.COLUMN_STATUS});
+            Cursor c = datasource.query(false, SQLiteHelper.TABLE_VPLAN, new String[]{SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_CLASS, SQLiteHelper.COLUMN_LESSON,
+                    SQLiteHelper.COLUMN_STATUS}, SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + vplanMode + " and " + SQLiteHelper.COLUMN_ID + "=" + id);
 
             ArrayList<Row> list = new ArrayList<>();
             ArrayList<Row> tempList = new ArrayList<>();
@@ -156,47 +154,18 @@ public class VplanPagerAdapter extends FragmentStatePagerAdapter {
             Row row = new Row();
 
             //only add to list if row isn't null
-            String help = c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE));
+            String help = c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS));
             if (help.contentEquals("Klasse")) continue;
             if (help.contentEquals("")) continue;
 
-            row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_GRADE)));
-            row.setStunde(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STUNDE)));
-            row.setStatus(c.getString(c.getColumnIndex(SQLiteHelperVplan.COLUMN_STATUS)));
+            row.setKlasse(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_CLASS)));
+            row.setStunde(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_LESSON)));
+            row.setStatus(c.getString(c.getColumnIndex(SQLiteHelper.COLUMN_STATUS)));
 
             tempList.add(row);
         }
 
         return tempList;
-    }
-
-    @NonNull
-    private String getTableName(int id) {
-        //query the data for the right vplan -> get requested table name by passed arg
-        String tableName;
-
-        switch (id) {
-
-            case 0:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
-                break;
-            case 1:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_1;
-                break;
-            case 2:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_2;
-                break;
-            case 3:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_3;
-                break;
-            case 4:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_4;
-                break;
-            default:
-                tableName = SQLiteHelperVplan.TABLE_VPLAN_0;
-                break;
-        }
-        return tableName;
     }
 
     private void applyFilter(int id, ArrayList<Row> list, ArrayList<Row> tempList) {
