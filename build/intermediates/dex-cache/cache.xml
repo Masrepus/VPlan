@@ -3,75 +3,253 @@
 
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\a691b9350706a62518d083e2b27e4b27a500c162\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/6.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="0fb891e8f0cfba0513043a7bb357513d229ca2cd">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_1028a8e51fd968981122afbe663f4de552adb564.jar" />
+        revision="25.0.2"
+        sha1="7f6b28afa77b0bc611cfd7f0014520370540c518">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/7.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\6252118ac8d369c1bd08a82b1c943ce8ab4b2268\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/23.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="02741d05d4b697fba5e279e9881aaa1da0ca7c7f">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_67b993691798d177f56d21df54dffe1654290acd.jar" />
+        revision="25.0.2"
+        sha1="54b615dc84eee4a68dd9b52d4cd9e2f1166a4cf2">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/24.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\badd17c80bfa96bcab971b7566145a06819119f1\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/21.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="e2719c102dca3a7a5b02ce07f769362da6ddb4ab">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_1d22742f22847b58e1554f4afc953cef85238adc.jar" />
+        revision="25.0.2"
+        sha1="89e238cf9b54e51d6ad949e4edf417830c9cb48c">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/22.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\91dd2ffcd791a4e7f75cf84443894094cec1dc15\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/19.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="3e04ac8ca644ea7baddf6fdcf72e15c79e9df94a">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_9c21ef7785dbf65dee298734cf212c5360d6ef0e.jar" />
+        revision="25.0.2"
+        sha1="7da6aff95b5c96a797ff1826bf3d7290660a207b">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/20.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.1.1\support-annotations-25.1.1.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/1.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="b59b6ee8d6ecc03e672d253800430343493a6ed8">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\support-annotations-25.1.1_f1226c98a1e63b702b006c9091f30bbf9476d901.jar" />
+        revision="25.0.2"
+        sha1="482d5498ef015676175d061d5da8a60061481692">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/2.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\730836f64459d460833f3f1ccccfde98dd6bfaff\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/16.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="c9649557905bf7a80fca9e0d54cbcb7662627860">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_4d721ea88b0d7417659b86f41e62187f493e0475.jar" />
+        revision="25.0.2"
+        sha1="d7998a6ad586a644bfa0b23368a4125cea8d3a0c">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/17.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\da4d4745523e214ab6f7ead43121db3e5d6f68a5\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/12.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="7bde4c34162092e0a77e7f12dc85ed77c484cf5c">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_5b60e4e5ce6285715a97851e8f95b4ade608b8b1.jar" />
+        revision="25.0.2"
+        sha1="f5036cd074493a3bf4d1d5b4c0fb171481c7dc79">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/13.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Samue\.android\build-cache\eb5962a65b9cca1c3e6464959c269aa4f7289740\output\jars\classes.jar"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/17.jar"
         jumboMode="false"
+        min-sdk-version="14"
         optimize="true"
-        revision="25.0.0"
-        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
-        <dex dex="C:\Users\Samue\AndroidStudioProjects\VPlan\wear\build\intermediates\pre-dexed\wear1\release\classes_aa835a1ef9e86a55a06d10808a352512719c766f.jar" />
+        revision="25.0.2"
+        sha1="723171f54164b56c944d2017026575fffe60140a">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/18.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/7.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="ecee8e641ef0ae2632e31ba4ab9c886ea45f0f0d">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/8.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/9.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="2aa6b146f66442d37982af1c8b782904097589b2">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/10.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/0.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="65035babfa1699a23f5a68828d79c8a4bd582b41">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/11.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="9cccac67bb4a66daa2649dc5eb2fcc36318dc3dc">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/12.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/2.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="37930b1286e44c98c66e28cfb07d6d2a88c6c6d9">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/15.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="402bba77ee6da665754112b0f71cb51ae28c01c0">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/16.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/processing-tools/runtime-deps/release/desugar_try_with_resources.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e3bc5a18c72a253efafc8b41be7274c2ff88fab0">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/25.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/8.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e70bb91d0f2a6a210603265f464de009433b2818">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/13.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3b5e2a30e65039f549bc4b0fcac8489466f0af74">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/14.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/3.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="7ea499ab28430148178c3f545752c4c865440cb0">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/10.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="563da1b32a1e41eac897da8ec3e2d017732088e2">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/11.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/22.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="4c15b67e58ccfce3fdacc76564122ca54ef397f3">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/23.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/14.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d54d0790273adea371735796c5cc790bdfb1fb6f">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/15.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/20.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="6cb416c60b422f92572249def57f9fd5fe8a3784">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/21.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/18.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e998281e98b1df6f6c78e66a4d79ba62ccde3d41">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/19.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/5.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f9630fcc0f58606bb082634f8fa40d19b514839c">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/desugar/release/4.jar"
+        jumboMode="false"
+        min-sdk-version="14"
+        optimize="true"
+        revision="25.0.2"
+        sha1="89b31d40303474205a2e48bdbdd331033f02d6d2">
+        <dex dex="/home/samuel/AndroidstudioProjects/VPlan/app/build/intermediates/transforms/preDex/release/5.jar" />
     </item>
 
 </items>
