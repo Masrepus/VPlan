@@ -563,6 +563,8 @@ public class ExamsActivity extends AppCompatActivity implements View.OnClickList
             examsList.add(row);
         }
 
+        datasource.close();
+
         return examsList;
     }
 
