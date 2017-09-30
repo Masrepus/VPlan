@@ -18,7 +18,6 @@ import com.masrepus.vplanapp.constants.AppModes;
 import com.masrepus.vplanapp.constants.ProgressCode;
 import com.masrepus.vplanapp.constants.SharedPrefs;
 import com.masrepus.vplanapp.constants.VplanModes;
-import com.masrepus.vplanapp.constants.XmlTags;
 import com.masrepus.vplanapp.databases.DataSource;
 import com.masrepus.vplanapp.databases.SQLiteHelper;
 import com.masrepus.vplanapp.vplan.MainActivity;
@@ -255,18 +254,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                     .putString(SharedPrefs.CURR_VPLAN_LINK, currentVPlanLink);
             editor.apply();
 
-            switch (requestedVplanMode) {
-
-                //treat oinfo differently
-
-                case VplanModes.OINFO:
-                    success = parseOinfoVplan();
-                    break;
-                default:
-                    success = parseUinfoMinfoVplan();
-                    break;
-            }
-
+            success = getVplanData();
             downloaded_files = c.getPosition() + 1;
 
             if (success) {
@@ -401,7 +389,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
     /**
      * Takes care of all the downloading and db-inserting
      */
-    public boolean parseUinfoMinfoVplan() {
+    public boolean getVplanData() {
 
         String encoding = encodeCredentials();
 
@@ -489,70 +477,6 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
         parseVplan(tableRows);
 
         parseAvailableFiles(availableFiles);
-
-        return true;
-    }
-
-    public boolean parseOinfoVplan() {
-
-        Document doc;
-
-        try {
-            doc = Jsoup.connect(findRequestedVPlan()).get();
-        } catch (IOException e) {
-            if (e instanceof HttpStatusException) {
-                HttpStatusException exception = (HttpStatusException) e;
-
-                switch (exception.getStatusCode()) {
-
-                    case UNAUTHORIZED:
-                        publishProgress(ProgressCode.ERR_NO_CREDS);
-                        break;
-                    default:
-                        publishProgress(ProgressCode.ERR_NO_INTERNET);
-                }
-            }
-            return false;
-        }
-
-        if (doc == null) return false;
-
-        //save timePublished
-        String headerCurrentDate = doc.child(0).select(XmlTags.HEADER).first().text();
-
-        Elements items = doc.select(XmlTags.ITEMS);
-
-        datasource.open();
-
-        //clear the entries for this day
-        datasource.delete(SQLiteHelper.TABLE_VPLAN, SQLiteHelper.COLUMN_CLASS_LEVEL + "=" + requestedVplanMode + " and " + SQLiteHelper.COLUMN_ID + "=" + requestedVplanId);
-
-        //iterate through the items
-        for (Element item : items) {
-
-            Element temp;
-
-            String[] contents = new String[5];
-            String[] xmlTags = {XmlTags.LESSON, XmlTags.COURSE, XmlTags.STATUS, XmlTags.MISC, XmlTags.ROOM};
-
-            for (int i = 0; i < 5; i++) {
-                temp = item.select(xmlTags[i]).first();
-                if (temp != null) contents[i] = temp.text();
-                else contents[i] = "";
-            }
-
-            String status = contents[2];
-            if (!contents[3].contentEquals("")) status += " " + contents[3];
-            if (!contents[4].contentEquals("")) status += " " + contents[4];
-
-            insertVplanRow(contents[0], contents[1], status);
-        }
-
-        datasource.close();
-
-        //save the current timestamp; add "Stand: " because it is missing in oinfo vplan
-        timePublished = "Stand: " + doc.select(XmlTags.TIME_PUBLISHED).first().text();
-        saveCurrentTimestamp(headerCurrentDate);
 
         return true;
     }
@@ -863,7 +787,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
                 url = vplanBase + "pw/" + "mrekursiv.php";
                 break;
             case OINFO:
-                url = "http://www.schyren-gymnasium.de/export/";
+                url = vplanBase + "oinfo/" + "srekursiv.php";
                 break;
             case VplanModes.FILES_ONLY:
                 return "http://app.schyren-gymnasium.de/oinfo/srekursiv.php";
@@ -871,14 +795,7 @@ public class AsyncDownloader extends AsyncTask<Context, Enum, Boolean> {
 
         if (currentVPlanLink != null && !currentVPlanLink.contentEquals("")) {
             String date = currentVPlanLink.split("_")[2];
-
-            switch (version) {
-
-                case OINFO:
-                    return url + "schuelerplan_vom_" + date;
-                default:
-                    return url + "?datei=schuelerplan_vom_" + date;
-            }
+            return url + "?datei=schuelerplan_vom_" + date;
         } else return url;
     }
 

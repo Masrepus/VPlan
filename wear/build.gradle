@@ -7,7 +7,7 @@ android {
     publishNonDefault true
 
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         applicationId "com.masrepus.vplanapp"
@@ -16,12 +16,17 @@ android {
         versionCode 232
         versionName "1.0.1"
     }
+    flavorDimensions "wear"
+
     productFlavors {
         wear1 {
+            dimension "wear"
         }
         wear2 {
             minSdkVersion 24
             versionCode 242
+
+            dimension "wear"
         }
     }
     buildTypes {

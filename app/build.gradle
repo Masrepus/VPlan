@@ -17,10 +17,6 @@ android {
         targetSdkVersion 25
         versionCode 35
         versionName "4.0"
-
-        jackOptions {
-            enabled true
-        }
     }
 
     buildTypes {
@@ -45,6 +41,6 @@ dependencies {
     compile 'com.github.rampo.updatechecker:library:2.1.8'
     compile project(':showcaseview')
     wearApp project(path: ':wear', configuration: 'wear1Release')
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'org.jsoup:jsoup:1.10.2'
 }
